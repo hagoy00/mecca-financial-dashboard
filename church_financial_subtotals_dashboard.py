@@ -36,12 +36,14 @@ def load_data():
         df = pd.read_excel(file_path, sheet_name=sheet)
 
         df.columns = df.columns.str.strip()
-    df["Category"] = (
-    df["Category"]
-    .astype(str)
-    .str.strip()
-    .str.replace("\u00A0", " ", regex=False)
-)
+
+        # FIX: Normalize Category inside the loop
+        df["Category"] = (
+            df["Category"]
+            .astype(str)
+            .str.strip()
+            .str.replace("\u00A0", " ", regex=False)
+        )
 
         if "Category" not in df.columns:
             continue
@@ -68,8 +70,6 @@ def load_data():
         all_years.append(df[["Category", "Year", "Amount"]])
 
     return pd.concat(all_years, ignore_index=True)
-
-
 # ---------------------------------------------------------
 # EXTRACT SUBTOTALS + AUTO TOTALS
 # ---------------------------------------------------------
