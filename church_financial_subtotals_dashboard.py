@@ -22,7 +22,7 @@ def df_to_excel_bytes(df, sheet_name="Sheet1"):
 # ---------------------------------------------------------
 @st.cache_data
 def load_data():
-    file_path = file_path = "MECCA_Financial_Data.xlsx"
+    file_path = "MECCA_Financial_Data.xlsx"
 
     xls = pd.ExcelFile(file_path)
     all_years = []
