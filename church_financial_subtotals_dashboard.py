@@ -70,19 +70,26 @@ def load_data():
 def extract_subtotals(df):
     df = df.copy()
 
-    mask = (
-        df["Category"].str.startswith("Total for ")
-        | (df["Category"] == "Net Income")
-        | (df["Category"] == "Net Operating Income")
+    # Normalize Category column
+    df["Category"] = (
+        df["Category"]
+        .astype(str)
+        .str.strip()
+        .str.replace("\u00A0", " ", regex=False)
     )
 
+    # Extract all subtotal rows
+    mask = df["Category"].str.startswith("Total for ")
     subtotals = df[mask].reset_index(drop=True)
 
-    income_rows = subtotals[subtotals["Category"] == "Total for Income"]
+    # Identify income vs expense based on sign
+    income_rows = subtotals[subtotals["Amount"] >= 0]
+    expense_rows = subtotals[subtotals["Amount"] < 0]
+
+    # Compute totals
     total_income = income_rows.groupby("Year")["Amount"].sum().reset_index()
     total_income["Category"] = "Total Income (Auto)"
 
-    expense_rows = subtotals[subtotals["Category"] == "Total for Expenses"]
     total_expenses = expense_rows.groupby("Year")["Amount"].sum().reset_index()
     total_expenses["Category"] = "Total Expenses (Auto)"
 
@@ -97,6 +104,7 @@ def extract_subtotals(df):
     revenue_df = revenue_df[["Year", "Amount"]]
     revenue_df["Category"] = "Total Revenue (Auto)"
 
+    # Net Income = Income - Expenses
     net_income = pd.merge(
         total_income,
         total_expenses,
@@ -107,15 +115,13 @@ def extract_subtotals(df):
     net_income = net_income[["Year", "Amount"]]
     net_income["Category"] = "Net Income (Auto)"
 
+    # Combine everything
     auto_totals = pd.concat(
         [total_income, total_expenses, revenue_df, net_income],
         ignore_index=True
     )
 
-    auto_totals = auto_totals[["Category", "Year", "Amount"]]
-
     return pd.concat([subtotals, auto_totals], ignore_index=True)
-
 
 # ---------------------------------------------------------
 # YEAR-OVER-YEAR
