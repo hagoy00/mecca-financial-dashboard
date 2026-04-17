@@ -36,6 +36,12 @@ def load_data():
         df = pd.read_excel(file_path, sheet_name=sheet)
 
         df.columns = df.columns.str.strip()
+    df["Category"] = (
+    df["Category"]
+    .astype(str)
+    .str.strip()
+    .str.replace("\u00A0", " ", regex=False)
+)
 
         if "Category" not in df.columns:
             continue
