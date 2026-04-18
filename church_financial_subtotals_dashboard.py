@@ -21,6 +21,7 @@ def df_to_excel_bytes(df, sheet_name="Sheet1"):
 # LOAD DATA
 # ---------------------------------------------------------
 @st.cache_data
+subtotals = extract_subtotals(df)
 def load_data():
     file_path = "MECCA_Financial_Data.xlsx"
 
