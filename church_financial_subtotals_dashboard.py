@@ -501,7 +501,7 @@ def main():
 # -----------------------------------------------------
 # TAB 4 — SURPLUS / DEFICIT (BOARD YOY VIEW)
 # -----------------------------------------------------
-with tab4:
+    with tab4:
     st.subheader("Surplus / Deficit — Board YOY View")
 
     yoy_df = compute_yoy(subtotals)
