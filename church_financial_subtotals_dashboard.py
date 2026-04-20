@@ -357,50 +357,105 @@ def main():
     # -----------------------------------------------------
     # TAB 2 — YEAR-OVER-YEAR CHANGE
     # -----------------------------------------------------
-    with tab2:
-        st.subheader("Year-over-Year Change")
+   # -----------------------------------------------------
+# TAB 2 — YEAR-OVER-YEAR CHANGE (BOARD-LEVEL SUMMARY)
+# -----------------------------------------------------
+with tab2:
+    st.subheader("Year-over-Year Change")
 
-        yoy_df = compute_yoy(subtotals)
+    yoy_df = compute_yoy(subtotals)
 
-        # Hide Auto totals
-        yoy_df = yoy_df[~yoy_df["Category"].str.contains("(Auto)")]
-        yoy_filtered = yoy_df[yoy_df["Year"].isin(selected_years)]
+    # Rename Auto totals so they match the categories we want
+    yoy_df["Category"] = yoy_df["Category"].replace({
+        "Total Revenue (Auto)": "Total Revenue",
+        "Total Income (Auto)": "Total Income",
+        "Total Expenses (Auto)": "Total Expenses",
+        "Net Income (Auto)": "Net Income",
+    })
 
-        if yoy_filtered.empty:
-            st.info("No YOY data available.")
-        else:
-            yoy_pivot = yoy_filtered.pivot_table(
-                index="Year",
-                columns="Category",
-                values="YoY Change",
-                aggfunc="sum"
-            ).sort_index()
+    # Define grouping rules
+    PAYROLL_GROUP = ["Total Payroll", "Total Payroll Tax"]
+    UTILITIES_GROUP = ["Total Utilities"]
 
-            yoy_pct = yoy_filtered.pivot_table(
-                index="Year",
-                columns="Category",
-                values="YoY %",
-                aggfunc="mean"
-            ).sort_index()
+    # Combine Payroll
+    payroll_df = yoy_df[yoy_df["Category"].isin(PAYROLL_GROUP)]
+    if not payroll_df.empty:
+        payroll_sum = payroll_df.groupby("Year")[["YoY Change", "YoY %"]].sum().reset_index()
+        payroll_sum["Category"] = "Payroll"
+    else:
+        payroll_sum = pd.DataFrame()
 
-            def format_cell(change, pct):
-                if pd.isna(change):
-                    return ""
-                arrow = "▲" if change > 0 else "▼" if change < 0 else ""
-                color = "green" if change > 0 else "red" if change < 0 else "black"
-                pct_str = f"{pct:.1f}%" if not pd.isna(pct) else ""
-                return f"<span style='color:{color}; font-weight:bold'>{arrow} {change:.0f} ({pct_str})</span>"
+    # Combine Utilities
+    utilities_df = yoy_df[yoy_df["Category"].isin(UTILITIES_GROUP)]
+    if not utilities_df.empty:
+        utilities_sum = utilities_df.groupby("Year")[["YoY Change", "YoY %"]].sum().reset_index()
+        utilities_sum["Category"] = "Utilities"
+    else:
+        utilities_sum = pd.DataFrame()
 
-            combined = yoy_pivot.copy().astype("object")
-            for row in combined.index:
-                for col in combined.columns:
-                    combined.loc[row, col] = format_cell(
-                        yoy_pivot.loc[row, col],
-                        yoy_pct.loc[row, col]
-                    )
+    # Keep only the main totals
+    main_yoy = yoy_df[yoy_df["Category"].isin([
+        "Total Revenue",
+        "Total Income",
+        "Total Expenses",
+        "Net Income"
+    ])]
 
-            st.markdown(combined.to_html(escape=False), unsafe_allow_html=True)
+    # Combine everything
+    final_yoy = pd.concat([main_yoy, payroll_sum, utilities_sum], ignore_index=True)
 
+    # Filter by selected years
+    final_yoy = final_yoy[final_yoy["Year"].isin(selected_years)]
+
+    if final_yoy.empty:
+        st.info("No YOY data available.")
+    else:
+        yoy_pivot = final_yoy.pivot_table(
+            index="Year",
+            columns="Category",
+            values="YoY Change",
+            aggfunc="sum"
+        ).sort_index()
+
+        yoy_pct = final_yoy.pivot_table(
+            index="Year",
+            columns="Category",
+            values="YoY %",
+            aggfunc="mean"
+        ).sort_index()
+
+        # Short number formatting
+        def short_number(n):
+            if pd.isna(n):
+                return ""
+            n = float(n)
+            if abs(n) >= 1_000_000:
+                return f"{n/1_000_000:.1f}M"
+            elif abs(n) >= 1_000:
+                return f"{n/1_000:.1f}K"
+            else:
+                return f"{n:.0f}"
+
+        # Cell formatting
+        def format_cell(change, pct):
+            if pd.isna(change):
+                return ""
+            arrow = "▲" if change > 0 else "▼" if change < 0 else ""
+            color = "green" if change > 0 else "red" if change < 0 else "black"
+            change_str = short_number(change)
+            pct_str = f"{pct:.1f}%" if not pd.isna(pct) else ""
+            return f"<span style='color:{color}; font-weight:bold'>{arrow} {change_str} ({pct_str})</span>"
+
+        combined = yoy_pivot.copy().astype("object")
+        for row in combined.index:
+            for col in combined.columns:
+                combined.loc[row, col] = format_cell(
+                    yoy_pivot.loc[row, col],
+                    yoy_pct.loc[row, col]
+                )
+
+        st.markdown(combined.to_html(escape=False), unsafe_allow_html=True)
+    
     # -----------------------------------------------------
     # TAB 3 — SURPLUS / DEFICIT
     # -----------------------------------------------------
