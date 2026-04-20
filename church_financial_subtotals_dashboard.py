@@ -303,19 +303,15 @@ def main():
 
     filtered = subtotals[subtotals["Year"].isin(selected_years)]
 
-    # Tabs
-    tab1, tab2, tab3, tab4 = st.tabs([
-        "Subtotal Summary",
-        "Year-over-Year Change",
-        "Surplus / Deficit",
-        "Forecasting"
-    ])
+   # Tabs
+tab1, tab2, tab3, tab4 = st.tabs([
+    "Subtotal Summary",
+    "Year-over-Year Change",
+    "Surplus / Deficit",
+    "Forecasting"
+])
 
-    # -----------------------------------------------------
-    # TAB 1 — SUBTOTAL SUMMARY
-    # -----------------------------------------------------
-    
-    # -----------------------------------------------------
+# -----------------------------------------------------
 # TAB 1 — SUBTOTAL SUMMARY
 # -----------------------------------------------------
 with tab1:
@@ -357,7 +353,6 @@ with tab1:
     subtotal_pivot = subtotal_pivot.loc[existing + others]
 
     st.dataframe(subtotal_pivot.T)
-
 # -----------------------------------------------------
 # TAB 2 — YEAR-OVER-YEAR CHANGE (BOARD-LEVEL SUMMARY)
 # -----------------------------------------------------
