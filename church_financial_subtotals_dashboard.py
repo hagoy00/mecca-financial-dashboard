@@ -290,7 +290,7 @@ def compute_yoy(df):
     # Ensure sorted by Year
     df = df.sort_values(["Category", "Year"])
 
-   def compute_yoy(df):
+def compute_yoy(df):
     st.write("COLUMNS:", df.columns.tolist())
     st.write(df.head())
 
