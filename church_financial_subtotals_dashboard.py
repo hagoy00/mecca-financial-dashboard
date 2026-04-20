@@ -480,28 +480,69 @@ def main():
 
             st.dataframe(detailed_pivot)
 
-    # -----------------------------------------------------
-    # TAB 4 — SURPLUS / DEFICIT
-    # -----------------------------------------------------
-    with tab4:
-        st.subheader("Surplus / Deficit")
+# -----------------------------------------------------
+# TAB 4 — SURPLUS / DEFICIT (BOARD YOY VIEW)
+# -----------------------------------------------------
+with tab4:
+    st.subheader("Surplus / Deficit — Board YOY View")
 
-        surplus_df = subtotals.copy()
-        surplus_df["Category"] = surplus_df["Category"].replace({
-            "Net Income (Auto)": "Net Income"
-        })
-        surplus_df = surplus_df[surplus_df["Category"] == "Net Income"]
+    yoy_df = compute_yoy(subtotals)
 
-        if surplus_df.empty:
-            st.info("No surplus/deficit data available.")
-        else:
-            surplus_pivot = surplus_df.pivot_table(
-                index="Year",
-                values="Amount",
-                aggfunc="sum"
-            ).sort_index()
-            st.dataframe(surplus_pivot)
+    # Rename Auto totals
+    yoy_df["Category"] = yoy_df["Category"].replace({
+        "Total Revenue (Auto)": "Total Revenue",
+        "Total Income (Auto)": "Total Income",
+        "Total Expenses (Auto)": "Total Expenses",
+        "Net Income (Auto)": "Net Income",
+    })
 
+    # Grouping rules
+    PAYROLL_GROUP = ["Salaries & Wages", "Payroll Tax Expense"]
+    UTILITIES_GROUP = ["Total for Utilities"]
+
+    # Combine Payroll
+    payroll_df = yoy_df[yoy_df["Category"].isin(PAYROLL_GROUP)]
+    if not payroll_df.empty:
+        payroll_sum = payroll_df.groupby("Year")[["YoY Change", "YoY %"]].sum().reset_index()
+        payroll_sum["Category"] = "Payroll"
+    else:
+        payroll_sum = pd.DataFrame()
+
+    # Combine Utilities
+    utilities_df = yoy_df[yoy_df["Category"].isin(UTILITIES_GROUP)]
+    if not utilities_df.empty:
+        utilities_sum = utilities_df.groupby("Year")[["YoY Change", "YoY %"]].sum().reset_index()
+        utilities_sum["Category"] = "Utilities"
+    else:
+        utilities_sum = pd.DataFrame()
+
+    # Keep only the main totals
+    main_yoy = yoy_df[yoy_df["Category"].isin([
+        "Total Revenue",
+        "Total Income",
+        "Total Expenses",
+        "Net Income"
+    ])]
+
+    # Combine everything
+    final_yoy = pd.concat([main_yoy, payroll_sum, utilities_sum], ignore_index=True)
+
+    # Filter by selected years
+    final_yoy = final_yoy[final_yoy["Year"].isin(selected_years)]
+
+    if final_yoy.empty:
+        st.info("No Surplus/Deficit YOY data available.")
+    else:
+        pivot = final_yoy.pivot_table(
+            index="Year",
+            columns="Category",
+            values="YoY Change",
+            aggfunc="sum"
+        ).sort_index()
+
+        st.dataframe(pivot)
+
+    
     # -----------------------------------------------------
     # TAB 5 — FORECASTING
     # -----------------------------------------------------
