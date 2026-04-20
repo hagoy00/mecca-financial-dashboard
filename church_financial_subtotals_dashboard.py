@@ -502,12 +502,12 @@ def main():
     # TAB 4 — SURPLUS / DEFICIT (BOARD YOY VIEW)
     # ----------------------------------------------------
     with tab4:
-    st.subheader("Surplus / Deficit — Board YOY View")
+        st.subheader("Surplus / Deficit — Board YOY View")
 
-    yoy_df = compute_yoy(subtotals)
+        yoy_df = compute_yoy(subtotals)
 
     # Rename Auto totals
-    yoy_df["Category"] = yoy_df["Category"].replace({
+        yoy_df["Category"] = yoy_df["Category"].replace({
         "Total Revenue (Auto)": "Total Revenue",
         "Total Income (Auto)": "Total Income",
         "Total Expenses (Auto)": "Total Expenses",
