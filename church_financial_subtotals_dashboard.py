@@ -498,9 +498,9 @@ def main():
 
             st.dataframe(detailed_pivot)
 
-# -----------------------------------------------------
-# TAB 4 — SURPLUS / DEFICIT (BOARD YOY VIEW)
-# -----------------------------------------------------
+    # -----------------------------------------------------
+    # TAB 4 — SURPLUS / DEFICIT (BOARD YOY VIEW)
+    # ----------------------------------------------------
     with tab4:
     st.subheader("Surplus / Deficit — Board YOY View")
 
