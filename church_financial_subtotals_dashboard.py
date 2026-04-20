@@ -355,11 +355,6 @@ others = [c for c in subtotal_pivot.index if c not in existing]
 # -----------------------------------------------------
 # TAB 2 — YEAR-OVER-YEAR CHANGE (BOARD-LEVEL SUMMARY)
 # -----------------------------------------------------
-
-
-# -----------------------------------------------------
-# TAB 2 — YEAR-OVER-YEAR CHANGE (BOARD-LEVEL SUMMARY)
-# -----------------------------------------------------
 with tab2:
     st.subheader("Year-over-Year Change")
 
