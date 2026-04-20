@@ -290,8 +290,10 @@ def compute_yoy(df):
     # Ensure sorted by Year
     df = df.sort_values(["Category", "Year"])
 
-    # Compute YoY Change
-    df["YoY Change"] = df.groupby("Category")["Amount"].diff()
+   def compute_yoy(df):
+    st.write("COLUMNS:", df.columns.tolist())
+    st.write(df.head())
+
 
     # Compute YoY %
     df["YoY %"] = df.groupby("Category")["Amount"].pct_change() * 100
