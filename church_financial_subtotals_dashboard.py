@@ -348,16 +348,16 @@ def main():
         ]
 
         existing = [c for c in desired_order if c in subtotal_pivot.index]
-        others = [c for c in subtotal_pivot.index if c not in existing]
-
+others = [c for c in subtotal_pivot.index if c not in existing]
         subtotal_pivot = subtotal_pivot.loc[existing + others]
 
-        st.dataframe(subtotal_pivot.T)
+        st.dataframe(subtotal_pivot.T) 
+# -----------------------------------------------------
+# TAB 2 — YEAR-OVER-YEAR CHANGE (BOARD-LEVEL SUMMARY)
+# -----------------------------------------------------
 
-    # -----------------------------------------------------
-    # TAB 2 — YEAR-OVER-YEAR CHANGE
-    # -----------------------------------------------------
-   # -----------------------------------------------------
+
+# -----------------------------------------------------
 # TAB 2 — YEAR-OVER-YEAR CHANGE (BOARD-LEVEL SUMMARY)
 # -----------------------------------------------------
 with tab2:
@@ -373,9 +373,9 @@ with tab2:
         "Net Income (Auto)": "Net Income",
     })
 
-    # Define grouping rules
-    PAYROLL_GROUP = ["Total Payroll", "Total Payroll Tax"]
-    UTILITIES_GROUP = ["Total Utilities"]
+    # Define grouping rules based on your actual Excel categories
+    PAYROLL_GROUP = ["Salaries & Wages", "Payroll Tax Expense"]
+    UTILITIES_GROUP = ["Total for Utilities"]
 
     # Combine Payroll
     payroll_df = yoy_df[yoy_df["Category"].isin(PAYROLL_GROUP)]
@@ -455,7 +455,7 @@ with tab2:
                 )
 
         st.markdown(combined.to_html(escape=False), unsafe_allow_html=True)
-    
+
     # -----------------------------------------------------
     # TAB 3 — SURPLUS / DEFICIT
     # -----------------------------------------------------
