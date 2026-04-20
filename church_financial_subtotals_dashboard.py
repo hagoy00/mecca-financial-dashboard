@@ -314,44 +314,50 @@ def main():
     # -----------------------------------------------------
     # TAB 1 — SUBTOTAL SUMMARY
     # -----------------------------------------------------
-    with tab1:
-        st.subheader("Subtotal Summary")
+    
+    # -----------------------------------------------------
+# TAB 1 — SUBTOTAL SUMMARY
+# -----------------------------------------------------
+with tab1:
+    st.subheader("Subtotal Summary")
 
-        # Hide Auto totals EXCEPT the 4 main totals (renamed)
-        visible = filtered.copy()
+    # Hide Auto totals EXCEPT the 4 main totals (renamed)
+    visible = filtered.copy()
 
-        # Promote Auto totals into visible totals
-        visible["Category"] = visible["Category"].replace({
-            "Total Revenue (Auto)": "Total Revenue",
-            "Total Income (Auto)": "Total Income",
-            "Total Expenses (Auto)": "Total Expenses",
-            "Net Income (Auto)": "Net Income",
-        })
+    # Promote Auto totals into visible totals
+    visible["Category"] = visible["Category"].replace({
+        "Total Revenue (Auto)": "Total Revenue",
+        "Total Income (Auto)": "Total Income",
+        "Total Expenses (Auto)": "Total Expenses",
+        "Net Income (Auto)": "Net Income",
+    })
 
-        # Hide all other Auto totals
-        visible = visible[~visible["Category"].str.contains("(Auto)")]
+    # Hide all other Auto totals
+    visible = visible[~visible["Category"].str.contains("(Auto)")]
 
-        subtotal_pivot = visible.pivot_table(
-            index="Category",
-            columns="Year",
-            values="Amount",
-            aggfunc="sum"
-        ).sort_index(axis=1)
+    subtotal_pivot = visible.pivot_table(
+        index="Category",
+        columns="Year",
+        values="Amount",
+        aggfunc="sum"
+    ).sort_index(axis=1)
 
-        # Desired ordering
-        desired_order = [
-            "Total Revenue",
-            "Total Income",
-            "Total Expenses",
-            "Net Income",
-            "Gross Profit",
-        ]
+    # Desired ordering
+    desired_order = [
+        "Total Revenue",
+        "Total Income",
+        "Total Expenses",
+        "Net Income",
+        "Gross Profit",
+    ]
 
-        existing = [c for c in desired_order if c in subtotal_pivot.index]
-others = [c for c in subtotal_pivot.index if c not in existing]
-        subtotal_pivot = subtotal_pivot.loc[existing + others]
+    existing = [c for c in desired_order if c in subtotal_pivot.index]
+    others = [c for c in subtotal_pivot.index if c not in existing]
 
-        st.dataframe(subtotal_pivot.T) 
+    subtotal_pivot = subtotal_pivot.loc[existing + others]
+
+    st.dataframe(subtotal_pivot.T)
+
 # -----------------------------------------------------
 # TAB 2 — YEAR-OVER-YEAR CHANGE (BOARD-LEVEL SUMMARY)
 # -----------------------------------------------------
