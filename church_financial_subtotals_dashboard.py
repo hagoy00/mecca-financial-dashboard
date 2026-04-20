@@ -281,6 +281,22 @@ def forecast_category(subtotals, category, forecast_years=3):
     })
 
     return pd.concat([actual_df, forecast_df], ignore_index=True)
+# -----------------------------------------------------
+# INSERT compute_yoy() RIGHT HERE
+# -----------------------------------------------------
+def compute_yoy(df):
+    df = df.copy()
+
+    # Ensure sorted by Year
+    df = df.sort_values(["Category", "Year"])
+
+    # Compute YoY Change
+    df["YoY Change"] = df.groupby("Category")["Amount"].diff()
+
+    # Compute YoY %
+    df["YoY %"] = df.groupby("Category")["Amount"].pct_change() * 100
+
+    return df
 
 # ---------------------------------------------------------
 # MAIN DASHBOARD
