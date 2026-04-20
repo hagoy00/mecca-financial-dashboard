@@ -172,6 +172,7 @@ def extract_subtotals(df):
     )
 
     return pd.concat([subtotals, auto_totals], ignore_index=True)
+
 # ---------------------------------------------------------
 # YEAR-OVER-YEAR CALCULATION
 # ---------------------------------------------------------
@@ -281,24 +282,7 @@ def forecast_category(subtotals, category, forecast_years=3):
     })
 
     return pd.concat([actual_df, forecast_df], ignore_index=True)
-# -----------------------------------------------------
-# INSERT compute_yoy() RIGHT HERE
-# -----------------------------------------------------
-def compute_yoy(df):
-    df = df.copy()
 
-    # Ensure sorted by Year
-    df = df.sort_values(["Category", "Year"])
-
-def compute_yoy(df):
-    st.write("COLUMNS:", df.columns.tolist())
-    st.write(df.head())
-
-
-    # Compute YoY %
-    df["YoY %"] = df.groupby("Category")["Amount"].pct_change() * 100
-
-    return df
 
 # ---------------------------------------------------------
 # MAIN DASHBOARD
@@ -317,19 +301,13 @@ def main():
         options=years_available,
         default=years_available
     )
-    
-    # -----------------------------------------------------
-    # Filter by selected years
-    # -----------------------------------------------------
+
     filtered = subtotals[subtotals["Year"].isin(selected_years)]
 
-    # -----------------------------------------------------
-    # TABS
-    # -----------------------------------------------------
-    tab1, tab2, tab3, tab4, tab5 = st.tabs([
+    # Tabs
+    tab1, tab2, tab3, tab4 = st.tabs([
         "Subtotal Summary",
-        "YOY (Board View)",
-        "YOY (Detailed View)",
+        "Year-over-Year Change",
         "Surplus / Deficit",
         "Forecasting"
     ])
@@ -378,93 +356,41 @@ def main():
         st.dataframe(subtotal_pivot.T)
 
     # -----------------------------------------------------
-    # TAB 2 — YOY (BOARD VIEW: 6 KEY CATEGORIES)
+    # TAB 2 — YEAR-OVER-YEAR CHANGE
     # -----------------------------------------------------
     with tab2:
-        st.subheader("Year-over-Year Change — Board View")
+        st.subheader("Year-over-Year Change")
 
         yoy_df = compute_yoy(subtotals)
 
-        # Rename Auto totals so they match the categories we want
-        yoy_df["Category"] = yoy_df["Category"].replace({
-            "Total Revenue (Auto)": "Total Revenue",
-            "Total Income (Auto)": "Total Income",
-            "Total Expenses (Auto)": "Total Expenses",
-            "Net Income (Auto)": "Net Income",
-        })
+        # Hide Auto totals
+        yoy_df = yoy_df[~yoy_df["Category"].str.contains("(Auto)")]
+        yoy_filtered = yoy_df[yoy_df["Year"].isin(selected_years)]
 
-        # Grouping rules based on your actual Excel categories
-        PAYROLL_GROUP = ["Salaries & Wages", "Payroll Tax Expense"]
-        UTILITIES_GROUP = ["Total for Utilities"]
-
-        # Combine Payroll
-        payroll_df = yoy_df[yoy_df["Category"].isin(PAYROLL_GROUP)]
-        if not payroll_df.empty:
-            payroll_sum = payroll_df.groupby("Year")[["YoY Change", "YoY %"]].sum().reset_index()
-            payroll_sum["Category"] = "Payroll"
-        else:
-            payroll_sum = pd.DataFrame()
-
-        # Combine Utilities
-        utilities_df = yoy_df[yoy_df["Category"].isin(UTILITIES_GROUP)]
-        if not utilities_df.empty:
-            utilities_sum = utilities_df.groupby("Year")[["YoY Change", "YoY %"]].sum().reset_index()
-            utilities_sum["Category"] = "Utilities"
-        else:
-            utilities_sum = pd.DataFrame()
-
-        # Keep only the main totals
-        main_yoy = yoy_df[yoy_df["Category"].isin([
-            "Total Revenue",
-            "Total Income",
-            "Total Expenses",
-            "Net Income"
-        ])]
-
-        # Combine everything
-        final_yoy = pd.concat([main_yoy, payroll_sum, utilities_sum], ignore_index=True)
-
-        # Filter by selected years
-        final_yoy = final_yoy[final_yoy["Year"].isin(selected_years)]
-
-        if final_yoy.empty:
+        if yoy_filtered.empty:
             st.info("No YOY data available.")
         else:
-            yoy_pivot = final_yoy.pivot_table(
+            yoy_pivot = yoy_filtered.pivot_table(
                 index="Year",
                 columns="Category",
                 values="YoY Change",
                 aggfunc="sum"
             ).sort_index()
 
-            yoy_pct = final_yoy.pivot_table(
+            yoy_pct = yoy_filtered.pivot_table(
                 index="Year",
                 columns="Category",
                 values="YoY %",
                 aggfunc="mean"
             ).sort_index()
 
-            # Short number formatting
-            def short_number(n):
-                if pd.isna(n):
-                    return ""
-                n = float(n)
-                if abs(n) >= 1_000_000:
-                    return f"{n/1_000_000:.1f}M"
-                elif abs(n) >= 1_000:
-                    return f"{n/1_000:.1f}K"
-                else:
-                    return f"{n:.0f}"
-
-            # Cell formatting
             def format_cell(change, pct):
                 if pd.isna(change):
                     return ""
                 arrow = "▲" if change > 0 else "▼" if change < 0 else ""
                 color = "green" if change > 0 else "red" if change < 0 else "black"
-                change_str = short_number(change)
                 pct_str = f"{pct:.1f}%" if not pd.isna(pct) else ""
-                return f"<span style='color:{color}; font-weight:bold'>{arrow} {change_str} ({pct_str})</span>"
+                return f"<span style='color:{color}; font-weight:bold'>{arrow} {change:.0f} ({pct_str})</span>"
 
             combined = yoy_pivot.copy().astype("object")
             for row in combined.index:
@@ -477,94 +403,29 @@ def main():
             st.markdown(combined.to_html(escape=False), unsafe_allow_html=True)
 
     # -----------------------------------------------------
-    # TAB 3 — YOY (DETAILED VIEW — ALL CATEGORIES)
+    # TAB 3 — SURPLUS / DEFICIT
     # -----------------------------------------------------
     with tab3:
-        st.subheader("Year-over-Year Change — Detailed View")
+        st.subheader("Surplus / Deficit")
 
-        yoy_df_full = compute_yoy(subtotals)
+        sd_df = compute_surplus_deficit(subtotals)
+        sd_filtered = sd_df[sd_df["Year"].isin(selected_years)]
 
-        # Filter by selected years
-        yoy_df_full = yoy_df_full[yoy_df_full["Year"].isin(selected_years)]
-
-        if yoy_df_full.empty:
-            st.info("No YOY data available.")
+        if sd_filtered.empty:
+            st.info("No Surplus/Deficit data available.")
         else:
-            detailed_pivot = yoy_df_full.pivot_table(
-                index=["Category", "Year"],
-                values=["YoY Change", "YoY %"],
-                aggfunc="sum"
-            )
+            sd_filtered = sd_filtered.set_index("Year")
 
-            st.dataframe(detailed_pivot)
+            desired_order = ["Total Revenue", "Total Income", "Total Expenses", "Net Income"]
+            existing = [c for c in desired_order if c in sd_filtered.columns]
+            others = [c for c in sd_filtered.columns if c not in existing]
+
+            st.dataframe(sd_filtered[existing + others].T)
 
     # -----------------------------------------------------
-    # TAB 4 — SURPLUS / DEFICIT (BOARD YOY VIEW)
-    # ----------------------------------------------------
+    # TAB 4 — FORECASTING
+    # -----------------------------------------------------
     with tab4:
-        st.subheader("Surplus / Deficit — Board YOY View")
-
-        yoy_df = compute_yoy(subtotals)
-
-    # Rename Auto totals
-        yoy_df["Category"] = yoy_df["Category"].replace({
-        "Total Revenue (Auto)": "Total Revenue",
-        "Total Income (Auto)": "Total Income",
-        "Total Expenses (Auto)": "Total Expenses",
-        "Net Income (Auto)": "Net Income",
-    })
-
-    # Grouping rules
-    PAYROLL_GROUP = ["Salaries & Wages", "Payroll Tax Expense"]
-    UTILITIES_GROUP = ["Total for Utilities"]
-
-    # Combine Payroll
-    payroll_df = yoy_df[yoy_df["Category"].isin(PAYROLL_GROUP)]
-    if not payroll_df.empty:
-        payroll_sum = payroll_df.groupby("Year")[["YoY Change", "YoY %"]].sum().reset_index()
-        payroll_sum["Category"] = "Payroll"
-    else:
-        payroll_sum = pd.DataFrame()
-
-    # Combine Utilities
-    utilities_df = yoy_df[yoy_df["Category"].isin(UTILITIES_GROUP)]
-    if not utilities_df.empty:
-        utilities_sum = utilities_df.groupby("Year")[["YoY Change", "YoY %"]].sum().reset_index()
-        utilities_sum["Category"] = "Utilities"
-    else:
-        utilities_sum = pd.DataFrame()
-
-    # Keep only the main totals
-    main_yoy = yoy_df[yoy_df["Category"].isin([
-        "Total Revenue",
-        "Total Income",
-        "Total Expenses",
-        "Net Income"
-    ])]
-
-    # Combine everything
-    final_yoy = pd.concat([main_yoy, payroll_sum, utilities_sum], ignore_index=True)
-
-    # Filter by selected years
-    final_yoy = final_yoy[final_yoy["Year"].isin(selected_years)]
-
-    if final_yoy.empty:
-        st.info("No Surplus/Deficit YOY data available.")
-    else:
-        pivot = final_yoy.pivot_table(
-            index="Year",
-            columns="Category",
-            values="YoY Change",
-            aggfunc="sum"
-        ).sort_index()
-
-        st.dataframe(pivot)
-
-    
-    # -----------------------------------------------------
-    # TAB 5 — FORECASTING
-    # -----------------------------------------------------
-    with tab5:
         st.subheader("Forecasting")
 
         forecast_mode = st.radio(
@@ -578,11 +439,13 @@ def main():
                 c for c in subtotals["Category"].unique()
                 if c.startswith("Total for ") or c == "Gross Profit"
             ])
+
         elif forecast_mode == "Auto Totals Only":
             category_list = sorted([
                 c for c in subtotals["Category"].unique()
                 if "(Auto)" in c
             ])
+
         else:
             category_list = sorted([
                 c for c in subtotals["Category"].unique()
