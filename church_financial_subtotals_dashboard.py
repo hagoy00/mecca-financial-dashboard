@@ -300,11 +300,12 @@ def main():
         options=years_available,
         default=years_available
     )
-
-    filtered = subtotals[subtotals["Year"].isin(selected_years)]
+    
 # -----------------------------------------------------
 # Filter by selected years
-filtered = subtotals[subtotals["Year"].isin(selected_years)]
+# -----------------------------------------------------
+
+    filtered = subtotals[subtotals["Year"].isin(selected_years)]
 
 # -----------------------------------------------------
 # TABS
@@ -473,8 +474,6 @@ with tab3:
     if yoy_df_full.empty:
         st.info("No YOY data available.")
     else:
-        # You can keep your existing detailed YOY logic here.
-        # Example: show raw YoY Change and YoY % by Category and Year
         detailed_pivot = yoy_df_full.pivot_table(
             index=["Category", "Year"],
             values=["YoY Change", "YoY %"],
@@ -489,10 +488,6 @@ with tab3:
 with tab4:
     st.subheader("Surplus / Deficit")
 
-    # Keep your existing surplus/deficit logic here.
-    # Example skeleton (replace with your real implementation):
-
-    # Assume subtotals has Net Income (Auto) or Net Income
     surplus_df = subtotals.copy()
     surplus_df["Category"] = surplus_df["Category"].replace({
         "Net Income (Auto)": "Net Income"
@@ -515,54 +510,43 @@ with tab4:
 with tab5:
     st.subheader("Forecasting")
 
-    # Keep your existing forecasting logic here.
-    # Example placeholder:
-    st.info("Forecasting logic goes here (use your existing implementation).")
-   # -----------------------------------------------------
-    # TAB 4 — FORECASTING
-    # -----------------------------------------------------
-    with tab4:
-        st.subheader("Forecasting")
+    forecast_mode = st.radio(
+        "Forecast Mode",
+        ["Totals Only", "Auto Totals Only", "All Categories"],
+        horizontal=True
+    )
 
-        forecast_mode = st.radio(
-            "Forecast Mode",
-            ["Totals Only", "Auto Totals Only", "All Categories"],
-            horizontal=True
-        )
+    if forecast_mode == "Totals Only":
+        category_list = sorted([
+            c for c in subtotals["Category"].unique()
+            if c.startswith("Total for ") or c == "Gross Profit"
+        ])
+    elif forecast_mode == "Auto Totals Only":
+        category_list = sorted([
+            c for c in subtotals["Category"].unique()
+            if "(Auto)" in c
+        ])
+    else:
+        category_list = sorted([
+            c for c in subtotals["Category"].unique()
+            if not c.endswith("(Auto)")
+        ])
 
-        if forecast_mode == "Totals Only":
-            category_list = sorted([
-                c for c in subtotals["Category"].unique()
-                if c.startswith("Total for ") or c == "Gross Profit"
-            ])
+    selected_category = st.selectbox("Select Category", category_list)
 
-        elif forecast_mode == "Auto Totals Only":
-            category_list = sorted([
-                c for c in subtotals["Category"].unique()
-                if "(Auto)" in c
-            ])
+    forecast_df = forecast_category(subtotals, selected_category)
 
-        else:
-            category_list = sorted([
-                c for c in subtotals["Category"].unique()
-                if not c.endswith("(Auto)")
-            ])
+    if forecast_df.empty:
+        st.warning("Not enough data to forecast.")
+    else:
+        chart = alt.Chart(forecast_df).mark_line(point=True).encode(
+            x=alt.X("Year:O"),
+            y=alt.Y("Amount:Q"),
+            color="Type:N",
+            tooltip=["Year", "Amount", "Type"]
+        ).properties(width=800, height=400)
 
-        selected_category = st.selectbox("Select Category", category_list)
-
-        forecast_df = forecast_category(subtotals, selected_category)
-
-        if forecast_df.empty:
-            st.warning("Not enough data to forecast.")
-        else:
-            chart = alt.Chart(forecast_df).mark_line(point=True).encode(
-                x=alt.X("Year:O"),
-                y=alt.Y("Amount:Q"),
-                color="Type:N",
-                tooltip=["Year", "Amount", "Type"]
-            ).properties(width=800, height=400)
-
-            st.altair_chart(chart, use_container_width=True)
+        st.altair_chart(chart, use_container_width=True)
 
 
 if __name__ == "__main__":
