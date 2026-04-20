@@ -302,11 +302,17 @@ def main():
     )
 
     filtered = subtotals[subtotals["Year"].isin(selected_years)]
+# -----------------------------------------------------
+# Filter by selected years
+filtered = subtotals[subtotals["Year"].isin(selected_years)]
 
-   # Tabs
-tab1, tab2, tab3, tab4 = st.tabs([
+# -----------------------------------------------------
+# TABS
+# -----------------------------------------------------
+tab1, tab2, tab3, tab4, tab5 = st.tabs([
     "Subtotal Summary",
-    "Year-over-Year Change",
+    "YOY (Board View)",
+    "YOY (Detailed View)",
     "Surplus / Deficit",
     "Forecasting"
 ])
@@ -353,11 +359,12 @@ with tab1:
     subtotal_pivot = subtotal_pivot.loc[existing + others]
 
     st.dataframe(subtotal_pivot.T)
+
 # -----------------------------------------------------
-# TAB 2 — YEAR-OVER-YEAR CHANGE (BOARD-LEVEL SUMMARY)
+# TAB 2 — YOY (BOARD VIEW: 6 KEY CATEGORIES)
 # -----------------------------------------------------
 with tab2:
-    st.subheader("Year-over-Year Change")
+    st.subheader("Year-over-Year Change — Board View")
 
     yoy_df = compute_yoy(subtotals)
 
@@ -369,7 +376,7 @@ with tab2:
         "Net Income (Auto)": "Net Income",
     })
 
-    # Define grouping rules based on your actual Excel categories
+    # Grouping rules based on your actual Excel categories
     PAYROLL_GROUP = ["Salaries & Wages", "Payroll Tax Expense"]
     UTILITIES_GROUP = ["Total for Utilities"]
 
@@ -452,27 +459,66 @@ with tab2:
 
         st.markdown(combined.to_html(escape=False), unsafe_allow_html=True)
 
-    # -----------------------------------------------------
-    # TAB 3 — SURPLUS / DEFICIT
-    # -----------------------------------------------------
-    with tab3:
-        st.subheader("Surplus / Deficit")
+# -----------------------------------------------------
+# TAB 3 — YOY (DETAILED VIEW — ALL CATEGORIES)
+# -----------------------------------------------------
+with tab3:
+    st.subheader("Year-over-Year Change — Detailed View")
 
-        sd_df = compute_surplus_deficit(subtotals)
-        sd_filtered = sd_df[sd_df["Year"].isin(selected_years)]
+    yoy_df_full = compute_yoy(subtotals)
 
-        if sd_filtered.empty:
-            st.info("No Surplus/Deficit data available.")
-        else:
-            sd_filtered = sd_filtered.set_index("Year")
+    # Filter by selected years
+    yoy_df_full = yoy_df_full[yoy_df_full["Year"].isin(selected_years)]
 
-            desired_order = ["Total Revenue", "Total Income", "Total Expenses", "Net Income"]
-            existing = [c for c in desired_order if c in sd_filtered.columns]
-            others = [c for c in sd_filtered.columns if c not in existing]
+    if yoy_df_full.empty:
+        st.info("No YOY data available.")
+    else:
+        # You can keep your existing detailed YOY logic here.
+        # Example: show raw YoY Change and YoY % by Category and Year
+        detailed_pivot = yoy_df_full.pivot_table(
+            index=["Category", "Year"],
+            values=["YoY Change", "YoY %"],
+            aggfunc="sum"
+        )
 
-            st.dataframe(sd_filtered[existing + others].T)
+        st.dataframe(detailed_pivot)
 
-    # -----------------------------------------------------
+# -----------------------------------------------------
+# TAB 4 — SURPLUS / DEFICIT
+# -----------------------------------------------------
+with tab4:
+    st.subheader("Surplus / Deficit")
+
+    # Keep your existing surplus/deficit logic here.
+    # Example skeleton (replace with your real implementation):
+
+    # Assume subtotals has Net Income (Auto) or Net Income
+    surplus_df = subtotals.copy()
+    surplus_df["Category"] = surplus_df["Category"].replace({
+        "Net Income (Auto)": "Net Income"
+    })
+    surplus_df = surplus_df[surplus_df["Category"] == "Net Income"]
+
+    if surplus_df.empty:
+        st.info("No surplus/deficit data available.")
+    else:
+        surplus_pivot = surplus_df.pivot_table(
+            index="Year",
+            values="Amount",
+            aggfunc="sum"
+        ).sort_index()
+        st.dataframe(surplus_pivot)
+
+# -----------------------------------------------------
+# TAB 5 — FORECASTING
+# -----------------------------------------------------
+with tab5:
+    st.subheader("Forecasting")
+
+    # Keep your existing forecasting logic here.
+    # Example placeholder:
+    st.info("Forecasting logic goes here (use your existing implementation).")
+   # -----------------------------------------------------
     # TAB 4 — FORECASTING
     # -----------------------------------------------------
     with tab4:
