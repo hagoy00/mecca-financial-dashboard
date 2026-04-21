@@ -1,27 +1,26 @@
 import streamlit as st
-import numpy as np
+import pandas as pd
 from utils.db_utils import load_data
-from utils.data_utils import extract_subtotals
+from utils.data_utils import extract_subtotals, build_board_categories, pivot_report
 
 st.title("Forecasting")
 
 df = load_data()
-subtotals = extract_subtotals(df)
+long_df = extract_subtotals(df)
+board_df = build_board_categories(long_df)
+pivot = pivot_report(board_df)
 
-category = st.selectbox("Category", sorted(subtotals["Category"].unique()))
-years_ahead = st.slider("Years Ahead", 1, 5, 3)
+category = st.selectbox("Select Category to Forecast", 
+                        [c for c in pivot.columns if c != "Year"])
 
-df_cat = subtotals[subtotals["Category"] == category].sort_values("Year")
+data = pivot[["Year", category]].copy()
+data = data.set_index("Year")
 
-if df_cat["Year"].nunique() < 2:
-    st.warning("Not enough data.")
-else:
-    x = df_cat["Year"].values
-    y = df_cat["Amount"].values
-    m, b = np.polyfit(x, y, 1)
+# Simple linear forecast
+data["Forecast"] = pd.Series(
+    pd.Series(data[category]).rolling(window=2).mean(),
+    index=data.index
+).fillna(method="bfill")
 
-    future_years = list(range(x.max() + 1, x.max() + 1 + years_ahead))
-    forecast = [m * fy + b for fy in future_years]
-
-    st.dataframe({"Year": future_years, "Forecast": forecast})
-
+st.subheader(f"Forecast for {category}")
+st.line_chart(data)
