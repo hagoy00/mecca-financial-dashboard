@@ -1,7 +1,10 @@
+
+
 import streamlit as st
 import pandas as pd
-from utils.db_utils import init_db
-from utils.data_utils import load_excel
+import os
+
+from utils.db_utils import load_data
 
 st.title("Admin — Data Upload & DB Refresh")
 
