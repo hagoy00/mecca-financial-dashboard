@@ -3,19 +3,4 @@ pandas
 numpy
 altair
 openpyxl
-mecca_financial_dashboard/
-│
-├── Home.py
-├── Subtotals.py
-├── YOY.py
-├── Surplus_Deficit.py
-├── Forecasting.py
-├── Board_YOY_Summary.py   ← Tab 5
-│
-├── utils/
-│   ├── data_utils.py
-│   ├── db_utils.py
-│   └── yoy_utils.py
-│
-├── MECCA_Financial_Data.xlsx
-└── mecca_finance.db   ← auto‑created
+
