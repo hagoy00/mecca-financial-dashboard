@@ -1,0 +1,14 @@
+# macOS system files
+.DS_Store
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Excel temporary files
+~$*.xlsx
+
+# Database files
+*.db
+
+church_financial_subtotals_dashboard.py
