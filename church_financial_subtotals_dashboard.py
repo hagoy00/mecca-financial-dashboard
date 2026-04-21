@@ -359,7 +359,7 @@ def main():
     # TAB 2 — YEAR-OVER-YEAR CHANGE
     # -----------------------------------------------------
     
-        with tab2:
+    with tab2:
         st.subheader("Year-over-Year Change — Board + Payroll + Utilities")
 
         yoy_df = compute_yoy(subtotals)
