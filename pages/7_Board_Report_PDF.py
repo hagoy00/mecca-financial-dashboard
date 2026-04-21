@@ -8,7 +8,12 @@ import io
 
 st.title("Board Report PDF Generator")
 
-df = load_data()
+from utils.data_utils import extract_subtotals
+from utils.db_utils import load_data as load_excel_data
+
+df = load_excel_data()
+subtotals = extract_subtotals(df)
+
 subtotals = extract_subtotals(df)
 
 years = sorted(subtotals["Year"].unique())
