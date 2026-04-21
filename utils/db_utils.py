@@ -12,5 +12,5 @@ def init_db():
 
 def load_data():
     engine = get_engine()
-    return pd.read_sql("SELECT * FROM transactions", engine)
-
+    file_path = "MECCA_Financial_Data.xlsx"
+    return pd.read_excel(file_path, sheet_name=None)
