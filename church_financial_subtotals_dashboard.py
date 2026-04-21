@@ -358,21 +358,19 @@ def main():
     # -----------------------------------------------------
     # TAB 2 — YEAR-OVER-YEAR CHANGE
     # -----------------------------------------------------
-    # -----------------------------------------------------
-# TAB 2 — YEAR-OVER-YEAR CHANGE (FULL 6-FIELD VERSION)
-# -----------------------------------------------------
-with tab2:
-    st.subheader("Year-over-Year Change — Board + Payroll + Utilities")
+    
+        with tab2:
+        st.subheader("Year-over-Year Change — Board + Payroll + Utilities")
 
-    yoy_df = compute_yoy(subtotals)
+        yoy_df = compute_yoy(subtotals)
 
-    # Normalize Auto totals
-    yoy_df["Category"] = yoy_df["Category"].replace({
+        # Normalize Auto totals
+        yoy_df["Category"] = yoy_df["Category"].replace({
         "Total Revenue (Auto)": "Total Revenue",
         "Total Income (Auto)": "Total Income",
         "Total Expenses (Auto)": "Total Expenses",
         "Net Income (Auto)": "Net Income",
-    })
+        })
 
     # Filter selected years
     yoy_df = yoy_df[yoy_df["Year"].isin(selected_years)]
