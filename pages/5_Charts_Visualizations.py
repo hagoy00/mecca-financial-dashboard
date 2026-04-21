@@ -1,27 +1,19 @@
 import streamlit as st
-import altair as alt
 from utils.db_utils import load_data
-from utils.data_utils import extract_subtotals
+from utils.data_utils import extract_subtotals, build_board_categories, pivot_report
 
 st.title("Charts & Visualizations")
 
 df = load_data()
-subtotals = extract_subtotals(df)
+long_df = extract_subtotals(df)
+board_df = build_board_categories(long_df)
+pivot = pivot_report(board_df)
 
-years = sorted(subtotals["Year"].unique())
-selected_years = st.sidebar.multiselect("Years", years, default=years)
+category = st.selectbox("Select Category", 
+                        [c for c in pivot.columns if c != "Year"])
 
-filtered = subtotals[subtotals["Year"].isin(selected_years)]
+st.subheader(f"{category} Over Time")
+st.line_chart(pivot.set_index("Year")[category])
 
-category = st.selectbox("Category", sorted(filtered["Category"].unique()))
-
-cat_df = filtered[filtered["Category"] == category]
-
-chart = alt.Chart(cat_df).mark_bar().encode(
-    x="Year:O",
-    y="Amount:Q",
-    tooltip=["Year", "Amount"]
-)
-
-st.altair_chart(chart, use_container_width=True)
-
+st.subheader("All Categories")
+st.area_chart(pivot.set_index("Year"))
