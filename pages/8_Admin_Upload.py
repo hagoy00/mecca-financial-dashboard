@@ -1,10 +1,5 @@
-
-
 import streamlit as st
 import pandas as pd
-import os
-
-from utils.db_utils import load_data
 
 st.title("Admin Upload")
 
@@ -15,4 +10,3 @@ if uploaded:
         f.write(uploaded.getbuffer())
 
     st.success("Excel file replaced successfully.")
-    
