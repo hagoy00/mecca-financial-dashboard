@@ -1,17 +1,3 @@
-import streamlit as st
-import pandas as pd
-import numpy as np
-import os
-
-@st.cache_data
-def load_excel():
-    local_path = "/Users/yemanehagos/my_first_project/data/MECCA_Financial_Data.xlsx"
-    cloud_path = "MECCA_Financial_Data.xlsx"
-    file_path = local_path if os.path.exists(local_path) else cloud_path
-    return pd.read_excel(file_path)
-
-#def extract_subtotals(df):
-    #return df.groupby(["Year", "Category"], as_index=False)["Amount"].sum()
 import pandas as pd
 
 def extract_subtotals(df):
@@ -24,6 +10,10 @@ def extract_subtotals(df):
     # Identify year columns (numeric column names)
     year_cols = [col for col in df.columns if str(col).isdigit()]
 
+    # Convert all year columns to numeric
+    for col in year_cols:
+        df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0)
+
     # Melt wide → long
     long_df = df.melt(
         id_vars=["Category"],
@@ -35,14 +25,34 @@ def extract_subtotals(df):
     # Convert Year to integer
     long_df["Year"] = long_df["Year"].astype(int)
 
-    # Replace NaN with 0
-    long_df["Amount"] = long_df["Amount"].fillna(0)
-
     return long_df
 
 
-def compute_yoy(df):
-    df = df.copy().sort_values(["Category", "Year"])
-    df["YoY Change"] = df.groupby("Category")["Amount"].diff()
-    df["YoY %"] = df.groupby("Category")["Amount"].pct_change() * 100
-    return df
+def compute_yoy(long_df):
+    """
+    Computes YOY change for each category.
+    """
+    long_df = long_df.sort_values(["Category", "Year"])
+    long_df["YOY_Change"] = long_df.groupby("Category")["Amount"].pct_change() * 100
+    return long_df
+
+
+def compute_six_category_yoy(long_df):
+    """
+    Computes YOY for the six board-level categories.
+    """
+
+    categories = [
+        "Total Revenue",
+        "Total Income",
+        "Total Expenses",
+        "Net Income",
+        "Payroll",
+        "Utilities"
+    ]
+
+    filtered = long_df[long_df["Category"].isin(categories)]
+    filtered = filtered.groupby(["Category", "Year"])["Amount"].sum().reset_index()
+    filtered = compute_yoy(filtered)
+
+    return filtered
