@@ -2,34 +2,22 @@ import pandas as pd
 
 DATA_FILE = "MECCA_Financial_Data.xlsx"
 
-def load_church_excel():
-    """
-    Loads the ORIGINAL church Excel format:
 
-    Sheet name = Year (2021, 2022, ...)
-    Columns:
-        Category | <YearValue>
-
-    Returns a unified DataFrame:
-        Year | Category | Amount | Type (Income/Expense/Subtotal)
-    """
-
-    xls = pd.ExcelFile(DATA_FILE)
+def load_all_years(path=DATA_FILE):
+    xls = pd.ExcelFile(path)
     all_years = []
 
     for sheet in xls.sheet_names:
-        # Sheet name must be a year
         try:
             year = int(sheet)
         except:
             continue
 
-        df = pd.read_excel(DATA_FILE, sheet_name=sheet)
+        df = pd.read_excel(path, sheet_name=sheet)
 
         if "Category" not in df.columns:
             continue
 
-        # The second column is the year value
         value_col = [c for c in df.columns if c != "Category"][0]
 
         df_long = pd.DataFrame({
@@ -38,36 +26,63 @@ def load_church_excel():
             "Amount": df[value_col]
         })
 
-        # Classification logic
-        def classify(cat):
-            cat_lower = str(cat).lower()
-
-            # Subtotals: "Total Something"
-            if cat_lower.startswith("total "):
-                return "Subtotal"
-
-            # Expense keywords
-            expense_keywords = [
-                "rent", "mortgage", "loan", "insurance", "repair",
-                "maintenance", "utility", "utilities", "fuel",
-                "cleaning", "janitorial", "supplies", "office",
-                "payroll", "salary", "salaries", "wages",
-                "service", "contract", "professional", "tax",
-                "internet", "phone", "security", "equipment",
-                "printing", "postage", "transport", "travel"
-            ]
-
-            if any(word in cat_lower for word in expense_keywords):
-                return "Expense"
-
-            # Everything else is Income
-            return "Income"
-
-        df_long["Type"] = df_long["Category"].apply(classify)
+        df_long["Kind"] = df_long["Category"].apply(classify_row_kind)
 
         all_years.append(df_long)
 
-    if not all_years:
-        return pd.DataFrame()
-
     return pd.concat(all_years, ignore_index=True)
+
+
+def classify_row_kind(cat):
+    c = str(cat).strip().lower()
+
+    if c.startswith("total for "):
+        return "Subtotal"
+
+    if c in ["gross profit", "expenses"]:
+        return "Header"
+
+    return "Detail"
+
+
+def build_board_categories(df):
+    df = df.copy()
+
+    board_rows = []
+
+    for year, group in df.groupby("Year"):
+        # explicit board totals from rows
+        total_income = group.loc[
+            group["Category"].str.strip().str.lower() == "total for income",
+            "Amount"
+        ].sum()
+
+        total_expenses = group.loc[
+            group["Category"].str.strip().str.lower() == "total for expenses",
+            "Amount"
+        ].sum()
+
+        net_income = total_income - total_expenses
+
+        board_rows.append({"Year": year, "Board Category": "Total Income", "Amount": total_income})
+        board_rows.append({"Year": year, "Board Category": "Total Expenses", "Amount": total_expenses})
+        board_rows.append({"Year": year, "Board Category": "Net Income", "Amount": net_income})
+
+    board_df = pd.DataFrame(board_rows)
+    return board_df
+
+
+def get_board_pivot(board_df):
+    pivot = board_df.pivot_table(
+        index="Year",
+        columns="Board Category",
+        values="Amount",
+        aggfunc="sum",
+        fill_value=0
+    ).reset_index()
+
+    for col in ["Total Income", "Total Expenses", "Net Income"]:
+        if col not in pivot.columns:
+            pivot[col] = 0
+
+    return pivot
