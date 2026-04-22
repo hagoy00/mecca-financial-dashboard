@@ -2,7 +2,24 @@ import pandas as pd
 
 DATA_FILE = "MECCA_Financial_Data.xlsx"
 
+# ---------------------------------------------------------
+# 1. DEFINE HELPERS FIRST
+# ---------------------------------------------------------
+def classify_row_kind(cat):
+    c = str(cat).strip().lower()
 
+    if c.startswith("total for "):
+        return "Subtotal"
+
+    if c in ["gross profit", "expenses"]:
+        return "Header"
+
+    return "Detail"
+
+
+# ---------------------------------------------------------
+# 2. MAIN LOADER (now safe to call classify_row_kind)
+# ---------------------------------------------------------
 def load_all_years(path=DATA_FILE):
     xls = pd.ExcelFile(path)
     all_years = []
@@ -33,25 +50,15 @@ def load_all_years(path=DATA_FILE):
     return pd.concat(all_years, ignore_index=True)
 
 
-def classify_row_kind(cat):
-    c = str(cat).strip().lower()
-
-    if c.startswith("total for "):
-        return "Subtotal"
-
-    if c in ["gross profit", "expenses"]:
-        return "Header"
-
-    return "Detail"
-
-
+# ---------------------------------------------------------
+# 3. BOARD CATEGORY BUILDER
+# ---------------------------------------------------------
 def build_board_categories(df):
     df = df.copy()
 
     board_rows = []
 
     for year, group in df.groupby("Year"):
-        # explicit board totals from rows
         total_income = group.loc[
             group["Category"].str.strip().str.lower() == "total for income",
             "Amount"
@@ -72,6 +79,9 @@ def build_board_categories(df):
     return board_df
 
 
+# ---------------------------------------------------------
+# 4. PIVOT FOR YOY
+# ---------------------------------------------------------
 def get_board_pivot(board_df):
     pivot = board_df.pivot_table(
         index="Year",
