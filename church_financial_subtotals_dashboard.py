@@ -397,7 +397,7 @@ def main():
     df = load_data()
     subtotals = extract_subtotals(df)
     yoy_df = compute_yoy(subtotals)
-    sd_df = compute_surplus_deficit(subtotals)
+    #sd_df = compute_surplus_deficit(subtotals)
 
     years = sorted(df["Year"].unique())
     selected_years = st.multiselect("Select Years", years, default=years)
@@ -637,10 +637,7 @@ def main():
     # -----------------------------------------------------
     # TAB 4 — SURPLUS / DEFICIT
     # -----------------------------------------------------
-    
-    # -----------------------------------------------------
-# TAB 4 — SURPLUS / DEFICIT
-# -----------------------------------------------------
+  
 with tab3:
     st.subheader("📉 Surplus / Deficit Summary")
 
@@ -685,6 +682,7 @@ with tab3:
         }),
         use_container_width=True
     )
+
     # -----------------------------------------------------
     # TAB 5 — FORECASTING
     # -----------------------------------------------------
