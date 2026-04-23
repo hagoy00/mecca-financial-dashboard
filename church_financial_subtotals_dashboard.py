@@ -507,13 +507,19 @@ def main():
         # -----------------------------------------------------
         # TOP 5 EXPENSE PIVOT (Corrected)
         # -----------------------------------------------------
-        st.markdown("### 📉 Top 5 Expense Categories (All Years)")
-
-        expense_df = df[
-            (df["Type"] == "Expense") &
-            (~df["Category"].str.lower().str.startswith("total for"))
-        ]
-
+        # Clean Expense Filter
+        # Clean Expense Filter
+    expense_df = df[
+    (df["Type"] == "Expense") & 
+    (~df["Category"].str.lower().str.startswith("total for")) &
+    (~df["Category"].str.lower().isin([
+        "gross profit",
+        "depreciation expense",
+        "depreciation",
+        "amortization"
+    ]))
+]
+    
         expense_grouped = expense_df.groupby(["Category", "Year"])["Amount"].sum().reset_index()
 
         top_expense_categories = (
