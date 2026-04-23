@@ -446,7 +446,8 @@ def main():
 
         st.markdown("### 📘 Main Financial Summary")
         #st.dataframe(summary_pivot.style.format("{:,.2f}"), use_container_width=True)
-        st.dataframe(style_top5(add_rank_icons(summary_pivot)), use_container_width=True)
+        #st.dataframe(style_top5(add_rank_icons(summary_pivot)), use_container_width=True)
+        st.dataframe(style_top5(add_summary_icons(summary_pivot)), use_container_width=True)
 
         st.divider()
 
