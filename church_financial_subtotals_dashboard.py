@@ -402,7 +402,7 @@ def main():
     years = sorted(df["Year"].unique())
     selected_years = st.multiselect("Select Years", years, default=years)
 
-  # Tabs
+    # Tabs
     tab1, tab2, tab_top, tab3, tab4, tab_pdf = st.tabs([
         "Subtotal Summary",
         "YOY Summary",
