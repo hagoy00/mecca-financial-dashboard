@@ -143,15 +143,17 @@ def extract_subtotals(df):
     # 2. AUTO TOTALS (your existing logic)
     income_rows = subtotals[subtotals["Category"] == "Total for Income"]
     total_income = income_rows.groupby("Year")["Amount"].sum().reset_index()
-    total_income["Category"] = "Total Income (Auto)"
-
+    #total_income["Category"] = "Total Income (Auto)"  
+    total_income["Category"] = "Total Income"
+    
     expense_rows = subtotals[subtotals["Category"] == "Total for Expenses"]
     total_expenses = expense_rows.groupby("Year")["Amount"].sum().reset_index()
-    total_expenses["Category"] = "Total Expenses (Auto)"
+    #total_expenses["Category"] = "Total Expenses (Auto)"
+    total_expenses["Category"] = "Total Expenses"
 
     revenue_df = total_income.copy()
-    revenue_df["Category"] = "Total Revenue (Auto)"
-
+    #revenue_df["Category"] = "Total Revenue (Auto)"
+    revenue_df["Category"] = "Total Revenue"
     net_income = pd.merge(
         total_income,
         total_expenses,
@@ -160,8 +162,8 @@ def extract_subtotals(df):
     )
     net_income["Amount"] = net_income["Amount_Income"] - net_income["Amount_Expenses"]
     net_income = net_income[["Year", "Amount"]]
-    net_income["Category"] = "Net Income (Auto)"
-
+    #net_income["Category"] = "Net Income (Auto)"
+    net_income["Category"] = "Net Income"
     auto_totals = pd.concat(
         [total_income, total_expenses, revenue_df, net_income],
         ignore_index=True
