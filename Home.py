@@ -2,7 +2,8 @@ import streamlit as st
 import pandas as pd
 import altair as alt
 
-from utils.data_utils import load_church_excel
+from utils.data_utils import load_all_years
+#from utils.data_utils import load_church_excel
 from utils.style_utils import highlight_subtotals
 
 st.set_page_config(page_title="MECCA Financial Dashboard", layout="wide")
@@ -10,7 +11,8 @@ st.set_page_config(page_title="MECCA Financial Dashboard", layout="wide")
 st.title("📊 MECCA Financial Dashboard – Home")
 
 # Load data
-df = load_church_excel()
+#df = load_church_excel()
+df = load_all_years()
 
 if df.empty:
     st.error("No financial data found. Please upload MECCA_Financial_Data.xlsx.")
