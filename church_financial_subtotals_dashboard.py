@@ -105,16 +105,24 @@ def assign_income_expense(df):
     df["Type"] = None
 
     for year, group in df.groupby("Year"):
-        income_end = group[group["Category"].str.strip().str.lower() == "total for income"].index
+        # Find the boundaries
+        income_start = group.index.min()
+        income_end = group[group["Category"].str.lower() == "total for income"].index
+
+        expense_start = None
+        expense_end = group[group["Category"].str.lower() == "total for expenses"].index
+
+        # Assign Income block
         if len(income_end) > 0:
             end_idx = income_end[0]
-            df.loc[group.index[0]:end_idx, "Type"] = "Income"
+            df.loc[income_start:end_idx, "Type"] = "Income"
 
-        expense_end = group[group["Category"].str.strip().str.lower() == "total for expenses"].index
-        if len(expense_end) > 0:
-            end_idx = expense_end[0]
-            df.loc[group.index[0]:end_idx, "Type"] = "Expense"
+        # Expense block starts AFTER income block
+        if len(income_end) > 0 and len(expense_end) > 0:
+            expense_start = income_end[0] + 1
+            df.loc[expense_start:expense_end[0], "Type"] = "Expense"
 
+        # Subtotals override everything
         subtotal_idx = group.index[group["Kind"] == "Subtotal"]
         df.loc[subtotal_idx, "Type"] = "Subtotal"
 
