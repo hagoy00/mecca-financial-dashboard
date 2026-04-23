@@ -11,7 +11,8 @@ st.set_page_config(page_title="Subtotals", layout="wide")
 st.title("🧮 Subtotals Overview")
 
 # Load data
-df = load_church_excel()
+df = load_all_years()
+#df = load_church_excel()
 
 if df.empty:
     st.error("No financial data found. Please upload MECCA_Financial_Data.xlsx.")
