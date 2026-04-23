@@ -298,9 +298,9 @@ def generate_pdf(subtotals, year):
     doc.build(story)
     buffer.seek(0)
     return buffer
-
-
-
+# ---------------------------------------------------------
+Add the same style function (reuse it everywhere)
+# ---------------------------------------------------------
 def style_top5(df):
     # df index = Category rows
     n = len(df)
@@ -315,6 +315,11 @@ def style_top5(df):
         lambda row: [highlight(row.name)] * len(df.columns),
         axis=1
     ).format("{:,.2f}")
+def add_rank_icons(df):
+    icons = ["🥇", "🥈", "🥉", "⭐", "⭐"]
+    df = df.copy()
+    df.insert(0, "Rank", icons[:len(df)])
+    return df
 
 # ---------------------------------------------------------
 # MAIN APP
@@ -393,7 +398,8 @@ def main():
         ).fillna(0)
 
         st.markdown("### 📘 Main Financial Summary")
-        st.dataframe(summary_pivot.style.format("{:,.2f}"), use_container_width=True)
+        #st.dataframe(summary_pivot.style.format("{:,.2f}"), use_container_width=True)
+        st.dataframe(style_top5(add_rank_icons(summary_pivot)), use_container_width=True)
 
         st.divider()
 
@@ -426,7 +432,8 @@ def main():
             aggfunc="sum"
         ).fillna(0)
 
-        st.dataframe(top_income_pivot.style.format("{:,.2f}"), use_container_width=True)
+        #st.dataframe(top_income_pivot.style.format("{:,.2f}"), use_container_width=True)
+        st.dataframe(style_top5(add_rank_icons(top_income_pivot)), use_container_width=True)
 
         st.divider()
 
@@ -459,7 +466,8 @@ def main():
             aggfunc="sum"
         ).fillna(0)
 
-        st.dataframe(top_expense_pivot.style.format("{:,.2f}"), use_container_width=True)
+        #st.dataframe(top_expense_pivot.style.format("{:,.2f}"), use_container_width=True)
+        st.dataframe(style_top5(add_rank_icons(top_expense_pivot)), use_container_width=True)
 
     # -----------------------------------------------------
     # TAB 2 — YOY SUMMARY
