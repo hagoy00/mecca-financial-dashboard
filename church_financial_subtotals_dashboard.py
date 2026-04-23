@@ -106,7 +106,7 @@ def extract_subtotals(df):
     """
     Extracts:
     - All "Total for ..." rows
-    - Gross Profit
+    #- Gross Profit
     - Net Income (if present)
     - Auto totals (Income, Expenses, Revenue, Net Income)
 
@@ -119,7 +119,7 @@ def extract_subtotals(df):
     # Manual subtotals from Excel
     mask = (
         df["Category"].str.startswith("Total for ")
-        | (df["Category"] == "Gross Profit")
+        #| (df["Category"] == "Gross Profit")
         | (df["Category"] == "Net Income")
         | (df["Category"] == "Net Operating Income")
     )
@@ -340,7 +340,7 @@ def main():
             "Total Income",
             "Total Expenses",
             "Net Income",
-            "Gross Profit",
+            #"Gross Profit",
         ]
 
         existing = [c for c in desired_order if c in subtotal_pivot.index]
