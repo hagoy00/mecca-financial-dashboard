@@ -317,11 +317,55 @@ def style_top5(df):
         axis=1
     ).format("{:,.2f}")
 
-
 def add_rank_icons(df):
-    icons = ["🥇", "🥈", "🥉", "⭐", "⭐"]
     df = df.copy()
-    df.insert(0, "Rank", icons[:len(df)])
+    n = len(df)
+
+    base_icons = ["🥇", "🥈", "🥉", "⭐", "⭐"]
+
+    # If df has more than 5 rows, extend icons
+    if n > 5:
+        icons = base_icons + ["⭐"] * (n - 5)
+    else:
+        icons = base_icons[:n]
+
+    df.insert(0, "Rank", icons)
+    return df
+
+
+def add_summary_icons(df):
+    df = df.copy()
+    n = len(df)
+
+    # Top 3 = ▲, rest = ▼
+    icons = ["▲"] * min(3, n) + ["▼"] * max(0, n - 3)
+
+    df.insert(0, "Trend", icons)
+    return df
+    
+def add_yoy_icons(df):
+    df = df.copy()
+    icons = []
+
+    for change in df["YoY Change"]:
+        if pd.isna(change):
+            icons.append("⏺️")
+        elif change > 0:
+            icons.append("📈")
+        elif change < 0:
+            icons.append("📉")
+        else:
+            icons.append("⏺️")
+
+    df.insert(0, "Trend", icons)
+    return df
+
+def add_forecast_icons(df):
+    df = df.copy()
+    mean_val = df["Amount"].mean()
+
+    icons = ["🔼" if amt > mean_val else "🔽" for amt in df["Amount"]]
+    df.insert(0, "Trend", icons)
     return df
 
 # ---------------------------------------------------------
