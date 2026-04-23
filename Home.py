@@ -19,8 +19,9 @@ if df.empty:
     st.stop()
 
 # --- SUMMARY METRICS (exclude subtotals) ---
-df_income = df[(df["Type"] == "Income")]
-df_expense = df[(df["Type"] == "Expense")]
+
+df_income = df[df["Kind"] == "Detail"]   # or Income if you classify differently
+df_expense = df[df["Kind"] == "Detail"]  # same here
 
 total_income = df_income["Amount"].sum()
 total_expense = df_expense["Amount"].sum()
