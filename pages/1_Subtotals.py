@@ -2,7 +2,8 @@ import streamlit as st
 import pandas as pd
 import altair as alt
 
-from utils.data_utils import load_church_excel
+from utils.data_utils import load_all_years
+#from utils.data_utils import load_church_excel
 from utils.style_utils import highlight_subtotals
 
 st.set_page_config(page_title="Subtotals", layout="wide")
