@@ -108,11 +108,12 @@ def extract_subtotals(df):
     - All "Total for ..." rows
     - Gross Profit
     - Net Income (if present)
-    - Auto totals (Revenue, Income, Expenses, Net Income)
+    - Auto totals (Income, Expenses, Revenue, Net Income)
 
-    Auto totals are used internally but hidden from the dashboard,
-    except for the four main totals which are renamed and shown.
+    Revenue is now defined EXACTLY as:
+    Revenue = Total for Income
     """
+
     df = df.copy()
 
     # Manual subtotals from Excel
@@ -140,16 +141,9 @@ def extract_subtotals(df):
     total_expenses["Category"] = "Total Expenses (Auto)"
 
     # ------------------------------
-    # AUTO TOTAL: Total Revenue = Income + abs(Expenses)
+    # AUTO TOTAL: Revenue = Total for Income
     # ------------------------------
-    revenue_df = pd.merge(
-        total_income,
-        total_expenses,
-        on="Year",
-        suffixes=("_Income", "_Expenses")
-    )
-    revenue_df["Amount"] = revenue_df["Amount_Income"] + revenue_df["Amount_Expenses"].abs()
-    revenue_df = revenue_df[["Year", "Amount"]]
+    revenue_df = total_income.copy()
     revenue_df["Category"] = "Total Revenue (Auto)"
 
     # ------------------------------
@@ -172,6 +166,7 @@ def extract_subtotals(df):
     )
 
     return pd.concat([subtotals, auto_totals], ignore_index=True)
+
 
 # ---------------------------------------------------------
 # YEAR-OVER-YEAR CALCULATION
