@@ -33,7 +33,8 @@ if uploaded_file:
         st.success("✅ File uploaded successfully!")
         
         # Try loading the new file
-        df = load_church_excel()
+        df = load_all_years()
+        #df = load_church_excel()
 
         if df.empty:
             st.warning("The file was uploaded, but no valid data was found.")
