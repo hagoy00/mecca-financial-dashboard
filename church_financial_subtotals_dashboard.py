@@ -403,7 +403,7 @@ def main():
     selected_years = st.multiselect("Select Years", years, default=years)
 
   # Tabs
-        tab1, tab2, tab_top, tab3, tab4, tab_pdf = st.tabs([
+    tab1, tab2, tab_top, tab3, tab4, tab_pdf = st.tabs([
         "Subtotal Summary",
         "YOY Summary",
         "Top Income & Expenses",
