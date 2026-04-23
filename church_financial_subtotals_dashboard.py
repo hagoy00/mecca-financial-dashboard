@@ -324,7 +324,7 @@ def style_top5(df):
     index_positions = {idx: pos for pos, idx in enumerate(df.index)}
 
     def highlight(row):
-        pos = index_positions[row.name]
+pos = index_positions[row.name]
         color = "background-color: #d4edda" if pos < 3 else "background-color: #fff3cd"
         return [color] * len(row)
 
@@ -504,7 +504,7 @@ def main():
 
         st.divider()
 
-       # -----------------------------------------------------
+# -----------------------------------------------------
 # TOP 5 EXPENSE PIVOT (Corrected)
 # -----------------------------------------------------
 st.markdown("### 📉 Top 5 Expense Categories (All Years)")
@@ -546,8 +546,8 @@ st.dataframe(style_top5(add_rank_icons(top_expense_pivot)), use_container_width=
     # -----------------------------------------------------
     # TAB 2 — CLEAN, FIXED, GUARANTEED YOY SUMMARY
     # ----------------------------------------------------
-    with tab2:
-        st.subheader("📘 Year‑Over‑Year (YOY) Summary")
+with tab2:
+st.subheader("📘 Year‑Over‑Year (YOY) Summary")
 
         TARGET_ORDER = [
             "Total Revenue",
