@@ -547,8 +547,8 @@ st.dataframe(style_top5(add_rank_icons(top_expense_pivot)), use_container_width=
     # TAB 2 — CLEAN, FIXED, GUARANTEED YOY SUMMARY
     # ----------------------------------------------------
 with tab2:
-st.subheader("📘 Year‑Over‑Year (YOY) Summary")
-
+    st.subheader("📘 Year‑Over‑Year (YOY) Summary")
+        
         TARGET_ORDER = [
             "Total Revenue",
             "Total Income",
