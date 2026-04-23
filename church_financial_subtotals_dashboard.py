@@ -300,6 +300,22 @@ def generate_pdf(subtotals, year):
     return buffer
 
 
+
+def style_top5(df):
+    # df index = Category rows
+    n = len(df)
+
+    def highlight(row_index):
+        if row_index < 3:   # top 3
+            return "background-color: #d4edda;"   # light green
+        else:               # bottom 2
+            return "background-color: #fff3cd;"   # light yellow
+
+    return df.style.apply(
+        lambda row: [highlight(row.name)] * len(df.columns),
+        axis=1
+    ).format("{:,.2f}")
+
 # ---------------------------------------------------------
 # MAIN APP
 # ---------------------------------------------------------
