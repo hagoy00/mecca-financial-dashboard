@@ -539,8 +539,6 @@ def main():
     # -----------------------------------------------------
     # TAB 2 — CLEAN, FIXED, GUARANTEED YOY SUMMARY
     # ----------------------------------------------------
-
-
     with tab2:
         st.subheader("📘 Year‑Over‑Year (YOY) Summary")
 
