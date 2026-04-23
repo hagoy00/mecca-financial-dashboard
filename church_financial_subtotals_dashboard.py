@@ -637,7 +637,6 @@ def main():
     # -----------------------------------------------------
     # TAB 4 — SURPLUS / DEFICIT
     # -----------------------------------------------------
-  
     with tab3:
     st.subheader("📉 Surplus / Deficit Summary")
 
