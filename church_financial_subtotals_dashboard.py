@@ -303,7 +303,7 @@ def generate_pdf(subtotals, year):
 # MAIN APP
 # ---------------------------------------------------------
 def main():
-    st.title("📊 MECCA Financial Subtotals Dashboard")
+    st.title("📊 MekanSelam Medhanialem Ethiopian Orthodox Church->> Financial Dashboard")
 
     # Load data
     df = load_data()
