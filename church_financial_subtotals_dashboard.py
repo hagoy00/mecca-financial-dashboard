@@ -556,8 +556,7 @@ with tab2:
             "Payroll",
             "Utilities"
         ]
-
-        yoy_rows = []
+    yoy_rows = []
         for cat in TARGET_ORDER:
             cat_data = subtotals[subtotals["Category"] == cat].sort_values("Year")
             years = cat_data["Year"].tolist()
