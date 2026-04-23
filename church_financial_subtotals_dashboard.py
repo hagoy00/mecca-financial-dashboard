@@ -326,7 +326,7 @@ def style_top5(df):
 def highlight(row):
     pos = index_positions[row.name]
     color = "background-color: #d4edda" if pos < 3 else "background-color: #fff3cd"
-        return [color] * len(row)
+    return [color] * len(row)
 
     # Apply shading
     styler = df.style.apply(highlight, axis=1)
