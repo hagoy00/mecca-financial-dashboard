@@ -336,9 +336,6 @@ def style_top5(df):
 
     return styler
 
-
-
-
 def add_rank_icons(df):
     df = df.copy()
     n = len(df)
@@ -538,76 +535,41 @@ def main():
 
         #st.dataframe(top_expense_pivot.style.format("{:,.2f}"), use_container_width=True)
         st.dataframe(style_top5(add_rank_icons(top_expense_pivot)), use_container_width=True)
+# -----------------------------------------------------
+# TAB 2 — YOY SUMMARY (CLEAN + FIXED)
+# -----------------------------------------------------
+with tab2:
+    st.subheader("📘 Year‑Over‑Year (YOY) Summary")
 
-    # -----------------------------------------------------
-    # TAB 2 — YOY SUMMARY
-    # -----------------------------------------------------
-    with tab2:
-        st.subheader("YOY Summary")
+    # We want these 6 categories in YOY:
+    TARGET_CATEGORIES = [
+        "Total Revenue",
+        "Total Income",
+        "Total Expenses",
+        "Net Income",
+        "Payroll",
+        "Utilities"
+    ]
 
-        yoy_filtered = yoy_df[yoy_df["Year"].isin(selected_years)]
+    # Filter only the categories we want
+    yoy_filtered = yoy_df[yoy_df["Category"].isin(TARGET_CATEGORIES)].copy()
 
-        PAYROLL_GROUP = ["Salaries & Wages", "Payroll Tax Expense"]
-        payroll_df = yoy_filtered[yoy_filtered["Category"].isin(PAYROLL_GROUP)]
-        if not payroll_df.empty:
-            payroll_sum = payroll_df.groupby("Year")[["YoY Change", "YoY %"]].sum().reset_index()
-            payroll_sum["Category"] = "Payroll"
-        else:
-            payroll_sum = pd.DataFrame()
+    # Sort in the correct order
+    yoy_filtered["SortOrder"] = yoy_filtered["Category"].map({
+        "Total Revenue": 1,
+        "Total Income": 2,
+        "Total Expenses": 3,
+        "Net Income": 4,
+        "Payroll": 5,
+        "Utilities": 6
+    })
+    yoy_filtered = yoy_filtered.sort_values("SortOrder").drop(columns=["SortOrder"])
 
-        UTILITIES_GROUP = [c for c in yoy_filtered["Category"].unique() if "Utilit" in c]
-        utilities_df = yoy_filtered[yoy_filtered["Category"].isin(UTILITIES_GROUP)]
-        if not utilities_df.empty:
-            utilities_sum = utilities_df.groupby("Year")[["YoY Change", "YoY %"]].sum().reset_index()
-            utilities_sum["Category"] = "Utilities"
-        else:
-            utilities_sum = pd.DataFrame()
+    # Add icons
+    yoy_final = add_yoy_icons(yoy_filtered)
 
-        board_totals = yoy_filtered[
-            yoy_filtered["Category"].isin([
-                "Total Income (Auto)",
-                "Total Expenses (Auto)",
-                "Total Revenue (Auto)",
-                "Net Income (Auto)"
-            ])
-        ]
-
-        final_yoy = pd.concat([board_totals, payroll_sum, utilities_sum], ignore_index=True)
-
-        if final_yoy.empty:
-            st.info("No YOY data available.")
-        else:
-            yoy_pivot = final_yoy.pivot_table(
-                index="Year",
-                columns="Category",
-                values="YoY Change",
-                aggfunc="sum"
-            ).sort_index()
-
-            yoy_pct = final_yoy.pivot_table(
-                index="Year",
-                columns="Category",
-                values="YoY %",
-                aggfunc="mean"
-            ).sort_index()
-
-            def format_cell(change, pct):
-                if pd.isna(change):
-                    return ""
-                arrow = "▲" if change > 0 else "▼" if change < 0 else ""
-                color = "green" if change > 0 else "red" if change < 0 else "black"
-                pct_str = f"{pct:.1f}%" if not pd.isna(pct) else ""
-                return f"<span style='color:{color}; font-weight:bold'>{arrow} {change:.0f} ({pct_str})</span>"
-
-            combined = yoy_pivot.copy().astype("object")
-            for row in combined.index:
-                for col in combined.columns:
-                    combined.loc[row, col] = format_cell(
-                        yoy_pivot.loc[row, col],
-                        yoy_pct.loc[row, col] if col in yoy_pct.columns else np.nan
-                    )
-
-            st.markdown(combined.to_html(escape=False), unsafe_allow_html=True)
+    # Display
+    st.dataframe(yoy_final, use_container_width=True
 
     # -----------------------------------------------------
     # TAB 3 — TOP INCOME & EXPENSES (FORECASTING)
