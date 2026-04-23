@@ -306,21 +306,26 @@ def generate_pdf(subtotals, year):
 def style_top5(df):
     df = df.copy()
 
-    # Convert index to numeric positions
+    # Identify numeric columns only
+    numeric_cols = df.select_dtypes(include=["number"]).columns
+
+    # Map index labels to numeric positions
     index_positions = {idx: pos for pos, idx in enumerate(df.index)}
 
     def highlight(row):
         pos = index_positions[row.name]
-
-        if pos < 3:
-            color = "background-color: #d4edda"   # green
-        else:
-            color = "background-color: #fff3cd"   # yellow
-
-        # Must return a list matching number of columns
+        color = "background-color: #d4edda" if pos < 3 else "background-color: #fff3cd"
         return [color] * len(row)
 
-    return df.style.apply(highlight, axis=1).format("{:,.2f}")
+    # Apply shading
+    styler = df.style.apply(highlight, axis=1)
+
+    # Apply numeric formatting ONLY to numeric columns
+    styler = styler.format("{:,.2f}", subset=numeric_cols)
+
+    return styler
+
+
 
 
 def add_rank_icons(df):
