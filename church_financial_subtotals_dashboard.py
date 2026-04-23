@@ -374,7 +374,7 @@ def add_forecast_icons(df):
 def main():
     st.title("📊 MekanSelam Medhanialem Ethiopian Orthodox Church->> Financial Dashboard")
 
-      # Load data
+    # Load data
     df = load_data()
     subtotals = extract_subtotals(df)
     yoy_df = compute_yoy(subtotals)
