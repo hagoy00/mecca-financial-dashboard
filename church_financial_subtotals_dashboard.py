@@ -5,67 +5,64 @@ import altair as alt
 from io import BytesIO
 import os
 
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib import colors
+
 # ---------------------------------------------------------
-# PAGE CONFIGURATION
+# PAGE CONFIG
 # ---------------------------------------------------------
-# Sets the title and layout of the Streamlit app
 st.set_page_config(
     page_title="Church Financial Subtotals Dashboard",
     layout="wide"
 )
 
 # ---------------------------------------------------------
-# UNIVERSAL FILE PATH (LOCAL + CLOUD)
+# FILE PATHS (LOCAL + CLOUD)
 # ---------------------------------------------------------
-# Local path on your Mac
 LOCAL_PATH = "/Users/yemanehagos/my_first_project/data/MECCA_Financial_Data.xlsx"
-
-# Cloud path (file in GitHub repo root)
 CLOUD_PATH = "MECCA_Financial_Data.xlsx"
 
+
 def get_file_path():
-    """
-    Automatically selects the correct file path:
-    - Uses local path if running on your Mac
-    - Uses cloud path if running on Streamlit Cloud
-    """
     if os.path.exists(LOCAL_PATH):
         return LOCAL_PATH
     return CLOUD_PATH
 
 
 # ---------------------------------------------------------
-# HELPER: Convert DataFrame to Excel bytes for download
+# HELPERS
 # ---------------------------------------------------------
 def df_to_excel_bytes(df, sheet_name="Sheet1"):
-    """
-    Converts a DataFrame into an Excel file in memory.
-    Used for download buttons.
-    """
     output = BytesIO()
     with pd.ExcelWriter(output, engine="openpyxl") as writer:
         df.to_excel(writer, index=False, sheet_name=sheet_name)
     return output.getvalue()
 
 
+def classify_row_kind(cat):
+    c = str(cat).strip().lower()
+    if c.startswith("total for "):
+        return "Subtotal"
+    if c in [ "expenses", "net income", "net operating income"]:
+        return "Header"
+    return "Detail"
+
+
 # ---------------------------------------------------------
-# LOAD DATA FROM EXCEL
+# LOAD DATA
 # ---------------------------------------------------------
 @st.cache_data
 def load_data():
-    """
-    Loads all sheets whose names are valid years (e.g., 2021, 2022).
-    Cleans numeric values and returns a combined DataFrame.
-    """
     file_path = get_file_path()
     xls = pd.ExcelFile(file_path)
     all_years = []
 
     for sheet in xls.sheet_names:
-        # Only load sheets named like "2021", "2022", etc.
         try:
             year = int(sheet)
-        except:
+        except Exception:
             continue
 
         df = pd.read_excel(file_path, sheet_name=sheet)
@@ -74,11 +71,9 @@ def load_data():
         if "Category" not in df.columns:
             continue
 
-        # Identify the numeric column (the year column)
         value_col = [c for c in df.columns if c != "Category"][0]
         df = df.rename(columns={value_col: "Amount"})
 
-        # Clean numeric values
         df["Amount"] = (
             df["Amount"]
             .astype(str)
@@ -88,67 +83,70 @@ def load_data():
             .str.replace("(", "-", regex=False)
             .str.replace(")", "", regex=False)
         )
-
         df["Amount"] = df["Amount"].replace("", 0)
         df["Amount"] = df["Amount"].fillna(0)
         df["Amount"] = pd.to_numeric(df["Amount"], errors="coerce")
 
         df["Year"] = year
-        all_years.append(df[["Category", "Year", "Amount"]])
+        df["Kind"] = df["Category"].apply(classify_row_kind)
 
-    return pd.concat(all_years, ignore_index=True)
+        all_years.append(df[["Category", "Year", "Amount", "Kind"]])
+
+    full_df = pd.concat(all_years, ignore_index=True)
+    full_df = assign_income_expense(full_df)
+    return full_df
+
+
+# ---------------------------------------------------------
+# ASSIGN Income / Expense / Subtotal
+# ---------------------------------------------------------
+def assign_income_expense(df):
+    df = df.copy()
+    df["Type"] = None
+
+    for year, group in df.groupby("Year"):
+        income_end = group[group["Category"].str.strip().str.lower() == "total for income"].index
+        if len(income_end) > 0:
+            end_idx = income_end[0]
+            df.loc[group.index[0]:end_idx, "Type"] = "Income"
+
+        expense_end = group[group["Category"].str.strip().str.lower() == "total for expenses"].index
+        if len(expense_end) > 0:
+            end_idx = expense_end[0]
+            df.loc[group.index[0]:end_idx, "Type"] = "Expense"
+
+        subtotal_idx = group.index[group["Kind"] == "Subtotal"]
+        df.loc[subtotal_idx, "Type"] = "Subtotal"
+
+    return df
 
 
 # ---------------------------------------------------------
 # EXTRACT SUBTOTALS + AUTO TOTALS
 # ---------------------------------------------------------
 def extract_subtotals(df):
-    """
-    Extracts:
-    - All "Total for ..." rows
-    #- Gross Profit
-    - Net Income (if present)
-    - Auto totals (Income, Expenses, Revenue, Net Income)
-
-    Revenue is now defined EXACTLY as:
-    Revenue = Total for Income
-    """
-
     df = df.copy()
 
-    # Manual subtotals from Excel
     mask = (
         df["Category"].str.startswith("Total for ")
         #| (df["Category"] == "Gross Profit")
         | (df["Category"] == "Net Income")
         | (df["Category"] == "Net Operating Income")
     )
-
     subtotals = df[mask].reset_index(drop=True)
 
-    # ------------------------------
-    # AUTO TOTAL: Total Income
-    # ------------------------------
     income_rows = subtotals[subtotals["Category"] == "Total for Income"]
     total_income = income_rows.groupby("Year")["Amount"].sum().reset_index()
     total_income["Category"] = "Total Income (Auto)"
 
-    # ------------------------------
-    # AUTO TOTAL: Total Expenses
-    # ------------------------------
     expense_rows = subtotals[subtotals["Category"] == "Total for Expenses"]
     total_expenses = expense_rows.groupby("Year")["Amount"].sum().reset_index()
     total_expenses["Category"] = "Total Expenses (Auto)"
 
-    # ------------------------------
-    # AUTO TOTAL: Revenue = Total for Income
-    # ------------------------------
+    # Revenue = Total for Income
     revenue_df = total_income.copy()
     revenue_df["Category"] = "Total Revenue (Auto)"
 
-    # ------------------------------
-    # AUTO TOTAL: Net Income = Income - Expenses
-    # ------------------------------
     net_income = pd.merge(
         total_income,
         total_expenses,
@@ -159,7 +157,6 @@ def extract_subtotals(df):
     net_income = net_income[["Year", "Amount"]]
     net_income["Category"] = "Net Income (Auto)"
 
-    # Combine everything
     auto_totals = pd.concat(
         [total_income, total_expenses, revenue_df, net_income],
         ignore_index=True
@@ -169,142 +166,152 @@ def extract_subtotals(df):
 
 
 # ---------------------------------------------------------
-# YEAR-OVER-YEAR CALCULATION
+# YOY CALC
 # ---------------------------------------------------------
 def compute_yoy(subtotals):
-    """
-    Computes year-over-year change for each subtotal category.
-    Auto totals are included internally but will be hidden later.
-    """
-    pivot = subtotals.pivot_table(
-        index="Category",
-        columns="Year",
-        values="Amount",
-        aggfunc="sum"
-    ).sort_index(axis=1)
-
-    yoy_list = []
-    years = sorted(subtotals["Year"].unique())
-
-    for i in range(1, len(years)):
-        prev_y = years[i - 1]
-        cur_y = years[i]
-
-        diff = pivot[cur_y] - pivot[prev_y]
-        pct = diff / pivot[prev_y].replace(0, np.nan) * 100
-
-        tmp = pd.DataFrame({
-            "Category": pivot.index,
-            "Year": cur_y,
-            "YoY Change": diff,
-            "YoY %": pct
-        })
-        yoy_list.append(tmp)
-
-    if not yoy_list:
-        return pd.DataFrame(columns=["Category", "Year", "YoY Change", "YoY %"])
-
-    return pd.concat(yoy_list, ignore_index=True)
+    df = subtotals.copy()
+    df = df.sort_values(["Category", "Year"])
+    df["YoY Change"] = df.groupby("Category")["Amount"].diff()
+    df["YoY %"] = df.groupby("Category")["Amount"].pct_change() * 100
+    return df
 
 
 # ---------------------------------------------------------
-# SURPLUS / DEFICIT (Auto totals renamed + shown)
+# SURPLUS / DEFICIT
 # ---------------------------------------------------------
 def compute_surplus_deficit(subtotals):
-    """
-    Uses Auto totals internally but renames them to clean names:
-    - Total Revenue
-    - Total Income
-    - Total Expenses
-    - Net Income
-    """
-    auto = subtotals[subtotals["Category"].str.contains("(Auto)")]
+    df = subtotals.copy()
 
-    pivot = auto.pivot_table(
-        index="Year",
-        columns="Category",
-        values="Amount",
-        aggfunc="sum"
-    ).reset_index()
+    total_income = df[df["Category"] == "Total Income (Auto)"][["Year", "Amount"]]
+    total_income = total_income.rename(columns={"Amount": "Total Income"})
 
-    pivot = pivot.rename(columns={
-        "Total Revenue (Auto)": "Total Revenue",
-        "Total Income (Auto)": "Total Income",
-        "Total Expenses (Auto)": "Total Expenses",
-        "Net Income (Auto)": "Net Income",
-    })
+    total_expenses = df[df["Category"] == "Total Expenses (Auto)"][["Year", "Amount"]]
+    total_expenses = total_expenses.rename(columns={"Amount": "Total Expenses"})
 
-    return pivot[["Year", "Total Revenue", "Total Income", "Total Expenses", "Net Income"]]
+    revenue = df[df["Category"] == "Total Revenue (Auto)"][["Year", "Amount"]]
+    revenue = revenue.rename(columns={"Amount": "Total Revenue"})
 
+    net_income = df[df["Category"] == "Net Income (Auto)"][["Year", "Amount"]]
+    net_income = net_income.rename(columns={"Amount": "Net Income"})
 
-# ---------------------------------------------------------
-# FORECASTING (Linear Regression)
-# ---------------------------------------------------------
-def forecast_category(subtotals, category, forecast_years=3):
-    """
-    Forecasts future values using a simple linear regression.
-    Works for both Auto totals and manual totals.
-    """
-    cat_df = subtotals[subtotals["Category"] == category].copy()
-    if cat_df.empty:
-        return pd.DataFrame(columns=["Year", "Amount", "Type"])
-
-    cat_df = cat_df.sort_values("Year")
-    cat_df = cat_df.dropna(subset=["Amount"])
-
-    if len(cat_df) < 2:
-        return pd.DataFrame(columns=["Year", "Amount", "Type"])
-
-    years = cat_df["Year"].values.astype(float)
-    amounts = cat_df["Amount"].values.astype(float)
-
-    m, b = np.polyfit(years, amounts, 1)
-
-    last_year = int(years.max())
-    future_years = np.arange(last_year + 1, last_year + 1 + forecast_years)
-    future_amounts = m * future_years + b
-
-    actual_df = pd.DataFrame({
-        "Year": years.astype(int),
-        "Amount": amounts,
-        "Type": "Actual"
-    })
-
-    forecast_df = pd.DataFrame({
-        "Year": future_years.astype(int),
-        "Amount": future_amounts,
-        "Type": "Forecast"
-    })
-
-    return pd.concat([actual_df, forecast_df], ignore_index=True)
-
-
-# ---------------------------------------------------------
-# MAIN DASHBOARD
-# ---------------------------------------------------------
-def main():
-    st.title("Church Financial Subtotals Dashboard")
-
-    # Load data
-    df = load_data()
-    subtotals = extract_subtotals(df)
-
-    # Sidebar year selection
-    years_available = sorted(df["Year"].unique())
-    selected_years = st.sidebar.multiselect(
-        "Select Years",
-        options=years_available,
-        default=years_available
+    merged = (
+        revenue.merge(total_income, on="Year", how="outer")
+        .merge(total_expenses, on="Year", how="outer")
+        .merge(net_income, on="Year", how="outer")
+        .sort_values("Year")
     )
 
-    filtered = subtotals[subtotals["Year"].isin(selected_years)]
+    return merged
 
-    # Tabs
-    tab1, tab2, tab3, tab4 = st.tabs([
+
+# ---------------------------------------------------------
+# FORECASTING
+# ---------------------------------------------------------
+def forecast_category(df, category, periods=3):
+    data = df[df["Category"] == category].groupby("Year")["Amount"].sum().reset_index()
+    if len(data) < 2:
+        return pd.DataFrame()
+
+    x = data["Year"].values
+    y = data["Amount"].values
+
+    coeffs = np.polyfit(x, y, 1)
+    m, b = coeffs
+
+    last_year = x.max()
+    future_years = np.arange(last_year + 1, last_year + 1 + periods)
+    future_amounts = m * future_years + b
+
+    hist = data.copy()
+    hist["Type"] = "Actual"
+
+    fut = pd.DataFrame({"Year": future_years, "Amount": future_amounts})
+    fut["Type"] = "Forecast"
+
+    return pd.concat([hist, fut], ignore_index=True)
+
+
+# ---------------------------------------------------------
+# TOP INCOME / EXPENSE
+# ---------------------------------------------------------
+def get_top_income(df, n=5):
+    d = df.copy()
+    d = d[d["Type"] == "Income"]
+    d = d[~d["Category"].str.startswith("Total for ")]
+    return d.groupby(["Year", "Category"])["Amount"].sum().reset_index()
+
+
+def get_top_expense(df, n=5):
+    d = df.copy()
+    d = d[d["Type"] == "Expense"]
+    d = d[~d["Category"].str.startswith("Total for ")]
+    return d.groupby(["Year", "Category"])["Amount"].sum().reset_index()
+
+
+# ---------------------------------------------------------
+# PDF GENERATION
+# ---------------------------------------------------------
+def generate_pdf(subtotals, year):
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=letter)
+    styles = getSampleStyleSheet()
+    story = []
+
+    title = Paragraph(f"<b>MECCA Financial Subtotals Report – {year}</b>", styles["Title"])
+    story.append(title)
+    story.append(Spacer(1, 12))
+
+    df_year = subtotals[subtotals["Year"] == year].copy()
+    df_year = df_year[["Category", "Amount"]]
+
+    table_data = [["Category", "Amount"]]
+    for _, row in df_year.iterrows():
+        table_data.append([row["Category"], f"${row['Amount']:,.2f}"])
+
+    table = Table(table_data, colWidths=[300, 150])
+    style = TableStyle([
+        ("BACKGROUND", (0, 0), (-1, 0), colors.lightgrey),
+        ("TEXTCOLOR", (0, 0), (-1, 0), colors.black),
+        ("ALIGN", (1, 1), (-1, -1), "RIGHT"),
+        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+        ("FONTSIZE", (0, 0), (-1, -1), 9),
+        ("GRID", (0, 0), (-1, -1), 0.25, colors.grey),
+    ])
+
+    for i, row in enumerate(df_year.itertuples(), start=1):
+        if str(row.Category).lower().startswith("total for "):
+            style.add("BACKGROUND", (0, i), (-1, i), colors.HexColor("#f0f0f0"))
+            style.add("FONTNAME", (0, i), (-1, i), "Helvetica-Bold")
+
+    table.setStyle(style)
+    story.append(table)
+
+    doc.build(story)
+    buffer.seek(0)
+    return buffer
+
+
+# ---------------------------------------------------------
+# MAIN APP
+# ---------------------------------------------------------
+def main():
+    st.title("📊 MekanSelam Medhanialem Ethiopian Orthodox Church Financial Subtotals Dashboard")
+
+    df = load_data()
+    subtotals = extract_subtotals(df)
+    yoy_df = compute_yoy(subtotals)
+    sd_df = compute_surplus_deficit(subtotals)
+
+    years = sorted(df["Year"].unique())
+    selected_years = st.multiselect("Select Years", years, default=years)
+
+    tab1, tab2, tab_top, tab3, tab4, tab_pdf = st.tabs([
         "Subtotal Summary",
-        "Year-over-Year Change",
+        "YOY Summary",
+        "Top Income & Expenses",
         "Surplus / Deficit",
-        "Forecasting"
+        "Forecasting",
+        "Board PDF"
     ])
 
     # -----------------------------------------------------
@@ -312,137 +319,135 @@ def main():
     # -----------------------------------------------------
     with tab1:
         st.subheader("Subtotal Summary")
+        sub_filtered = subtotals[subtotals["Year"].isin(selected_years)]
+        st.dataframe(sub_filtered, use_container_width=True)
 
-        # Hide Auto totals EXCEPT the 4 main totals (renamed)
-        visible = filtered.copy()
+        if not sub_filtered.empty:
+            excel_bytes = df_to_excel_bytes(sub_filtered, sheet_name="Subtotals")
+            st.download_button(
+                "Download Subtotals as Excel",
+                data=excel_bytes,
+                file_name="subtotals.xlsx",
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            )
 
-        # Promote Auto totals into visible totals
-        visible["Category"] = visible["Category"].replace({
-            "Total Revenue (Auto)": "Total Revenue",
-            "Total Income (Auto)": "Total Income",
-            "Total Expenses (Auto)": "Total Expenses",
-            "Net Income (Auto)": "Net Income",
-        })
+    # -----------------------------------------------------
+    # TAB 2 — YOY SUMMARY
+    # -----------------------------------------------------
+    with tab2:
+        st.subheader("YOY Summary")
 
-        # Hide all other Auto totals
-        visible = visible[~visible["Category"].str.contains("(Auto)")]
+        yoy_filtered = yoy_df[yoy_df["Year"].isin(selected_years)]
 
-        subtotal_pivot = visible.pivot_table(
-            index="Category",
-            columns="Year",
-            values="Amount",
-            aggfunc="sum"
-        ).sort_index(axis=1)
+        PAYROLL_GROUP = ["Salaries & Wages", "Payroll Tax Expense"]
+        payroll_df = yoy_filtered[yoy_filtered["Category"].isin(PAYROLL_GROUP)]
+        if not payroll_df.empty:
+            payroll_sum = payroll_df.groupby("Year")[["YoY Change", "YoY %"]].sum().reset_index()
+            payroll_sum["Category"] = "Payroll"
+        else:
+            payroll_sum = pd.DataFrame()
 
-        # Desired ordering
-        desired_order = [
-            "Total Revenue",
-            "Total Income",
-            "Total Expenses",
-            "Net Income",
-            #"Gross Profit",
+        UTILITIES_GROUP = [c for c in yoy_filtered["Category"].unique() if "Utilit" in c]
+        utilities_df = yoy_filtered[yoy_filtered["Category"].isin(UTILITIES_GROUP)]
+        if not utilities_df.empty:
+            utilities_sum = utilities_df.groupby("Year")[["YoY Change", "YoY %"]].sum().reset_index()
+            utilities_sum["Category"] = "Utilities"
+        else:
+            utilities_sum = pd.DataFrame()
+
+        board_totals = yoy_filtered[
+            yoy_filtered["Category"].isin([
+                "Total Income (Auto)",
+                "Total Expenses (Auto)",
+                "Total Revenue (Auto)",
+                "Net Income (Auto)"
+            ])
         ]
 
-        existing = [c for c in desired_order if c in subtotal_pivot.index]
-        others = [c for c in subtotal_pivot.index if c not in existing]
+        final_yoy = pd.concat([board_totals, payroll_sum, utilities_sum], ignore_index=True)
 
-        subtotal_pivot = subtotal_pivot.loc[existing + others]
+        if final_yoy.empty:
+            st.info("No YOY data available.")
+        else:
+            yoy_pivot = final_yoy.pivot_table(
+                index="Year",
+                columns="Category",
+                values="YoY Change",
+                aggfunc="sum"
+            ).sort_index()
 
-        st.dataframe(subtotal_pivot.T)
+            yoy_pct = final_yoy.pivot_table(
+                index="Year",
+                columns="Category",
+                values="YoY %",
+                aggfunc="mean"
+            ).sort_index()
+
+            def format_cell(change, pct):
+                if pd.isna(change):
+                    return ""
+                arrow = "▲" if change > 0 else "▼" if change < 0 else ""
+                color = "green" if change > 0 else "red" if change < 0 else "black"
+                pct_str = f"{pct:.1f}%" if not pd.isna(pct) else ""
+                return f"<span style='color:{color}; font-weight:bold'>{arrow} {change:.0f} ({pct_str})</span>"
+
+            combined = yoy_pivot.copy().astype("object")
+            for row in combined.index:
+                for col in combined.columns:
+                    combined.loc[row, col] = format_cell(
+                        yoy_pivot.loc[row, col],
+                        yoy_pct.loc[row, col] if col in yoy_pct.columns else np.nan
+                    )
+
+            st.markdown(combined.to_html(escape=False), unsafe_allow_html=True)
 
     # -----------------------------------------------------
-    # TAB 2 — YEAR-OVER-YEAR CHANGE
+    # TAB — TOP INCOME & EXPENSES
     # -----------------------------------------------------
-    
-    with tab2:
-        st.subheader("Year-over-Year Change — Board + Payroll + Utilities")
+    with tab_top:
+        st.subheader("Top Income & Top Expenses")
 
-        yoy_df = compute_yoy(subtotals)
+        top_income = get_top_income(df)
+        top_expense = get_top_expense(df)
 
-        # Normalize Auto totals
-        yoy_df["Category"] = yoy_df["Category"].replace({
-        "Total Revenue (Auto)": "Total Revenue",
-        "Total Income (Auto)": "Total Income",
-        "Total Expenses (Auto)": "Total Expenses",
-        "Net Income (Auto)": "Net Income",
-        })
+        year = st.selectbox("Select Year", years)
 
-    # Filter selected years
-    yoy_df = yoy_df[yoy_df["Year"].isin(selected_years)]
+        inc_year = top_income[top_income["Year"] == year].sort_values("Amount", ascending=False).head(5)
+        exp_year = top_expense[top_expense["Year"] == year].sort_values("Amount", ascending=False).head(5)
 
-    # -------------------------------
-    # 1. BOARD TOTALS
-    # -------------------------------
-    board_totals = yoy_df[yoy_df["Category"].isin([
-        "Total Revenue",
-        "Total Income",
-        "Total Expenses",
-        "Net Income"
-    ])]
+        col1, col2 = st.columns(2)
 
-    # -------------------------------
-    # 2. PAYROLL GROUP
-    # -------------------------------
-    PAYROLL_GROUP = ["Salaries & Wages", "Payroll Tax Expense"]
+        with col1:
+            st.markdown("### Top Income Categories")
+            st.dataframe(inc_year, use_container_width=True)
 
-    payroll_df = yoy_df[yoy_df["Category"].isin(PAYROLL_GROUP)]
-    if not payroll_df.empty:
-        payroll_sum = payroll_df.groupby("Year")[["YoY Change", "YoY %"]].sum().reset_index()
-        payroll_sum["Category"] = "Payroll"
-    else:
-        payroll_sum = pd.DataFrame()
+            if not inc_year.empty:
+                selected_inc = st.selectbox("Forecast Income Category", inc_year["Category"])
+                inc_forecast = forecast_category(df, selected_inc)
+                if not inc_forecast.empty:
+                    chart = alt.Chart(inc_forecast).mark_line(point=True).encode(
+                        x=alt.X("Year:O"),
+                        y=alt.Y("Amount:Q"),
+                        color="Type:N",
+                        tooltip=["Year", "Amount", "Type"]
+                    ).properties(title=f"Forecast — {selected_inc}", width=400, height=300)
+                    st.altair_chart(chart, use_container_width=True)
 
-    # -------------------------------
-    # 3. UTILITIES GROUP
-    # -------------------------------
-    UTILITIES_GROUP = [c for c in yoy_df["Category"].unique() if "Utilit" in c]
+        with col2:
+            st.markdown("### Top Expense Categories")
+            st.dataframe(exp_year, use_container_width=True)
 
-    utilities_df = yoy_df[yoy_df["Category"].isin(UTILITIES_GROUP)]
-    if not utilities_df.empty:
-        utilities_sum = utilities_df.groupby("Year")[["YoY Change", "YoY %"]].sum().reset_index()
-        utilities_sum["Category"] = "Utilities"
-    else:
-        utilities_sum = pd.DataFrame()
-
-    # -------------------------------
-    # COMBINE ALL SIX FIELDS
-    # -------------------------------
-    final_yoy = pd.concat([board_totals, payroll_sum, utilities_sum], ignore_index=True)
-
-    if final_yoy.empty:
-        st.info("No YOY data available.")
-    else:
-        yoy_pivot = final_yoy.pivot_table(
-            index="Year",
-            columns="Category",
-            values="YoY Change",
-            aggfunc="sum"
-        ).sort_index()
-
-        yoy_pct = final_yoy.pivot_table(
-            index="Year",
-            columns="Category",
-            values="YoY %",
-            aggfunc="mean"
-        ).sort_index()
-
-        def format_cell(change, pct):
-            if pd.isna(change):
-                return ""
-            arrow = "▲" if change > 0 else "▼" if change < 0 else ""
-            color = "green" if change > 0 else "red" if change < 0 else "black"
-            pct_str = f"{pct:.1f}%" if not pd.isna(pct) else ""
-            return f"<span style='color:{color}; font-weight:bold'>{arrow} {change:.0f} ({pct_str})</span>"
-
-        combined = yoy_pivot.copy().astype("object")
-        for row in combined.index:
-            for col in combined.columns:
-                combined.loc[row, col] = format_cell(
-                    yoy_pivot.loc[row, col],
-                    yoy_pct.loc[row, col]
-                )
-
-        st.markdown(combined.to_html(escape=False), unsafe_allow_html=True)
+            if not exp_year.empty:
+                selected_exp = st.selectbox("Forecast Expense Category", exp_year["Category"])
+                exp_forecast = forecast_category(df, selected_exp)
+                if not exp_forecast.empty:
+                    chart = alt.Chart(exp_forecast).mark_line(point=True).encode(
+                        x=alt.X("Year:O"),
+                        y=alt.Y("Amount:Q"),
+                        color="Type:N",
+                        tooltip=["Year", "Amount", "Type"]
+                    ).properties(title=f"Forecast — {selected_exp}", width=400, height=300)
+                    st.altair_chart(chart, use_container_width=True)
 
     # -----------------------------------------------------
     # TAB 3 — SURPLUS / DEFICIT
@@ -450,19 +455,15 @@ def main():
     with tab3:
         st.subheader("Surplus / Deficit")
 
-        sd_df = compute_surplus_deficit(subtotals)
         sd_filtered = sd_df[sd_df["Year"].isin(selected_years)]
-
         if sd_filtered.empty:
             st.info("No Surplus/Deficit data available.")
         else:
             sd_filtered = sd_filtered.set_index("Year")
-
             desired_order = ["Total Revenue", "Total Income", "Total Expenses", "Net Income"]
             existing = [c for c in desired_order if c in sd_filtered.columns]
             others = [c for c in sd_filtered.columns if c not in existing]
-
-            st.dataframe(sd_filtered[existing + others].T)
+            st.dataframe(sd_filtered[existing + others].T, use_container_width=True)
 
     # -----------------------------------------------------
     # TAB 4 — FORECASTING
@@ -481,13 +482,11 @@ def main():
                 c for c in subtotals["Category"].unique()
                 if c.startswith("Total for ") or c == "Gross Profit"
             ])
-
         elif forecast_mode == "Auto Totals Only":
             category_list = sorted([
                 c for c in subtotals["Category"].unique()
                 if "(Auto)" in c
             ])
-
         else:
             category_list = sorted([
                 c for c in subtotals["Category"].unique()
@@ -495,7 +494,6 @@ def main():
             ])
 
         selected_category = st.selectbox("Select Category", category_list)
-
         forecast_df = forecast_category(subtotals, selected_category)
 
         if forecast_df.empty:
@@ -506,9 +504,24 @@ def main():
                 y=alt.Y("Amount:Q"),
                 color="Type:N",
                 tooltip=["Year", "Amount", "Type"]
-            ).properties(width=800, height=400)
-
+            ).properties(width=800, height=400, title=f"Forecast — {selected_category}")
             st.altair_chart(chart, use_container_width=True)
+
+    # -----------------------------------------------------
+    # TAB 5 — BOARD PDF
+    # -----------------------------------------------------
+    with tab_pdf:
+        st.subheader("Board PDF Report")
+
+        year_for_pdf = st.selectbox("Select Year for PDF", years)
+        if st.button("Generate PDF"):
+            pdf_buffer = generate_pdf(subtotals, year_for_pdf)
+            st.download_button(
+                label="Download PDF",
+                data=pdf_buffer,
+                file_name=f"MECCA_Financial_Subtotals_{year_for_pdf}.pdf",
+                mime="application/pdf"
+            )
 
 
 if __name__ == "__main__":
