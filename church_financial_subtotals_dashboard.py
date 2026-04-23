@@ -411,7 +411,7 @@ def main():
         "Forecasting",
         "Board PDF"
     ])
-
+    
     # -----------------------------------------------------
     # TAB 1 — UNIFIED SUBTOTAL SUMMARY (NEW)
     # -----------------------------------------------------
@@ -536,13 +536,15 @@ def main():
         #st.dataframe(top_expense_pivot.style.format("{:,.2f}"), use_container_width=True)
         st.dataframe(style_top5(add_rank_icons(top_expense_pivot)), use_container_width=True)
 
-# -----------------------------------------------------
-# TAB 2 — CLEAN, FIXED, GUARANTEED YOY SUMMARY
-# -----------------------------------------------------
+    # -----------------------------------------------------
+    # TAB 2 — CLEAN, FIXED, GUARANTEED YOY SUMMARY
+    # ----------------------------------------------------
+
+
 with tab2:
     st.subheader("📘 Year‑Over‑Year (YOY) Summary")
 
-    # We want these 6 categories in this exact order
+    # The 6 categories we want in this exact order
     TARGET_ORDER = [
         "Total Revenue",
         "Total Income",
@@ -552,14 +554,14 @@ with tab2:
         "Utilities"
     ]
 
-    # --- 1. Build a clean YOY table from subtotals ---
+    # --- 1. Build YOY rows manually from subtotals ---
     yoy_rows = []
 
     for cat in TARGET_ORDER:
-        cat_rows = subtotals[subtotals["Category"] == cat].sort_values("Year")
+        cat_data = subtotals[subtotals["Category"] == cat].sort_values("Year")
 
-        years = cat_rows["Year"].tolist()
-        amounts = cat_rows["Amount"].tolist()
+        years = cat_data["Year"].tolist()
+        amounts = cat_data["Amount"].tolist()
 
         for i in range(len(years)):
             year = years[i]
@@ -590,14 +592,17 @@ with tab2:
 
     # --- 3. Pivot for display ---
     yoy_pivot = yoy_clean.pivot_table(
-        index="Year",
-        columns="Category",
+        index="Category",
+        columns="Year",
         values="YoY Change",
         aggfunc="sum"
     ).fillna(0)
 
     # --- 4. Display ---
-    st.dataframe(yoy_pivot, use_container_width=True)
+    st.dataframe(yoy_pivot.style.format("{:,.2f}"), use_container_width=True)
+
+
+
 
     # -----------------------------------------------------
     # TAB 3 — TOP INCOME & EXPENSES (FORECASTING)
