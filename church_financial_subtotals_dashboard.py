@@ -323,7 +323,7 @@ def style_top5(df):
     # Map index labels to numeric positions
     index_positions = {idx: pos for pos, idx in enumerate(df.index)}
 
-    def highlight(row):
+def highlight(row):
 pos = index_positions[row.name]
         color = "background-color: #d4edda" if pos < 3 else "background-color: #fff3cd"
         return [color] * len(row)
