@@ -303,8 +303,9 @@ def generate_pdf(subtotals, year):
 # MAIN APP
 # ---------------------------------------------------------
 def main():
-    st.title("📊 MekanSelam Medhanialem Ethiopian Orthodox Church Financial Subtotals Dashboard")
+    st.title("📊 MECCA Financial Subtotals Dashboard")
 
+    # Load data
     df = load_data()
     subtotals = extract_subtotals(df)
     yoy_df = compute_yoy(subtotals)
@@ -313,6 +314,7 @@ def main():
     years = sorted(df["Year"].unique())
     selected_years = st.multiselect("Select Years", years, default=years)
 
+    # Tabs
     tab1, tab2, tab_top, tab3, tab4, tab_pdf = st.tabs([
         "Subtotal Summary",
         "YOY Summary",
@@ -323,21 +325,121 @@ def main():
     ])
 
     # -----------------------------------------------------
-    # TAB 1 — SUBTOTAL SUMMARY
+    # TAB 1 — UNIFIED SUBTOTAL SUMMARY (NEW)
     # -----------------------------------------------------
     with tab1:
-        st.subheader("Subtotal Summary")
-        sub_filtered = subtotals[subtotals["Year"].isin(selected_years)]
-        st.dataframe(sub_filtered, use_container_width=True)
+        st.subheader("📘 Unified Subtotal Summary (Pivot View)")
 
-        if not sub_filtered.empty:
-            excel_bytes = df_to_excel_bytes(sub_filtered, sheet_name="Subtotals")
-            st.download_button(
-                "Download Subtotals as Excel",
-                data=excel_bytes,
-                file_name="subtotals.xlsx",
-                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-            )
+        # --- 1. BUILD MAIN SUMMARY PIVOT ---
+        summary_rows = []
+
+        for year, group in subtotals.groupby("Year"):
+
+            # Revenue = Total for Income
+            revenue = group.loc[
+                group["Category"].str.lower() == "total for income",
+                "Amount"
+            ].sum()
+
+            total_income = group.loc[
+                group["Category"].str.lower() == "total for income",
+                "Amount"
+            ].sum()
+
+            total_expenses = group.loc[
+                group["Category"].str.lower() == "total for expenses",
+                "Amount"
+            ].sum()
+
+            net_income = total_income - total_expenses
+
+            payroll = df[
+                (df["Year"] == year) &
+                (df["Category"].isin(["Salaries & Wages", "Payroll Tax Expense"]))
+            ]["Amount"].sum()
+
+            utilities = df[
+                (df["Year"] == year) &
+                (df["Category"].str.contains("Utilit", case=False))
+            ]["Amount"].sum()
+
+            summary_rows.append(["Total Revenue", year, revenue])
+            summary_rows.append(["Total Income", year, total_income])
+            summary_rows.append(["Total Expenses", year, total_expenses])
+            summary_rows.append(["Net Income", year, net_income])
+            summary_rows.append(["Payroll", year, payroll])
+            summary_rows.append(["Utilities", year, utilities])
+
+        summary_df = pd.DataFrame(summary_rows, columns=["Category", "Year", "Amount"])
+        summary_pivot = summary_df.pivot_table(
+            index="Category",
+            columns="Year",
+            values="Amount",
+            aggfunc="sum"
+        ).fillna(0)
+
+        st.markdown("### 📘 Main Financial Summary")
+        st.dataframe(summary_pivot.style.format("{:,.2f}"), use_container_width=True)
+
+        st.divider()
+
+        # --- 2. TOP 5 INCOME PIVOT ---
+        st.markdown("### 💰 Top 5 Income Categories (All Years)")
+
+        top_income_all = (
+            df[df["Type"] == "Income"]
+            .groupby(["Category", "Year"])["Amount"]
+            .sum()
+            .reset_index()
+        )
+
+        top_income_totals = (
+            top_income_all.groupby("Category")["Amount"].sum()
+            .sort_values(ascending=False)
+            .head(5)
+            .index
+        )
+
+        top_income_pivot = top_income_all[
+            top_income_all["Category"].isin(top_income_totals)
+        ].pivot_table(
+            index="Category",
+            columns="Year",
+            values="Amount",
+            aggfunc="sum"
+        ).fillna(0)
+
+        st.dataframe(top_income_pivot.style.format("{:,.2f}"), use_container_width=True)
+
+        st.divider()
+
+        # --- 3. TOP 5 EXPENSE PIVOT ---
+        st.markdown("### 📉 Top 5 Expense Categories (All Years)")
+
+        top_expense_all = (
+            df[df["Type"] == "Expense"]
+            .groupby(["Category", "Year"])["Amount"]
+            .sum()
+            .reset_index()
+        )
+
+        top_expense_totals = (
+            top_expense_all.groupby("Category")["Amount"].sum()
+            .sort_values(ascending=False)
+            .head(5)
+            .index
+        )
+
+        top_expense_pivot = top_expense_all[
+            top_expense_all["Category"].isin(top_expense_totals)
+        ].pivot_table(
+            index="Category",
+            columns="Year",
+            values="Amount",
+            aggfunc="sum"
+        ).fillna(0)
+
+        st.dataframe(top_expense_pivot.style.format("{:,.2f}"), use_container_width=True)
 
     # -----------------------------------------------------
     # TAB 2 — YOY SUMMARY
@@ -410,7 +512,7 @@ def main():
             st.markdown(combined.to_html(escape=False), unsafe_allow_html=True)
 
     # -----------------------------------------------------
-    # TAB — TOP INCOME & EXPENSES
+    # TAB 3 — TOP INCOME & EXPENSES
     # -----------------------------------------------------
     with tab_top:
         st.subheader("Top Income & Top Expenses")
@@ -458,7 +560,7 @@ def main():
                     st.altair_chart(chart, use_container_width=True)
 
     # -----------------------------------------------------
-    # TAB 3 — SURPLUS / DEFICIT
+    # TAB 4 — SURPLUS / DEFICIT
     # -----------------------------------------------------
     with tab3:
         st.subheader("Surplus / Deficit")
@@ -474,7 +576,7 @@ def main():
             st.dataframe(sd_filtered[existing + others].T, use_container_width=True)
 
     # -----------------------------------------------------
-    # TAB 4 — FORECASTING
+    # TAB 5 — FORECASTING
     # -----------------------------------------------------
     with tab4:
         st.subheader("Forecasting")
@@ -516,7 +618,7 @@ def main():
             st.altair_chart(chart, use_container_width=True)
 
     # -----------------------------------------------------
-    # TAB 5 — BOARD PDF
+    # TAB 6 — BOARD PDF
     # -----------------------------------------------------
     with tab_pdf:
         st.subheader("Board PDF Report")
@@ -530,7 +632,5 @@ def main():
                 file_name=f"MECCA_Financial_Subtotals_{year_for_pdf}.pdf",
                 mime="application/pdf"
             )
-
-
 if __name__ == "__main__":
     main()
