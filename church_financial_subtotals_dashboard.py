@@ -638,7 +638,7 @@ def main():
     # TAB 4 — SURPLUS / DEFICIT
     # -----------------------------------------------------
   
-with tab3:
+    with tab3:
     st.subheader("📉 Surplus / Deficit Summary")
 
     # Extract Total Income and Total Expenses from subtotals
