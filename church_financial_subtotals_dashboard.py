@@ -298,8 +298,9 @@ def generate_pdf(subtotals, year):
     doc.build(story)
     buffer.seek(0)
     return buffer
+
 # ---------------------------------------------------------
-Add the same style function (reuse it everywhere)
+# Add the same style function (reuse it everywhere)
 # ---------------------------------------------------------
 def style_top5(df):
     # df index = Category rows
@@ -315,6 +316,8 @@ def style_top5(df):
         lambda row: [highlight(row.name)] * len(df.columns),
         axis=1
     ).format("{:,.2f}")
+
+
 def add_rank_icons(df):
     icons = ["🥇", "🥈", "🥉", "⭐", "⭐"]
     df = df.copy()
