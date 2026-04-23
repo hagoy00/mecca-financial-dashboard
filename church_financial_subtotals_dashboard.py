@@ -469,7 +469,7 @@ def main():
         st.dataframe(style_top5(add_summary_icons(summary_pivot)), use_container_width=True)
 
         st.divider()
-
+        
         # -----------------------------------------------------
         # TOP 5 INCOME PIVOT (Corrected)
         # -----------------------------------------------------
@@ -535,14 +535,15 @@ def main():
 
         #st.dataframe(top_expense_pivot.style.format("{:,.2f}"), use_container_width=True)
         st.dataframe(style_top5(add_rank_icons(top_expense_pivot)), use_container_width=True)
+
 # -----------------------------------------------------
-# TAB 2 — YOY SUMMARY (CLEAN + FIXED)
+# TAB 2 — CLEAN, FIXED, GUARANTEED YOY SUMMARY
 # -----------------------------------------------------
 with tab2:
     st.subheader("📘 Year‑Over‑Year (YOY) Summary")
 
-    # We want these 6 categories in YOY:
-    TARGET_CATEGORIES = [
+    # We want these 6 categories in this exact order
+    TARGET_ORDER = [
         "Total Revenue",
         "Total Income",
         "Total Expenses",
@@ -551,25 +552,52 @@ with tab2:
         "Utilities"
     ]
 
-    # Filter only the categories we want
-    yoy_filtered = yoy_df[yoy_df["Category"].isin(TARGET_CATEGORIES)].copy()
+    # --- 1. Build a clean YOY table from subtotals ---
+    yoy_rows = []
 
-    # Sort in the correct order
-    yoy_filtered["SortOrder"] = yoy_filtered["Category"].map({
-        "Total Revenue": 1,
-        "Total Income": 2,
-        "Total Expenses": 3,
-        "Net Income": 4,
-        "Payroll": 5,
-        "Utilities": 6
-    })
-    yoy_filtered = yoy_filtered.sort_values("SortOrder").drop(columns=["SortOrder"])
+    for cat in TARGET_ORDER:
+        cat_rows = subtotals[subtotals["Category"] == cat].sort_values("Year")
 
-    # Add icons
-    yoy_final = add_yoy_icons(yoy_filtered)
+        years = cat_rows["Year"].tolist()
+        amounts = cat_rows["Amount"].tolist()
 
-    # Display
-    st.dataframe(yoy_final, use_container_width=True
+        for i in range(len(years)):
+            year = years[i]
+            amount = amounts[i]
+
+            if i == 0:
+                yoy_change = 0
+                yoy_pct = 0
+            else:
+                prev = amounts[i - 1]
+                yoy_change = amount - prev
+                yoy_pct = (yoy_change / prev * 100) if prev != 0 else 0
+
+            yoy_rows.append([
+                cat,
+                year,
+                amount,
+                yoy_change,
+                yoy_pct
+            ])
+
+    yoy_clean = pd.DataFrame(yoy_rows, columns=[
+        "Category", "Year", "Amount", "YoY Change", "YoY %"
+    ])
+
+    # --- 2. Add icons ---
+    yoy_clean = add_yoy_icons(yoy_clean)
+
+    # --- 3. Pivot for display ---
+    yoy_pivot = yoy_clean.pivot_table(
+        index="Year",
+        columns="Category",
+        values="YoY Change",
+        aggfunc="sum"
+    ).fillna(0)
+
+    # --- 4. Display ---
+    st.dataframe(yoy_pivot, use_container_width=True)
 
     # -----------------------------------------------------
     # TAB 3 — TOP INCOME & EXPENSES (FORECASTING)
