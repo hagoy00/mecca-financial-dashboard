@@ -7,7 +7,7 @@ from reportlab.lib import colors
 from io import BytesIO
 
 from utils.data_utils import load_all_years
-$from utils.data_utils import load_church_excel
+from utils.data_utils import load_church_excel
 from utils.style_utils import highlight_subtotals
 
 st.set_page_config(page_title="PDF Generator", layout="wide")
