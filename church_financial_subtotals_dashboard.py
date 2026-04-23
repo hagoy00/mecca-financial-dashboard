@@ -504,12 +504,13 @@ def main():
 
         st.divider()
 
-        # -----------------------------------------------------
-        # TOP 5 EXPENSE PIVOT (Corrected)
-        # -----------------------------------------------------
-        # Clean Expense Filter
-        # Clean Expense Filter
-    expense_df = df[
+       # -----------------------------------------------------
+# TOP 5 EXPENSE PIVOT (Corrected)
+# -----------------------------------------------------
+st.markdown("### 📉 Top 5 Expense Categories (All Years)")
+
+# Clean Expense Filter
+expense_df = df[
     (df["Type"] == "Expense") & 
     (~df["Category"].str.lower().str.startswith("total for")) &
     (~df["Category"].str.lower().isin([
@@ -519,28 +520,28 @@ def main():
         "amortization"
     ]))
 ]
-    
-        expense_grouped = expense_df.groupby(["Category", "Year"])["Amount"].sum().reset_index()
 
-        top_expense_categories = (
-            expense_grouped.groupby("Category")["Amount"]
-            .sum()
-            .sort_values(ascending=False)
-            .head(5)
-            .index
-        )
+expense_grouped = expense_df.groupby(["Category", "Year"])["Amount"].sum().reset_index()
 
-        top_expense_pivot = expense_grouped[
-            expense_grouped["Category"].isin(top_expense_categories)
-        ].pivot_table(
-            index="Category",
-            columns="Year",
-            values="Amount",
-            aggfunc="sum"
-        ).fillna(0)
+top_expense_categories = (
+    expense_grouped.groupby("Category")["Amount"]
+    .sum()
+    .sort_values(ascending=False)
+    .head(5)
+    .index
+)
 
-        #st.dataframe(top_expense_pivot.style.format("{:,.2f}"), use_container_width=True)
-        st.dataframe(style_top5(add_rank_icons(top_expense_pivot)), use_container_width=True)
+top_expense_pivot = expense_grouped[
+    expense_grouped["Category"].isin(top_expense_categories)
+].pivot_table(
+    index="Category",
+    columns="Year",
+    values="Amount",
+    aggfunc="sum"
+).fillna(0)
+
+st.dataframe(style_top5(add_rank_icons(top_expense_pivot)), use_container_width=True)
+st.dataframe(style_top5(add_rank_icons(top_expense_pivot)), use_container_width=True)
 
     # -----------------------------------------------------
     # TAB 2 — CLEAN, FIXED, GUARANTEED YOY SUMMARY
