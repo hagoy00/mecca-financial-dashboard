@@ -3,7 +3,7 @@ import pandas as pd
 DATA_FILE = "MECCA_Financial_Data.xlsx"
 
 # ---------------------------------------------------------
-# 1. DEFINE HELPERS FIRST
+# 1. CLASSIFY ROW KIND (Detail, Header, Subtotal)
 # ---------------------------------------------------------
 def classify_row_kind(cat):
     c = str(cat).strip().lower()
@@ -18,13 +18,14 @@ def classify_row_kind(cat):
 
 
 # ---------------------------------------------------------
-# 2. MAIN LOADER (now safe to call classify_row_kind)
+# 2. MAIN LOADER — READ ALL YEAR SHEETS
 # ---------------------------------------------------------
 def load_all_years(path=DATA_FILE):
     xls = pd.ExcelFile(path)
     all_years = []
 
     for sheet in xls.sheet_names:
+        # Only load sheets that are numeric years
         try:
             year = int(sheet)
         except:
@@ -35,6 +36,7 @@ def load_all_years(path=DATA_FILE):
         if "Category" not in df.columns:
             continue
 
+        # The value column is the only non-Category column
         value_col = [c for c in df.columns if c != "Category"][0]
 
         df_long = pd.DataFrame({
@@ -47,11 +49,42 @@ def load_all_years(path=DATA_FILE):
 
         all_years.append(df_long)
 
-    return pd.concat(all_years, ignore_index=True)
+    df = pd.concat(all_years, ignore_index=True)
+
+    # Assign Income / Expense / Subtotal
+    df = assign_income_expense(df)
+
+    return df
 
 
 # ---------------------------------------------------------
-# 3. BOARD CATEGORY BUILDER
+# 3. ASSIGN Income / Expense / Subtotal
+# ---------------------------------------------------------
+def assign_income_expense(df):
+    df = df.copy()
+    df["Type"] = None
+
+    for year, group in df.groupby("Year"):
+        # Income block ends at "Total for Income"
+        income_end = group[group["Category"].str.lower() == "total for income"].index
+        if len(income_end) > 0:
+            end_idx = income_end[0]
+            df.loc[group.index[0]:end_idx, "Type"] = "Income"
+
+        # Expense block ends at "Total for Expenses"
+        expense_end = group[group["Category"].str.lower() == "total for expenses"].index
+        if len(expense_end) > 0:
+            end_idx = expense_end[0]
+            df.loc[group.index[0]:end_idx, "Type"] = "Expense"
+
+        # Subtotals override the above
+        df.loc[group["Kind"] == "Subtotal", "Type"] = "Subtotal"
+
+    return df
+
+
+# ---------------------------------------------------------
+# 4. BOARD CATEGORY BUILDER
 # ---------------------------------------------------------
 def build_board_categories(df):
     df = df.copy()
@@ -80,7 +113,7 @@ def build_board_categories(df):
 
 
 # ---------------------------------------------------------
-# 4. PIVOT FOR YOY
+# 5. YOY PIVOT
 # ---------------------------------------------------------
 def get_board_pivot(board_df):
     pivot = board_df.pivot_table(
