@@ -78,7 +78,9 @@ def assign_income_expense(df):
             df.loc[group.index[0]:end_idx, "Type"] = "Expense"
 
         # Subtotals override the above
-        df.loc[group["Kind"] == "Subtotal", "Type"] = "Subtotal"
+        df.loc[group.index[group["Kind"] == "Subtotal"], "Type"] = "Subtotal"
+#df.loc[group["Kind"] == "Subtotal", "Type"] = "Subtotal"
+        
 
     return df
 
