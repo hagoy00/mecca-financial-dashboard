@@ -576,20 +576,19 @@ with tab2:
 
                 yoy_rows.append([cat, year, amount, yoy_change, yoy_pct])
 
-        yoy_clean = pd.DataFrame(yoy_rows, columns=[
+    yoy_clean = pd.DataFrame(yoy_rows, columns=[
             "Category", "Year", "Amount", "YoY Change", "YoY %"
         ])
 
-        yoy_clean = add_yoy_icons(yoy_clean)
-
-        yoy_pivot = yoy_clean.pivot_table(
+    yoy_clean = add_yoy_icons(yoy_clean)        
+    yoy_pivot = yoy_clean.pivot_table(
             index="Category",
             columns="Year",
             values="YoY Change",
             aggfunc="sum"
         ).fillna(0)
 
-        st.dataframe(yoy_pivot.style.format("{:,.2f}"), use_container_width=True)
+    st.dataframe(yoy_pivot.style.format("{:,.2f}"), use_container_width=True)
 
     # -----------------------------------------------------
     # TAB 3 — TOP INCOME & EXPENSES (FORECASTING)
