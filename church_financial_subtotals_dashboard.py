@@ -557,7 +557,7 @@ with tab2:
             "Utilities"
         ]
     yoy_rows = []
-        for cat in TARGET_ORDER:
+    for cat in TARGET_ORDER:
             cat_data = subtotals[subtotals["Category"] == cat].sort_values("Year")
             years = cat_data["Year"].tolist()
             amounts = cat_data["Amount"].tolist()
