@@ -1,3 +1,8 @@
+import inspect
+import utils.data_utils as du
+st.code(inspect.getsource(du))
+
+
 import streamlit as st
 import pandas as pd
 import altair as alt
