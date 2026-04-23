@@ -100,35 +100,36 @@ def load_data():
 # ---------------------------------------------------------
 # ASSIGN Income / Expense / Subtotal
 # ---------------------------------------------------------
+# ---------------------------------------------------------
+# ASSIGN Income / Expense / Subtotal (Corrected)
+# ---------------------------------------------------------
 def assign_income_expense(df):
     df = df.copy()
     df["Type"] = None
 
     for year, group in df.groupby("Year"):
-        # Find the boundaries
-        income_start = group.index.min()
-        income_end = group[group["Category"].str.lower() == "total for income"].index
+        # Find subtotal boundaries
+        income_total_idx = group[group["Category"].str.lower() == "total for income"].index
+        expense_total_idx = group[group["Category"].str.lower() == "total for expenses"].index
 
-        expense_start = None
-        expense_end = group[group["Category"].str.lower() == "total for expenses"].index
+        # Skip if sheet is malformed
+        if len(income_total_idx) == 0 or len(expense_total_idx) == 0:
+            continue
 
-        # Assign Income block
-        if len(income_end) > 0:
-            end_idx = income_end[0]
-            df.loc[income_start:end_idx, "Type"] = "Income"
+        income_end = income_total_idx[0]      # row of "Total for Income"
+        expense_end = expense_total_idx[0]    # row of "Total for Expenses"
 
-        # Expense block starts AFTER income block
-        if len(income_end) > 0 and len(expense_end) > 0:
-            expense_start = income_end[0] + 1
-            df.loc[expense_start:expense_end[0], "Type"] = "Expense"
+        # 1. INCOME BLOCK (exclude "Total for Income")
+        df.loc[group.index.min():income_end - 1, "Type"] = "Income"
 
-        # Subtotals override everything
-        subtotal_idx = group.index[group["Kind"] == "Subtotal"]
+        # 2. EXPENSE BLOCK (exclude both totals)
+        df.loc[income_end + 1:expense_end - 1, "Type"] = "Expense"
+
+        # 3. SUBTOTALS override everything
+        subtotal_idx = group.index[group["Category"].str.lower().str.startswith("total for ")]
         df.loc[subtotal_idx, "Type"] = "Subtotal"
 
     return df
-
-
 # ---------------------------------------------------------
 # EXTRACT SUBTOTALS + AUTO TOTALS
 # ---------------------------------------------------------
@@ -305,7 +306,7 @@ def generate_pdf(subtotals, year):
 def main():
     st.title("📊 MekanSelam Medhanialem Ethiopian Orthodox Church->> Financial Dashboard")
 
-    # Load data
+      # Load data
     df = load_data()
     subtotals = extract_subtotals(df)
     yoy_df = compute_yoy(subtotals)
@@ -341,10 +342,7 @@ def main():
                 "Amount"
             ].sum()
 
-            total_income = group.loc[
-                group["Category"].str.lower() == "total for income",
-                "Amount"
-            ].sum()
+            total_income = revenue
 
             total_expenses = group.loc[
                 group["Category"].str.lower() == "total for expenses",
@@ -383,25 +381,28 @@ def main():
 
         st.divider()
 
-        # --- 2. TOP 5 INCOME PIVOT ---
+        # -----------------------------------------------------
+        # TOP 5 INCOME PIVOT (Corrected)
+        # -----------------------------------------------------
         st.markdown("### 💰 Top 5 Income Categories (All Years)")
 
-        top_income_all = (
-            df[df["Type"] == "Income"]
-            .groupby(["Category", "Year"])["Amount"]
-            .sum()
-            .reset_index()
-        )
+        income_df = df[
+            (df["Type"] == "Income") &
+            (~df["Category"].str.lower().str.startswith("total for"))
+        ]
 
-        top_income_totals = (
-            top_income_all.groupby("Category")["Amount"].sum()
+        income_grouped = income_df.groupby(["Category", "Year"])["Amount"].sum().reset_index()
+
+        top_income_categories = (
+            income_grouped.groupby("Category")["Amount"]
+            .sum()
             .sort_values(ascending=False)
             .head(5)
             .index
         )
 
-        top_income_pivot = top_income_all[
-            top_income_all["Category"].isin(top_income_totals)
+        top_income_pivot = income_grouped[
+            income_grouped["Category"].isin(top_income_categories)
         ].pivot_table(
             index="Category",
             columns="Year",
@@ -413,25 +414,28 @@ def main():
 
         st.divider()
 
-        # --- 3. TOP 5 EXPENSE PIVOT ---
+        # -----------------------------------------------------
+        # TOP 5 EXPENSE PIVOT (Corrected)
+        # -----------------------------------------------------
         st.markdown("### 📉 Top 5 Expense Categories (All Years)")
 
-        top_expense_all = (
-            df[df["Type"] == "Expense"]
-            .groupby(["Category", "Year"])["Amount"]
-            .sum()
-            .reset_index()
-        )
+        expense_df = df[
+            (df["Type"] == "Expense") &
+            (~df["Category"].str.lower().str.startswith("total for"))
+        ]
 
-        top_expense_totals = (
-            top_expense_all.groupby("Category")["Amount"].sum()
+        expense_grouped = expense_df.groupby(["Category", "Year"])["Amount"].sum().reset_index()
+
+        top_expense_categories = (
+            expense_grouped.groupby("Category")["Amount"]
+            .sum()
             .sort_values(ascending=False)
             .head(5)
             .index
         )
 
-        top_expense_pivot = top_expense_all[
-            top_expense_all["Category"].isin(top_expense_totals)
+        top_expense_pivot = expense_grouped[
+            expense_grouped["Category"].isin(top_expense_categories)
         ].pivot_table(
             index="Category",
             columns="Year",
@@ -512,7 +516,7 @@ def main():
             st.markdown(combined.to_html(escape=False), unsafe_allow_html=True)
 
     # -----------------------------------------------------
-    # TAB 3 — TOP INCOME & EXPENSES
+    # TAB 3 — TOP INCOME & EXPENSES (FORECASTING)
     # -----------------------------------------------------
     with tab_top:
         st.subheader("Top Income & Top Expenses")
