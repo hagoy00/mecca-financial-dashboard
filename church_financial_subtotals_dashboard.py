@@ -265,8 +265,14 @@ def get_top_income(df, n=5):
 
 def get_top_expense(df, n=5):
     d = df.copy()
-    d = d[d["Type"] == "Expense"]
-    d = d[~d["Category"].str.startswith("Total for ")]
+    d = d[
+    (d["Type"] == "Expense") &
+    (~d["Category"].str.lower().str.startswith("total for")) &
+    (~d["Category"].str.contains("depreciat", case=False, na=False))
+]
+
+    #d = d[d["Type"] == "Expense"]
+    #d = d[~d["Category"].str.startswith("Total for ")]
     grouped = d.groupby(["Year", "Category"])["Amount"].sum().reset_index()
 
     grouped["Rank"] = grouped.groupby("Year")["Amount"].rank(method="first", ascending=False)
