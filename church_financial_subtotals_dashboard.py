@@ -227,7 +227,7 @@ def compute_surplus_deficit(subtotals):
 # ---------------------------------------------------------
 # FORECASTING
 # ---------------------------------------------------------
-def forecast_category(df, category, periods=3):
+def forecast_category(df, category, end_year=2032):
     data = df[df["Category"] == category].groupby("Year")["Amount"].sum().reset_index()
     if len(data) < 2:
         return pd.DataFrame()
@@ -239,7 +239,7 @@ def forecast_category(df, category, periods=3):
     m, b = coeffs
 
     last_year = x.max()
-    future_years = np.arange(last_year + 1, last_year + 1 + periods)
+    future_years = np.arange(last_year + 1, end_year + 1)
     future_amounts = m * future_years + b
 
     hist = data.copy()
@@ -249,8 +249,6 @@ def forecast_category(df, category, periods=3):
     fut["Type"] = "Forecast"
 
     return pd.concat([hist, fut], ignore_index=True)
-
-
 # ---------------------------------------------------------
 # TOP INCOME / EXPENSE
 # ---------------------------------------------------------
