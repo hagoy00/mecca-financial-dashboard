@@ -689,7 +689,7 @@ def main():
      # -----------------------------------------------------
 # TAB 5 — FORECASTING
 # -----------------------------------------------------
-with tab4:
+    with tab4:
     st.subheader("📈 Forecasting Through 2032")
 
     FORECAST_TARGETS = [
