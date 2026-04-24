@@ -323,10 +323,10 @@ def style_top5(df):
     # Map index labels to numeric positions
     index_positions = {idx: pos for pos, idx in enumerate(df.index)}
 
-def highlight(row):
-    pos = index_positions[row.name]
-    color = "background-color: #d4edda" if pos < 3 else "background-color: #fff3cd"
-    return [color] * len(row)
+    def highlight(row):
+        pos = index_positions[row.name]
+        color = "background-color: #d4edda" if pos < 3 else "background-color: #fff3cd"
+        return [color] * len(row)
 
     # Apply shading
     styler = df.style.apply(highlight, axis=1)
@@ -423,6 +423,7 @@ def main():
 
         for year, group in subtotals.groupby("Year"):
 
+            # Revenue = Total for Income
             revenue = group.loc[
                 group["Category"].str.lower() == "total for income",
                 "Amount"
@@ -463,12 +464,14 @@ def main():
         ).fillna(0)
 
         st.markdown("### 📘 Main Financial Summary")
+        #st.dataframe(summary_pivot.style.format("{:,.2f}"), use_container_width=True)
+        #st.dataframe(style_top5(add_rank_icons(summary_pivot)), use_container_width=True)
         st.dataframe(style_top5(add_summary_icons(summary_pivot)), use_container_width=True)
 
         st.divider()
-
+        
         # -----------------------------------------------------
-        # TOP 5 INCOME PIVOT
+        # TOP 5 INCOME PIVOT (Corrected)
         # -----------------------------------------------------
         st.markdown("### 💰 Top 5 Income Categories (All Years)")
 
@@ -496,6 +499,7 @@ def main():
             aggfunc="sum"
         ).fillna(0)
 
+        #st.dataframe(top_income_pivot.style.format("{:,.2f}"), use_container_width=True)
         st.dataframe(style_top5(add_rank_icons(top_income_pivot)), use_container_width=True)
 
         st.divider()
@@ -505,16 +509,9 @@ def main():
         # -----------------------------------------------------
         st.markdown("### 📉 Top 5 Expense Categories (All Years)")
 
-        # Clean Expense Filter
         expense_df = df[
-            (df["Type"] == "Expense") & 
-            (~df["Category"].str.lower().str.startswith("total for")) &
-            (~df["Category"].str.lower().isin([
-                "gross profit",
-                "depreciation expense",
-                "depreciation",
-                "amortization"
-            ]))
+            (df["Type"] == "Expense") &
+            (~df["Category"].str.lower().str.startswith("total for"))
         ]
 
         expense_grouped = expense_df.groupby(["Category", "Year"])["Amount"].sum().reset_index()
@@ -536,13 +533,15 @@ def main():
             aggfunc="sum"
         ).fillna(0)
 
+        #st.dataframe(top_expense_pivot.style.format("{:,.2f}"), use_container_width=True)
         st.dataframe(style_top5(add_rank_icons(top_expense_pivot)), use_container_width=True)
 
     # -----------------------------------------------------
     # TAB 2 — CLEAN, FIXED, GUARANTEED YOY SUMMARY
     # ----------------------------------------------------
     with tab2:
-        st.subheader("📘 Year‑Over‑Year (YOY) Summary")    
+        st.subheader("📘 Year‑Over‑Year (YOY) Summary")
+
         TARGET_ORDER = [
             "Total Revenue",
             "Total Income",
@@ -551,8 +550,9 @@ def main():
             "Payroll",
             "Utilities"
         ]
-    yoy_rows = []
-    for cat in TARGET_ORDER:
+
+        yoy_rows = []
+        for cat in TARGET_ORDER:
             cat_data = subtotals[subtotals["Category"] == cat].sort_values("Year")
             years = cat_data["Year"].tolist()
             amounts = cat_data["Amount"].tolist()
@@ -571,19 +571,20 @@ def main():
 
                 yoy_rows.append([cat, year, amount, yoy_change, yoy_pct])
 
-    yoy_clean = pd.DataFrame(yoy_rows, columns=[
+        yoy_clean = pd.DataFrame(yoy_rows, columns=[
             "Category", "Year", "Amount", "YoY Change", "YoY %"
         ])
 
-    yoy_clean = add_yoy_icons(yoy_clean)        
-    yoy_pivot = yoy_clean.pivot_table(
+        yoy_clean = add_yoy_icons(yoy_clean)
+
+        yoy_pivot = yoy_clean.pivot_table(
             index="Category",
             columns="Year",
             values="YoY Change",
             aggfunc="sum"
         ).fillna(0)
 
-    st.dataframe(yoy_pivot.style.format("{:,.2f}"), use_container_width=True)
+        st.dataframe(yoy_pivot.style.format("{:,.2f}"), use_container_width=True)
 
     # -----------------------------------------------------
     # TAB 3 — TOP INCOME & EXPENSES (FORECASTING)
