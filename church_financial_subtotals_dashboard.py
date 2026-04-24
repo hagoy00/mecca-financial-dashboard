@@ -560,16 +560,16 @@ def main():
 
             # If previous calendar year does not exist → YOY = 0
             if prev_year not in years_cat:
-            yoy_change = 0
-            yoy_pct = 0
-        else:
-            prev_index = years_cat.index(prev_year)
-            prev = amounts[prev_index]
+                yoy_change = 0
+                yoy_pct = 0
+            else:
+                prev_index = years_cat.index(prev_year)
+                prev = amounts[prev_index]
 
-            yoy_change = amount - prev
-            yoy_pct = (yoy_change / prev * 100) if prev != 0 else 0
+                yoy_change = amount - prev
+                yoy_pct = (yoy_change / prev * 100) if prev != 0 else 0
 
-        yoy_rows.append([cat, year, amount, yoy_change, yoy_pct])
+            yoy_rows.append([cat, year, amount, yoy_change, yoy_pct])
 
         for i in range(len(years_cat)):
         year = years_cat[i]
