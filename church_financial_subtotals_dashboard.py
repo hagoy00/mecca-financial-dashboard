@@ -389,6 +389,12 @@ def add_forecast_icons(df):
 # MAIN APP
 # ---------------------------------------------------------
 def main():
+    st.set_page_config(
+    page_title="Church Financial Dashboard",
+    layout="wide",
+    initial_sidebar_state="collapsed"
+)
+
     st.title("📊 MekanSelam Medhanialem Ethiopian Orthodox Church->> Financial Dashboard")
 
     # Load data
@@ -680,10 +686,13 @@ def main():
     # -----------------------------------------------------
     # TAB 5 — FORECASTING
     # -----------------------------------------------------
-    with tab4:
-      st.subheader("📈 Forecasting Through 2032")
+     # -----------------------------------------------------
+# TAB 5 — FORECASTING
+# -----------------------------------------------------
+with tab4:
+    st.subheader("📈 Forecasting Through 2032")
 
-      FORECAST_TARGETS = [
+    FORECAST_TARGETS = [
         "Total Revenue",
         "Total Income",
         "Total Expenses",
@@ -717,7 +726,8 @@ def main():
             use_container_width=True
         )
 
-        st.divider()
+        st.divider()    
+    
     # -----------------------------------------------------
     # TAB 6 — BOARD PDF
     # -----------------------------------------------------
