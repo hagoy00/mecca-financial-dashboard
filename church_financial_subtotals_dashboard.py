@@ -394,7 +394,7 @@ def add_forecast_icons(df):
 # MAIN APP
 # ---------------------------------------------------------
 def main():
-    st.title("📊 MekanSelam Medhanialem Ethiopian Orthodox Church → Financial Dashboard")
+    st.title("📊 Medhanialem Mekan Selam Ethiopian Orthodox Church → Financial Dashboard")
 
     # Load data
     df = load_data()
