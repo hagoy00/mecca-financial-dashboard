@@ -496,8 +496,7 @@ def main():
 
         # TOP 5 EXPENSE PIVOT
         st.markdown("### 📉 Top 5 Expense Categories (All Years)")
-
-       expense_df = df[
+        expense_df = df[
          (df["Type"] == "Expense") &
          (~df["Category"].str.lower().str.startswith("total for")) &
          (~df["Category"].str.contains("depreciat", case=False, na=False))
