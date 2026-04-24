@@ -529,8 +529,6 @@ def main():
         ).fillna(0)
 
         st.dataframe(style_top5(add_rank_icons(top_expense_pivot)), use_container_width=True)
-
-
 # -----------------------------------------------------
 # TAB 2 — CLEAN YOY SUMMARY
 # ----------------------------------------------------
@@ -587,7 +585,7 @@ with tab2:
     ).fillna(0)
 
     st.dataframe(yoy_pivot.style.format("{:,.2f}"), use_container_width=True)
-    
+        
     # -----------------------------------------------------
     # TAB 3 — TOP INCOME & EXPENSES (FORECASTING)
     # -----------------------------------------------------
