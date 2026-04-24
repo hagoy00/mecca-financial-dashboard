@@ -551,8 +551,8 @@ def main():
             years_cat = cat_data["Year"].tolist()
             amounts = cat_data["Amount"].tolist()
         for i in range(len(years_cat)):
-    year = years_cat[i]
-    amount = amounts[i]
+        year = years_cat[i]
+        amount = amounts[i]
 
     # Determine previous calendar year
     prev_year = year - 1
