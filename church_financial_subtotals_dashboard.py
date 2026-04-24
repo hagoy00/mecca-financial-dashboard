@@ -423,7 +423,6 @@ def main():
 
         for year, group in subtotals.groupby("Year"):
 
-            # Revenue = Total for Income
             revenue = group.loc[
                 group["Category"].str.lower() == "total for income",
                 "Amount"
@@ -464,14 +463,12 @@ def main():
         ).fillna(0)
 
         st.markdown("### 📘 Main Financial Summary")
-        #st.dataframe(summary_pivot.style.format("{:,.2f}"), use_container_width=True)
-        #st.dataframe(style_top5(add_rank_icons(summary_pivot)), use_container_width=True)
         st.dataframe(style_top5(add_summary_icons(summary_pivot)), use_container_width=True)
 
         st.divider()
-        
+
         # -----------------------------------------------------
-        # TOP 5 INCOME PIVOT (Corrected)
+        # TOP 5 INCOME PIVOT
         # -----------------------------------------------------
         st.markdown("### 💰 Top 5 Income Categories (All Years)")
 
@@ -499,49 +496,47 @@ def main():
             aggfunc="sum"
         ).fillna(0)
 
-        #st.dataframe(top_income_pivot.style.format("{:,.2f}"), use_container_width=True)
         st.dataframe(style_top5(add_rank_icons(top_income_pivot)), use_container_width=True)
 
         st.divider()
 
-# -----------------------------------------------------
-# TOP 5 EXPENSE PIVOT (Corrected)
-# -----------------------------------------------------
-st.markdown("### 📉 Top 5 Expense Categories (All Years)")
+        # -----------------------------------------------------
+        # TOP 5 EXPENSE PIVOT (Corrected)
+        # -----------------------------------------------------
+        st.markdown("### 📉 Top 5 Expense Categories (All Years)")
 
-# Clean Expense Filter
-expense_df = df[
-    (df["Type"] == "Expense") & 
-    (~df["Category"].str.lower().str.startswith("total for")) &
-    (~df["Category"].str.lower().isin([
-        "gross profit",
-        "depreciation expense",
-        "depreciation",
-        "amortization"
-    ]))
-]
+        # Clean Expense Filter
+        expense_df = df[
+            (df["Type"] == "Expense") & 
+            (~df["Category"].str.lower().str.startswith("total for")) &
+            (~df["Category"].str.lower().isin([
+                "gross profit",
+                "depreciation expense",
+                "depreciation",
+                "amortization"
+            ]))
+        ]
 
-expense_grouped = expense_df.groupby(["Category", "Year"])["Amount"].sum().reset_index()
+        expense_grouped = expense_df.groupby(["Category", "Year"])["Amount"].sum().reset_index()
 
-top_expense_categories = (
-    expense_grouped.groupby("Category")["Amount"]
-    .sum()
-    .sort_values(ascending=False)
-    .head(5)
-    .index
-)
+        top_expense_categories = (
+            expense_grouped.groupby("Category")["Amount"]
+            .sum()
+            .sort_values(ascending=False)
+            .head(5)
+            .index
+        )
 
-top_expense_pivot = expense_grouped[
-    expense_grouped["Category"].isin(top_expense_categories)
-].pivot_table(
-    index="Category",
-    columns="Year",
-    values="Amount",
-    aggfunc="sum"
-).fillna(0)
+        top_expense_pivot = expense_grouped[
+            expense_grouped["Category"].isin(top_expense_categories)
+        ].pivot_table(
+            index="Category",
+            columns="Year",
+            values="Amount",
+            aggfunc="sum"
+        ).fillna(0)
 
-st.dataframe(style_top5(add_rank_icons(top_expense_pivot)), use_container_width=True)
-st.dataframe(style_top5(add_rank_icons(top_expense_pivot)), use_container_width=True)
+        st.dataframe(style_top5(add_rank_icons(top_expense_pivot)), use_container_width=True)
 
     # -----------------------------------------------------
     # TAB 2 — CLEAN, FIXED, GUARANTEED YOY SUMMARY
