@@ -681,44 +681,43 @@ def main():
     # TAB 5 — FORECASTING
     # -----------------------------------------------------
     with tab4:
-        st.subheader("Forecasting")
+    st.subheader("📈 Forecasting Through 2032")
 
-        forecast_mode = st.radio(
-            "Forecast Mode",
-            ["Totals Only", "Auto Totals Only", "All Categories"],
-            horizontal=True
+    FORECAST_TARGETS = [
+        "Total Revenue",
+        "Total Income",
+        "Total Expenses",
+        "Net Income",
+        "Payroll",
+        "Utilities"
+    ]
+
+    for category in FORECAST_TARGETS:
+        st.markdown(f"### 🔮 {category} Forecast (to 2032)")
+
+        fc = forecast_category(subtotals, category)
+
+        if fc.empty:
+            st.warning(f"No data available to forecast {category}")
+            continue
+
+        chart = alt.Chart(fc).mark_line(point=True).encode(
+            x="Year:O",
+            y="Amount:Q",
+            color="Type:N",
+            tooltip=["Year", "Amount", "Type"]
+        ).properties(width=800, height=400)
+
+        st.altair_chart(chart, use_container_width=True)
+
+        st.dataframe(
+            fc.pivot_table(index="Year", columns="Type", values="Amount")
+              .fillna(0)
+              .style.format("{:,.2f}"),
+            use_container_width=True
         )
 
-        if forecast_mode == "Totals Only":
-            category_list = sorted([
-                c for c in subtotals["Category"].unique()
-                if c.startswith("Total for ") or c == "Gross Profit"
-            ])
-        elif forecast_mode == "Auto Totals Only":
-            category_list = sorted([
-                c for c in subtotals["Category"].unique()
-                if "(Auto)" in c
-            ])
-        else:
-            category_list = sorted([
-                c for c in subtotals["Category"].unique()
-                if not c.endswith("(Auto)")
-            ])
-
-        selected_category = st.selectbox("Select Category", category_list)
-        forecast_df = forecast_category(subtotals, selected_category)
-
-        if forecast_df.empty:
-            st.warning("Not enough data to forecast.")
-        else:
-            chart = alt.Chart(forecast_df).mark_line(point=True).encode(
-                x=alt.X("Year:O"),
-                y=alt.Y("Amount:Q"),
-                color="Type:N",
-                tooltip=["Year", "Amount", "Type"]
-            ).properties(width=800, height=400, title=f"Forecast — {selected_category}")
-            st.altair_chart(chart, use_container_width=True)
-
+        st.divider()
     # -----------------------------------------------------
     # TAB 6 — BOARD PDF
     # -----------------------------------------------------
