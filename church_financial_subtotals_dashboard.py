@@ -681,9 +681,9 @@ def main():
     # TAB 5 — FORECASTING
     # -----------------------------------------------------
     with tab4:
-    st.subheader("📈 Forecasting Through 2032")
+      st.subheader("📈 Forecasting Through 2032")
 
-    FORECAST_TARGETS = [
+      FORECAST_TARGETS = [
         "Total Revenue",
         "Total Income",
         "Total Expenses",
