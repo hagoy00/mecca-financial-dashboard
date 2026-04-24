@@ -542,8 +542,8 @@ def main():
     # TAB 2 — CLEAN, FIXED, GUARANTEED YOY SUMMARY
     # ----------------------------------------------------
     with tab2:
-    st.subheader("📘 Year‑Over‑Year (YOY) Summary")    
-    TARGET_ORDER = [
+        st.subheader("📘 Year‑Over‑Year (YOY) Summary")    
+        TARGET_ORDER = [
             "Total Revenue",
             "Total Income",
             "Total Expenses",
