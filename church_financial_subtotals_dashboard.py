@@ -390,7 +390,6 @@ def add_forecast_icons(df):
     df.insert(0, "Trend", icons)
     return df
 
-
 # ---------------------------------------------------------
 # MAIN APP
 # ---------------------------------------------------------
@@ -503,11 +502,10 @@ def main():
         # TOP 5 EXPENSE PIVOT
         st.markdown("### 📉 Top 5 Expense Categories (All Years)")
         expense_df = df[
-         (df["Type"] == "Expense") &
-         (~df["Category"].str.lower().str.startswith("total for")) &
-         (~df["Category"].str.contains("depreciat", case=False, na=False))
-          ]
-
+            (df["Type"] == "Expense") &
+            (~df["Category"].str.lower().str.startswith("total for")) &
+            (~df["Category"].str.contains("depreciat", case=False, na=False))
+        ]
 
         expense_grouped = expense_df.groupby(["Category", "Year"])["Amount"].sum().reset_index()
 
@@ -529,63 +527,63 @@ def main():
         ).fillna(0)
 
         st.dataframe(style_top5(add_rank_icons(top_expense_pivot)), use_container_width=True)
-# -----------------------------------------------------
-# TAB 2 — CLEAN YOY SUMMARY
-# ----------------------------------------------------
-with tab2:
-    st.subheader("📘 Year‑Over‑Year (YOY) Summary")
 
-    TARGET_ORDER = [
-        "Total Revenue",
-        "Total Income",
-        "Total Expenses",
-        "Net Income",
-        "Payroll",
-        "Utilities"
-    ]
+    # -----------------------------------------------------
+    # TAB 2 — CLEAN YOY SUMMARY
+    # -----------------------------------------------------
+    with tab2:
+        st.subheader("📘 Year‑Over‑Year (YOY) Summary")
 
-    yoy_rows = []
+        TARGET_ORDER = [
+            "Total Revenue",
+            "Total Income",
+            "Total Expenses",
+            "Net Income",
+            "Payroll",
+            "Utilities"
+        ]
 
-    for cat in TARGET_ORDER:
-        cat_data = subtotals[subtotals["Category"] == cat].sort_values("Year")
-        years_cat = cat_data["Year"].tolist()
-        amounts = cat_data["Amount"].tolist()
+        yoy_rows = []
 
-        for i in range(len(years_cat)):
-            year = years_cat[i]
-            amount = amounts[i]
+        for cat in TARGET_ORDER:
+            cat_data = subtotals[subtotals["Category"] == cat].sort_values("Year")
+            years_cat = cat_data["Year"].tolist()
+            amounts = cat_data["Amount"].tolist()
 
-            # Determine previous calendar year
-            prev_year = year - 1
+            for i in range(len(years_cat)):
+                year = years_cat[i]
+                amount = amounts[i]
 
-            # If previous calendar year does not exist → YOY = 0
-            if prev_year not in years_cat:
-                yoy_change = 0
-                yoy_pct = 0
-            else:
-                prev_index = years_cat.index(prev_year)
-                prev = amounts[prev_index]
+                prev_year = year - 1
 
-                yoy_change = amount - prev
-                yoy_pct = (yoy_change / prev * 100) if prev != 0 else 0
+                if prev_year not in years_cat:
+                    yoy_change = 0
+                    yoy_pct = 0
+                else:
+                    prev_index = years_cat.index(prev_year)
+                    prev = amounts[prev_index]
 
-            yoy_rows.append([cat, year, amount, yoy_change, yoy_pct])
+                    yoy_change = amount - prev
+                    yoy_pct = (yoy_change / prev * 100) if prev != 0 else 0
 
-    yoy_clean = pd.DataFrame(yoy_rows, columns=[
-        "Category", "Year", "Amount", "YoY Change", "YoY %"
-    ])
+                yoy_rows.append([cat, year, amount, yoy_change, yoy_pct])
 
-    yoy_clean = add_yoy_icons(yoy_clean)
+        yoy_clean = pd.DataFrame(yoy_rows, columns=[
+            "Category", "Year", "Amount", "YoY Change", "YoY %"
+        ])
 
-    yoy_pivot = yoy_clean.pivot_table(
-        index="Category",
-        columns="Year",
-        values="YoY Change",
-        aggfunc="sum"
-    ).fillna(0)
+        yoy_clean = add_yoy_icons(yoy_clean)
 
-    st.dataframe(yoy_pivot.style.format("{:,.2f}"), use_container_width=True)
-        
+        yoy_pivot = yoy_clean.pivot_table(
+            index="Category",
+            columns="Year",
+            values="YoY Change",
+            aggfunc="sum"
+        ).fillna(0)
+
+        st.dataframe(yoy_pivot.style.format("{:,.2f}"), use_container_width=True)
+
+    
     # -----------------------------------------------------
     # TAB 3 — TOP INCOME & EXPENSES (FORECASTING)
     # -----------------------------------------------------
