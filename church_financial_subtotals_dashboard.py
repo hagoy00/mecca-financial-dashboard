@@ -550,17 +550,18 @@ def main():
             cat_data = subtotals[subtotals["Category"] == cat].sort_values("Year")
             years_cat = cat_data["Year"].tolist()
             amounts = cat_data["Amount"].tolist()
+            for i in range(len(years_cat)):
+    year = years_cat[i]
+    amount = amounts[i]
 
-        for i in range(len(years_cat)):
-            year = years_cat[i]
-            amount = amounts[i]
+    # Determine previous calendar year
+    prev_year = year - 1
 
-    # Check if previous calendar year exists in the data
-        prev_year = year - 1
-            if prev_year not in years_cat:
+    # If previous calendar year does not exist → YOY = 0
+    if prev_year not in years_cat:
         yoy_change = 0
         yoy_pct = 0
-        else:
+    else:
         prev_index = years_cat.index(prev_year)
         prev = amounts[prev_index]
 
@@ -569,6 +570,35 @@ def main():
 
     yoy_rows.append([cat, year, amount, yoy_change, yoy_pct])
 
+
+
+
+
+
+
+
+
+        for i in range(len(years_cat)):
+    year = years_cat[i]
+    amount = amounts[i]
+
+    # Determine previous calendar year
+    prev_year = year - 1
+
+    # If previous calendar year does not exist → YOY = 0
+    if prev_year not in years_cat:
+        yoy_change = 0
+        yoy_pct = 0
+    else:
+        prev_index = years_cat.index(prev_year)
+        prev = amounts[prev_index]
+
+        yoy_change = amount - prev
+        yoy_pct = (yoy_change / prev * 100) if prev != 0 else 0
+
+    yoy_rows.append([cat, year, amount, yoy_change, yoy_pct])
+
+        
 
         yoy_clean = pd.DataFrame(yoy_rows, columns=[
             "Category", "Year", "Amount", "YoY Change", "YoY %"
