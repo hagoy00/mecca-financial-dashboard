@@ -681,7 +681,7 @@ def main():
     # TAB 5 — FORECASTING
     # -----------------------------------------------------
     with tab4:
-        st.subheader("📈 Forecasting Through 2032")
+        st.subheader("📈 Forecasting Through 2030")
 
         FORECAST_TARGETS = [
             "Total Revenue",
@@ -693,7 +693,7 @@ def main():
         ]
 
         for category in FORECAST_TARGETS:
-            st.markdown(f"### 🔮 {category} Forecast (to 2032)")
+            st.markdown(f"### 🔮 {category} Forecast (to 2030)")
 
             fc = forecast_category(subtotals, category)
 
