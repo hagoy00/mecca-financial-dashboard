@@ -45,9 +45,39 @@ def classify_row_kind(cat):
     c = str(cat).strip().lower()
     if c.startswith("total for "):
         return "Subtotal"
-    if c in [ "expenses", "net income", "net operating income"]:
+    if c in ["expenses", "net income", "net operating income"]:
         return "Header"
     return "Detail"
+
+
+# ---------------------------------------------------------
+# ASSIGN Income / Expense / Subtotal
+# ---------------------------------------------------------
+def assign_income_expense(df):
+    df = df.copy()
+    df["Type"] = None
+
+    for year, group in df.groupby("Year"):
+        income_total_idx = group[group["Category"].str.lower() == "total for income"].index
+        expense_total_idx = group[group["Category"].str.lower() == "total for expenses"].index
+
+        if len(income_total_idx) == 0 or len(expense_total_idx) == 0:
+            continue
+
+        income_end = income_total_idx[0]
+        expense_end = expense_total_idx[0]
+
+        # 1. INCOME BLOCK (exclude "Total for Income")
+        df.loc[group.index.min():income_end - 1, "Type"] = "Income"
+
+        # 2. EXPENSE BLOCK (exclude both totals)
+        df.loc[income_end + 1:expense_end - 1, "Type"] = "Expense"
+
+        # 3. SUBTOTALS override everything
+        subtotal_idx = group.index[group["Category"].str.lower().str.startswith("total for ")]
+        df.loc[subtotal_idx, "Type"] = "Subtotal"
+
+    return df
 
 
 # ---------------------------------------------------------
@@ -96,36 +126,7 @@ def load_data():
     full_df = assign_income_expense(full_df)
     return full_df
 
-# ---------------------------------------------------------
-# ASSIGN Income / Expense / Subtotal (Corrected)
-# ---------------------------------------------------------
-def assign_income_expense(df):
-    df = df.copy()
-    df["Type"] = None
 
-    for year, group in df.groupby("Year"):
-        # Find subtotal boundaries
-        income_total_idx = group[group["Category"].str.lower() == "total for income"].index
-        expense_total_idx = group[group["Category"].str.lower() == "total for expenses"].index
-
-        # Skip if sheet is malformed
-        if len(income_total_idx) == 0 or len(expense_total_idx) == 0:
-            continue
-
-        income_end = income_total_idx[0]      # row of "Total for Income"
-        expense_end = expense_total_idx[0]    # row of "Total for Expenses"
-
-        # 1. INCOME BLOCK (exclude "Total for Income")
-        df.loc[group.index.min():income_end - 1, "Type"] = "Income"
-
-        # 2. EXPENSE BLOCK (exclude both totals)
-        df.loc[income_end + 1:expense_end - 1, "Type"] = "Expense"
-
-        # 3. SUBTOTALS override everything
-        subtotal_idx = group.index[group["Category"].str.lower().str.startswith("total for ")]
-        df.loc[subtotal_idx, "Type"] = "Subtotal"
-
-    return df
 # ---------------------------------------------------------
 # EXTRACT SUBTOTALS + AUTO TOTALS (with Payroll + Utilities)
 # ---------------------------------------------------------
@@ -140,20 +141,18 @@ def extract_subtotals(df):
     )
     subtotals = df[mask].reset_index(drop=True)
 
-    # 2. AUTO TOTALS (your existing logic)
+    # 2. AUTO TOTALS
     income_rows = subtotals[subtotals["Category"] == "Total for Income"]
     total_income = income_rows.groupby("Year")["Amount"].sum().reset_index()
-    #total_income["Category"] = "Total Income (Auto)"  
     total_income["Category"] = "Total Income"
-    
+
     expense_rows = subtotals[subtotals["Category"] == "Total for Expenses"]
     total_expenses = expense_rows.groupby("Year")["Amount"].sum().reset_index()
-    #total_expenses["Category"] = "Total Expenses (Auto)"
     total_expenses["Category"] = "Total Expenses"
 
     revenue_df = total_income.copy()
-    #revenue_df["Category"] = "Total Revenue (Auto)"
     revenue_df["Category"] = "Total Revenue"
+
     net_income = pd.merge(
         total_income,
         total_expenses,
@@ -162,8 +161,8 @@ def extract_subtotals(df):
     )
     net_income["Amount"] = net_income["Amount_Income"] - net_income["Amount_Expenses"]
     net_income = net_income[["Year", "Amount"]]
-    #net_income["Category"] = "Net Income (Auto)"
     net_income["Category"] = "Net Income"
+
     auto_totals = pd.concat(
         [total_income, total_expenses, revenue_df, net_income],
         ignore_index=True
@@ -175,7 +174,7 @@ def extract_subtotals(df):
     payroll_sum["Category"] = "Payroll"
 
     # 4. ADD UTILITIES SUBTOTAL
-    util_rows = df[df["Category"].str.contains("Utilit", case=False)]
+    util_rows = df[df["Category"].str.contains("Utilit", case=False, na=False)]
     util_sum = util_rows.groupby("Year")["Amount"].sum().reset_index()
     util_sum["Category"] = "Utilities"
 
@@ -185,8 +184,9 @@ def extract_subtotals(df):
         ignore_index=True
     )
 
+
 # ---------------------------------------------------------
-# YOY CALC
+# YOY CALC (generic)
 # ---------------------------------------------------------
 def compute_yoy(subtotals):
     df = subtotals.copy()
@@ -197,21 +197,21 @@ def compute_yoy(subtotals):
 
 
 # ---------------------------------------------------------
-# SURPLUS / DEFICIT
+# SURPLUS / DEFICIT (using auto totals)
 # ---------------------------------------------------------
 def compute_surplus_deficit(subtotals):
     df = subtotals.copy()
 
-    total_income = df[df["Category"] == "Total Income (Auto)"][["Year", "Amount"]]
+    total_income = df[df["Category"] == "Total Income"][["Year", "Amount"]]
     total_income = total_income.rename(columns={"Amount": "Total Income"})
 
-    total_expenses = df[df["Category"] == "Total Expenses (Auto)"][["Year", "Amount"]]
+    total_expenses = df[df["Category"] == "Total Expenses"][["Year", "Amount"]]
     total_expenses = total_expenses.rename(columns={"Amount": "Total Expenses"})
 
-    revenue = df[df["Category"] == "Total Revenue (Auto)"][["Year", "Amount"]]
+    revenue = df[df["Category"] == "Total Revenue"][["Year", "Amount"]]
     revenue = revenue.rename(columns={"Amount": "Total Revenue"})
 
-    net_income = df[df["Category"] == "Net Income (Auto)"][["Year", "Amount"]]
+    net_income = df[df["Category"] == "Net Income"][["Year", "Amount"]]
     net_income = net_income.rename(columns={"Amount": "Net Income"})
 
     merged = (
@@ -235,8 +235,7 @@ def forecast_category(df, category, end_year=2032):
     x = data["Year"].values
     y = data["Amount"].values
 
-    coeffs = np.polyfit(x, y, 1)
-    m, b = coeffs
+    m, b = np.polyfit(x, y, 1)
 
     last_year = x.max()
     future_years = np.arange(last_year + 1, end_year + 1)
@@ -249,6 +248,8 @@ def forecast_category(df, category, end_year=2032):
     fut["Type"] = "Forecast"
 
     return pd.concat([hist, fut], ignore_index=True)
+
+
 # ---------------------------------------------------------
 # TOP INCOME / EXPENSE
 # ---------------------------------------------------------
@@ -256,14 +257,20 @@ def get_top_income(df, n=5):
     d = df.copy()
     d = d[d["Type"] == "Income"]
     d = d[~d["Category"].str.startswith("Total for ")]
-    return d.groupby(["Year", "Category"])["Amount"].sum().reset_index()
+    grouped = d.groupby(["Year", "Category"])["Amount"].sum().reset_index()
+
+    grouped["Rank"] = grouped.groupby("Year")["Amount"].rank(method="first", ascending=False)
+    return grouped[grouped["Rank"] <= n].drop(columns="Rank")
 
 
 def get_top_expense(df, n=5):
     d = df.copy()
     d = d[d["Type"] == "Expense"]
     d = d[~d["Category"].str.startswith("Total for ")]
-    return d.groupby(["Year", "Category"])["Amount"].sum().reset_index()
+    grouped = d.groupby(["Year", "Category"])["Amount"].sum().reset_index()
+
+    grouped["Rank"] = grouped.groupby("Year")["Amount"].rank(method="first", ascending=False)
+    return grouped[grouped["Rank"] <= n].drop(columns="Rank")
 
 
 # ---------------------------------------------------------
@@ -308,17 +315,14 @@ def generate_pdf(subtotals, year):
     buffer.seek(0)
     return buffer
 
-# ---------------------------------------------------------
-# Add the same style function (reuse it everywhere)
-# ---------------------------------------------------------
 
+# ---------------------------------------------------------
+# STYLING HELPERS
+# ---------------------------------------------------------
 def style_top5(df):
     df = df.copy()
 
-    # Identify numeric columns only
     numeric_cols = df.select_dtypes(include=["number"]).columns
-
-    # Map index labels to numeric positions
     index_positions = {idx: pos for pos, idx in enumerate(df.index)}
 
     def highlight(row):
@@ -326,21 +330,17 @@ def style_top5(df):
         color = "background-color: #d4edda" if pos < 3 else "background-color: #fff3cd"
         return [color] * len(row)
 
-    # Apply shading
     styler = df.style.apply(highlight, axis=1)
-
-    # Apply numeric formatting ONLY to numeric columns
     styler = styler.format("{:,.2f}", subset=numeric_cols)
 
     return styler
+
 
 def add_rank_icons(df):
     df = df.copy()
     n = len(df)
 
     base_icons = ["🥇", "🥈", "🥉", "⭐", "⭐"]
-
-    # If df has more than 5 rows, extend icons
     if n > 5:
         icons = base_icons + ["⭐"] * (n - 5)
     else:
@@ -354,12 +354,11 @@ def add_summary_icons(df):
     df = df.copy()
     n = len(df)
 
-    # Top 3 = ▲, rest = ▼
     icons = ["▲"] * min(3, n) + ["▼"] * max(0, n - 3)
-
     df.insert(0, "Trend", icons)
     return df
-    
+
+
 def add_yoy_icons(df):
     df = df.copy()
     icons = []
@@ -377,31 +376,25 @@ def add_yoy_icons(df):
     df.insert(0, "Trend", icons)
     return df
 
+
 def add_forecast_icons(df):
     df = df.copy()
     mean_val = df["Amount"].mean()
-
     icons = ["🔼" if amt > mean_val else "🔽" for amt in df["Amount"]]
     df.insert(0, "Trend", icons)
     return df
+
 
 # ---------------------------------------------------------
 # MAIN APP
 # ---------------------------------------------------------
 def main():
-    st.set_page_config(
-    page_title="Church Financial Dashboard",
-    layout="wide",
-    initial_sidebar_state="collapsed"
-)
-
-    st.title("📊 MekanSelam Medhanialem Ethiopian Orthodox Church->> Financial Dashboard")
+    st.title("📊 MekanSelam Medhanialem Ethiopian Orthodox Church → Financial Dashboard")
 
     # Load data
     df = load_data()
     subtotals = extract_subtotals(df)
-    yoy_df = compute_yoy(subtotals)
-    #sd_df = compute_surplus_deficit(subtotals)
+    yoy_df = compute_yoy(subtotals)  # kept for future use if needed
 
     years = sorted(df["Year"].unique())
     selected_years = st.multiselect("Select Years", years, default=years)
@@ -415,19 +408,17 @@ def main():
         "Forecasting",
         "Board PDF"
     ])
-    
+
     # -----------------------------------------------------
     # TAB 1 — UNIFIED SUBTOTAL SUMMARY (NEW)
     # -----------------------------------------------------
     with tab1:
         st.subheader("📘 Unified Subtotal Summary (Pivot View)")
 
-        # --- 1. BUILD MAIN SUMMARY PIVOT ---
         summary_rows = []
 
         for year, group in subtotals.groupby("Year"):
 
-            # Revenue = Total for Income
             revenue = group.loc[
                 group["Category"].str.lower() == "total for income",
                 "Amount"
@@ -449,7 +440,7 @@ def main():
 
             utilities = df[
                 (df["Year"] == year) &
-                (df["Category"].str.contains("Utilit", case=False))
+                (df["Category"].str.contains("Utilit", case=False, na=False))
             ]["Amount"].sum()
 
             summary_rows.append(["Total Revenue", year, revenue])
@@ -468,15 +459,11 @@ def main():
         ).fillna(0)
 
         st.markdown("### 📘 Main Financial Summary")
-        #st.dataframe(summary_pivot.style.format("{:,.2f}"), use_container_width=True)
-        #st.dataframe(style_top5(add_rank_icons(summary_pivot)), use_container_width=True)
         st.dataframe(style_top5(add_summary_icons(summary_pivot)), use_container_width=True)
 
         st.divider()
-        
-        # -----------------------------------------------------
-        # TOP 5 INCOME PIVOT (Corrected)
-        # -----------------------------------------------------
+
+        # TOP 5 INCOME PIVOT
         st.markdown("### 💰 Top 5 Income Categories (All Years)")
 
         income_df = df[
@@ -503,14 +490,11 @@ def main():
             aggfunc="sum"
         ).fillna(0)
 
-        #st.dataframe(top_income_pivot.style.format("{:,.2f}"), use_container_width=True)
         st.dataframe(style_top5(add_rank_icons(top_income_pivot)), use_container_width=True)
 
         st.divider()
 
-        # -----------------------------------------------------
-        # TOP 5 EXPENSE PIVOT (Corrected)
-        # -----------------------------------------------------
+        # TOP 5 EXPENSE PIVOT
         st.markdown("### 📉 Top 5 Expense Categories (All Years)")
 
         expense_df = df[
@@ -537,11 +521,10 @@ def main():
             aggfunc="sum"
         ).fillna(0)
 
-        #st.dataframe(top_expense_pivot.style.format("{:,.2f}"), use_container_width=True)
         st.dataframe(style_top5(add_rank_icons(top_expense_pivot)), use_container_width=True)
 
     # -----------------------------------------------------
-    # TAB 2 — CLEAN, FIXED, GUARANTEED YOY SUMMARY
+    # TAB 2 — CLEAN YOY SUMMARY
     # ----------------------------------------------------
     with tab2:
         st.subheader("📘 Year‑Over‑Year (YOY) Summary")
@@ -558,11 +541,11 @@ def main():
         yoy_rows = []
         for cat in TARGET_ORDER:
             cat_data = subtotals[subtotals["Category"] == cat].sort_values("Year")
-            years = cat_data["Year"].tolist()
+            years_cat = cat_data["Year"].tolist()
             amounts = cat_data["Amount"].tolist()
 
-            for i in range(len(years)):
-                year = years[i]
+            for i in range(len(years_cat)):
+                year = years_cat[i]
                 amount = amounts[i]
 
                 if i == 0:
@@ -599,10 +582,10 @@ def main():
         top_income = get_top_income(df)
         top_expense = get_top_expense(df)
 
-        year = st.selectbox("Select Year", years)
+        year_sel = st.selectbox("Select Year", years)
 
-        inc_year = top_income[top_income["Year"] == year].sort_values("Amount", ascending=False).head(5)
-        exp_year = top_expense[top_expense["Year"] == year].sort_values("Amount", ascending=False).head(5)
+        inc_year = top_income[top_income["Year"] == year_sel].sort_values("Amount", ascending=False).head(5)
+        exp_year = top_expense[top_expense["Year"] == year_sel].sort_values("Amount", ascending=False).head(5)
 
         col1, col2 = st.columns(2)
 
@@ -637,25 +620,24 @@ def main():
                         tooltip=["Year", "Amount", "Type"]
                     ).properties(title=f"Forecast — {selected_exp}", width=400, height=300)
                     st.altair_chart(chart, use_container_width=True)
-    
+
     # -----------------------------------------------------
     # TAB 4 — SURPLUS / DEFICIT
     # -----------------------------------------------------
     with tab3:
         st.subheader("📉 Surplus / Deficit Summary")
 
-        # Extract Total Income and Total Expenses from subtotals
-        income_df = subtotals[subtotals["Category"] == "Total Income"].sort_values("Year")
-        expense_df = subtotals[subtotals["Category"] == "Total Expenses"].sort_values("Year")
+        income_df_sd = subtotals[subtotals["Category"] == "Total Income"].sort_values("Year")
+        expense_df_sd = subtotals[subtotals["Category"] == "Total Expenses"].sort_values("Year")
 
-        years = income_df["Year"].tolist()
-        income_vals = income_df["Amount"].tolist()
-        expense_vals = expense_df["Amount"].tolist()
+        years_income = income_df_sd["Year"].tolist()
+        income_vals = income_df_sd["Amount"].tolist()
+        expense_vals = expense_df_sd["Amount"].tolist()
 
         sd_rows = []
 
-        for i in range(len(years)):
-            year = years[i]
+        for i in range(len(years_income)):
+            year = years_income[i]
             inc = income_vals[i]
             exp = expense_vals[i]
             surplus = inc - exp
@@ -663,7 +645,7 @@ def main():
             if i == 0:
                 yoy_change = 0
             else:
-                prev_surplus = income_vals[i-1] - expense_vals[i-1]
+                prev_surplus = income_vals[i - 1] - expense_vals[i - 1]
                 yoy_change = surplus - prev_surplus
 
             sd_rows.append([year, inc, exp, surplus, yoy_change])
@@ -741,5 +723,7 @@ def main():
                 file_name=f"MECCA_Financial_Subtotals_{year_for_pdf}.pdf",
                 mime="application/pdf"
             )
+
+
 if __name__ == "__main__":
     main()
