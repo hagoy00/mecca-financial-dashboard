@@ -227,7 +227,7 @@ def compute_surplus_deficit(subtotals):
 # ---------------------------------------------------------
 # FORECASTING
 # ---------------------------------------------------------
-def forecast_category(df, category, end_year=2032):
+def forecast_category(df, category, end_year=2030):
     data = df[df["Category"] == category].groupby("Year")["Amount"].sum().reset_index()
     if len(data) < 2:
         return pd.DataFrame()
