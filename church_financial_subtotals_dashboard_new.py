@@ -29,10 +29,11 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ---------------------------------------------------------
-# MAKE THE MAIN CONTENT CONTAINER ALLOW STICKY ELEMENTS
+# FIX STREAMLIT CONTAINER SO STICKY WORKS
 # ---------------------------------------------------------
 st.markdown("""
     <style>
+        /* Allow sticky elements inside main container */
         div[data-testid="stAppViewContainer"] {
             overflow: visible !important;
         }
@@ -40,7 +41,28 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ---------------------------------------------------------
-# STICKY BLUE TITLE (THIS ONE WILL NOW STICK)
+# RESTORE LARGE DASHBOARD FONTS
+# ---------------------------------------------------------
+st.markdown("""
+    <style>
+        html, body, div, span, p, label, h1, h2, h3, h4, h5, h6 {
+            font-size: 26px !important;
+        }
+        .stMarkdown, .stText, .stDataFrame, .stTable, .stMetric, .stNumberInput, .stSlider {
+            font-size: 26px !important;
+        }
+        .dataframe tbody tr td {
+            font-size: 26px !important;
+        }
+        .dataframe thead tr th {
+            font-size: 26px !important;
+            font-weight: bold !important;
+        }
+    </style>
+""", unsafe_allow_html=True)
+
+# ---------------------------------------------------------
+# STICKY BLUE TITLE (NOW WORKS)
 # ---------------------------------------------------------
 st.markdown("""
     <style>
