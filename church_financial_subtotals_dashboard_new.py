@@ -50,27 +50,29 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ---------------------------------------------------------
-# BIG CUSTOM DASHBOARD TITLE (BLUE + BOLD + SMALLER SIZE)
+# STICKY BLUE CUSTOM TITLE
 # ---------------------------------------------------------
 st.markdown("""
     <style>
-        .big-dashboard-title, .big-dashboard-title * {
-            font-size: 48px !important;      /* Smaller than before */
-            font-weight: 900 !important;     /* Extra bold */
-            color: #1E90FF !important;       /* Blue */
-            text-align: center !important;   /* Centered */
-            margin-top: 15px !important;
-            margin-bottom: 30px !important;
+        .big-dashboard-title {
+            position: sticky;
+            top: 0;
+            z-index: 9999;
+            background-color: white;
+            padding: 12px 0 18px 0;
+            font-size: 48px !important;
+            font-weight: 900 !important;
+            color: #1E90FF !important;
+            text-align: center !important;
+            border-bottom: 2px solid #1E90FF;
         }
     </style>
 """, unsafe_allow_html=True)
 
-# DISPLAY THE CUSTOM TITLE
 st.markdown(
     "<div class='big-dashboard-title'>Mekan Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard</div>",
     unsafe_allow_html=True
 )
-
 # ---------------------------------------------------------
 # FILE PATHS (LOCAL + CLOUD)
 # ---------------------------------------------------------
