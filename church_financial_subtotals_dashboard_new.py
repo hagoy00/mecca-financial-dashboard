@@ -691,35 +691,35 @@ def main():
             st.dataframe(inc_year, use_container_width=True)
 
             if not inc_year.empty:
-                selected_inc = st.selectbox("Forecast Income Category", inc_year["Category"])
-                inc_forecast = forecast_category(df, selected_inc)
-                if not inc_forecast.empty:
-                    chart = alt.Chart(inc_forecast).mark_line(point=True).encode(
-                        x=alt.X("Year:O"),
-                        y=alt.Y("Amount:Q"),
-                        color="Type:N",
-                        tooltip=["Year", "Amount", "Type"]
-                    ).properties(title=f"Forecast — {selected_inc}", width=400, height=300)
-                    st.altair_chart(chart, use_container_width=True)      
-    chart = alt.Chart(df).mark_line().encode(
-    chart = alt.Chart(df).mark_line().encode(
-        x='Year:O',
-        y='Amount:Q'
-    ).properties(
-    width='container',
-    height=400
-    )
+    selected_inc = st.selectbox("Forecast Income Category", inc_year["Category"])
+    inc_forecast = forecast_category(df, selected_inc)
 
-# ⭐ ADD THIS PART RIGHT HERE ⭐
-chart = chart.configure_axis(
-    labelFontSize=18,     # Y-axis label font
-    titleFontSize=20,     # Y-axis title font
-    tickCount=12          # Increase number of Y-axis ticks
-)
+    if not inc_forecast.empty:
+        chart = (
+            alt.Chart(inc_forecast)
+            .mark_line(point=True)
+            .encode(
+                x=alt.X("Year:O"),
+                y=alt.Y("Amount:Q"),
+                color="Type:N",
+                tooltip=["Year", "Amount", "Type"]
+            )
+            .properties(
+                title=f"Forecast — {selected_inc}",
+                width=400,
+                height=300
+            )
+        )
 
-# Then display it
-st.altair_chart(chart, use_container_width=True)
-        with col2:
+        # ⭐ EXPAND Y‑AXIS TICKS + CLEAN FONTS ⭐
+        chart = chart.configure_axis(
+            labelFontSize=18,
+            titleFontSize=20,
+            tickCount=12
+        )
+
+        st.altair_chart(chart, use_container_width=True)
+with col2:
             st.markdown("### Top Expense Categories")
             st.dataframe(exp_year, use_container_width=True)
 
