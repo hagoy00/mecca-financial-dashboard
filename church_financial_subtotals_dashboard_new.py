@@ -17,15 +17,20 @@ st.set_page_config(
     page_title="MekanSelam Medhanialem Ethiopian Orthodox Church → Financial Dashboard",
     layout="wide"
 )
-
-# Hide Streamlit default title
+# ---------------------------------------------------------
+# REMOVE STREAMLIT DEFAULT TITLE BAR
+# ---------------------------------------------------------
 st.markdown("""
     <style>
-        header {visibility: hidden;}
+        header[data-testid="stHeader"] {
+            display: none !important;
+        }
     </style>
 """, unsafe_allow_html=True)
 
-# 🔥 GLOBAL FONT OVERRIDE FOR DASHBOARD
+# ---------------------------------------------------------
+# GLOBAL FONT OVERRIDE FOR DASHBOARD
+# ---------------------------------------------------------
 st.markdown("""
     <style>
         html, body, div, span, p, label, h1, h2, h3, h4, h5, h6 {
@@ -44,20 +49,23 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# BIG CUSTOM TITLE
+# ---------------------------------------------------------
+# BIG CUSTOM DASHBOARD TITLE (BLUE + BOLD + SMALLER SIZE)
+# ---------------------------------------------------------
 st.markdown("""
     <style>
-        .big-dashboard-title {
-            font-size: 80px !important;
-            font-weight: 900 !important;
-            color: #1E90FF !important;
-            text-align: center !important;
-            margin-top: 20px !important;
-            margin-bottom: 40px !important;
+        .big-dashboard-title, .big-dashboard-title * {
+            font-size: 48px !important;      /* Smaller than before */
+            font-weight: 900 !important;     /* Extra bold */
+            color: #1E90FF !important;       /* Blue */
+            text-align: center !important;   /* Centered */
+            margin-top: 15px !important;
+            margin-bottom: 30px !important;
         }
     </style>
 """, unsafe_allow_html=True)
 
+# DISPLAY THE CUSTOM TITLE
 st.markdown(
     "<div class='big-dashboard-title'>MekanSelam Medhanialem Ethiopian Orthodox Church → Financial Dashboard</div>",
     unsafe_allow_html=True
