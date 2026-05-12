@@ -703,12 +703,12 @@ def main():
                     st.altair_chart(chart, use_container_width=True)      
     chart = alt.Chart(df).mark_line().encode(
     chart = alt.Chart(df).mark_line().encode(
-    x='Year:O',
-    y='Amount:Q'
-).properties(
+        x='Year:O',
+        y='Amount:Q'
+    ).properties(
     width='container',
     height=400
-)
+    )
 
 # ⭐ ADD THIS PART RIGHT HERE ⭐
 chart = chart.configure_axis(
