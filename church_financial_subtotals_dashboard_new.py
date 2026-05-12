@@ -261,7 +261,6 @@ def extract_subtotals(df):
         ignore_index=True
     )
 
-
 # ---------------------------------------------------------
 # YOY CALC (generic)
 # ---------------------------------------------------------
@@ -271,7 +270,6 @@ def compute_yoy(subtotals):
     df["YoY Change"] = df.groupby("Category")["Amount"].diff()
     df["YoY %"] = df.groupby("Category")["Amount"].pct_change() * 100
     return df
-
 
 # ---------------------------------------------------------
 # SURPLUS / DEFICIT (using auto totals)
@@ -672,200 +670,200 @@ def main():
 
         st.dataframe(yoy_pivot.style.format("{:,.2f}"), use_container_width=True)
 
-# -----------------------------------------------------
-# TAB 3 — TOP INCOME & EXPENSES (FORECASTING)
-# -----------------------------------------------------
-with tab_top:
-    st.subheader("Top Income & Top Expenses")
+    # -----------------------------------------------------
+    # TAB 3 — TOP INCOME & EXPENSES (FORECASTING)
+    # -----------------------------------------------------
+    with tab_top:
+        st.subheader("Top Income & Top Expenses")
 
-    top_income = get_top_income(df)
-    top_expense = get_top_expense(df)
+        top_income = get_top_income(df)
+        top_expense = get_top_expense(df)
 
-    year_sel = st.selectbox("Select Year", years)
+        year_sel = st.selectbox("Select Year", years)
 
-    inc_year = top_income[top_income["Year"] == year_sel].sort_values("Amount", ascending=False).head(5)
-    exp_year = top_expense[top_expense["Year"] == year_sel].sort_values("Amount", ascending=False).head(5)
+        inc_year = top_income[top_income["Year"] == year_sel].sort_values("Amount", ascending=False).head(5)
+        exp_year = top_expense[top_expense["Year"] == year_sel].sort_values("Amount", ascending=False).head(5)
 
-    col1, col2 = st.columns(2)
+        col1, col2 = st.columns(2)
 
-    # -----------------------------
-    # LEFT COLUMN — INCOME FORECAST
-    # -----------------------------
-    with col1:
-        st.markdown("### Top Income Categories")
-        st.dataframe(inc_year, use_container_width=True)
+        # -----------------------------
+        # LEFT COLUMN — INCOME FORECAST
+        # -----------------------------
+        with col1:
+            st.markdown("### Top Income Categories")
+            st.dataframe(inc_year, use_container_width=True)
 
-        if not inc_year.empty:
-            selected_inc = st.selectbox("Forecast Income Category", inc_year["Category"])
-            inc_forecast = forecast_category(df, selected_inc)
+            if not inc_year.empty:
+                selected_inc = st.selectbox("Forecast Income Category", inc_year["Category"])
+                inc_forecast = forecast_category(df, selected_inc)
 
-            if not inc_forecast.empty:
-                chart = (
-                    alt.Chart(inc_forecast)
-                    .mark_line(point=True)
-                    .encode(
-                        x=alt.X("Year:O"),
-                        y=alt.Y("Amount:Q"),
-                        color="Type:N",
-                        tooltip=["Year", "Amount", "Type"]
+                if not inc_forecast.empty:
+                    chart = (
+                        alt.Chart(inc_forecast)
+                        .mark_line(point=True)
+                        .encode(
+                            x=alt.X("Year:O"),
+                            y=alt.Y("Amount:Q"),
+                            color="Type:N",
+                            tooltip=["Year", "Amount", "Type"]
+                        )
+                        .properties(
+                            title=f"Forecast — {selected_inc}",
+                            width=400,
+                            height=300
+                        )
+                    ).configure_axis(
+                        labelFontSize=18,
+                        titleFontSize=20,
+                        tickCount=12
                     )
-                    .properties(
-                        title=f"Forecast — {selected_inc}",
-                        width=400,
-                        height=300
+
+                    st.altair_chart(chart, use_container_width=True)
+
+        # -----------------------------
+        # RIGHT COLUMN — EXPENSE FORECAST
+        # -----------------------------
+        with col2:
+            st.markdown("### Top Expense Categories")
+            st.dataframe(exp_year, use_container_width=True)
+
+            if not exp_year.empty:
+                selected_exp = st.selectbox("Forecast Expense Category", exp_year["Category"])
+                exp_forecast = forecast_category(df, selected_exp)
+
+                if not exp_forecast.empty:
+                    chart = (
+                        alt.Chart(exp_forecast)
+                        .mark_line(point=True)
+                        .encode(
+                            x=alt.X("Year:O"),
+                            y=alt.Y("Amount:Q"),
+                            color="Type:N",
+                            tooltip=["Year", "Amount", "Type"]
+                        )
+                        .properties(
+                            title=f"Forecast — {selected_exp}",
+                            width=400,
+                            height=300
+                        )
+                    ).configure_axis(
+                        labelFontSize=18,
+                        titleFontSize=20,
+                        tickCount=12
                     )
-                ).configure_axis(
-                    labelFontSize=18,
-                    titleFontSize=20,
-                    tickCount=12
-                )
 
-                st.altair_chart(chart, use_container_width=True)
+                    st.altair_chart(chart, use_container_width=True)
 
-    # -----------------------------
-    # RIGHT COLUMN — EXPENSE FORECAST
-    # -----------------------------
-    with col2:
-        st.markdown("### Top Expense Categories")
-        st.dataframe(exp_year, use_container_width=True)
+    # -----------------------------------------------------
+    # TAB 4 — SURPLUS / DEFICIT
+    # -----------------------------------------------------
+    with tab3:
+        st.subheader("📉 Surplus / Deficit Summary")
 
-        if not exp_year.empty:
-            selected_exp = st.selectbox("Forecast Expense Category", exp_year["Category"])
-            exp_forecast = forecast_category(df, selected_exp)
+        income_df_sd = subtotals[subtotals["Category"] == "Total Income"].sort_values("Year")
+        expense_df_sd = subtotals[subtotals["Category"] == "Total Expenses"].sort_values("Year")
 
-            if not exp_forecast.empty:
-                chart = (
-                    alt.Chart(exp_forecast)
-                    .mark_line(point=True)
-                    .encode(
-                        x=alt.X("Year:O"),
-                        y=alt.Y("Amount:Q"),
-                        color="Type:N",
-                        tooltip=["Year", "Amount", "Type"]
-                    )
-                    .properties(
-                        title=f"Forecast — {selected_exp}",
-                        width=400,
-                        height=300
-                    )
-                ).configure_axis(
-                    labelFontSize=18,
-                    titleFontSize=20,
-                    tickCount=12
-                )
+        years_income = income_df_sd["Year"].tolist()
+        income_vals = income_df_sd["Amount"].tolist()
+        expense_vals = expense_df_sd["Amount"].tolist()
 
-                st.altair_chart(chart, use_container_width=True)
-# -----------------------------------------------------
-# TAB 4 — SURPLUS / DEFICIT
-# -----------------------------------------------------
-with tab3:
-    st.subheader("📉 Surplus / Deficit Summary")
+        sd_rows = []
 
-    income_df_sd = subtotals[subtotals["Category"] == "Total Income"].sort_values("Year")
-    expense_df_sd = subtotals[subtotals["Category"] == "Total Expenses"].sort_values("Year")
+        for i in range(len(years_income)):
+            year = years_income[i]
+            inc = income_vals[i]
+            exp = expense_vals[i]
+            surplus = inc - exp
 
-    years_income = income_df_sd["Year"].tolist()
-    income_vals = income_df_sd["Amount"].tolist()
-    expense_vals = expense_df_sd["Amount"].tolist()
+            if i == 0:
+                yoy_change = 0
+            else:
+                prev_surplus = income_vals[i - 1] - expense_vals[i - 1]
+                yoy_change = surplus - prev_surplus
 
-    sd_rows = []
+            sd_rows.append([year, inc, exp, surplus, yoy_change])
 
-    for i in range(len(years_income)):
-        year = years_income[i]
-        inc = income_vals[i]
-        exp = expense_vals[i]
-        surplus = inc - exp
+        sd_df = pd.DataFrame(sd_rows, columns=[
+            "Year", "Total Income", "Total Expenses", "Surplus/Deficit", "YoY Change"
+        ])
 
-        if i == 0:
-            yoy_change = 0
-        else:
-            prev_surplus = income_vals[i - 1] - expense_vals[i - 1]
-            yoy_change = surplus - prev_surplus
-
-        sd_rows.append([year, inc, exp, surplus, yoy_change])
-
-    sd_df = pd.DataFrame(sd_rows, columns=[
-        "Year", "Total Income", "Total Expenses", "Surplus/Deficit", "YoY Change"
-    ])
-
-    sd_filtered = sd_df[sd_df["Year"].isin(selected_years)]
-
-    st.dataframe(
-        sd_filtered.style.format({
-            "Total Income": "{:,.2f}",
-            "Total Expenses": "{:,.2f}",
-            "Surplus/Deficit": "{:,.2f}",
-            "YoY Change": "{:,.2f}"
-        }),
-        use_container_width=True
-    )
-
-
-# -----------------------------------------------------
-# TAB 5 — FORECASTING
-# -----------------------------------------------------
-with tab4:
-    st.subheader("📈 Forecasting Through 2032")
-
-    FORECAST_TARGETS = [
-        "Total Revenue",
-        "Total Income",
-        "Total Expenses",
-        "Net Income",
-        "Payroll",
-        "Utilities"
-    ]
-
-    for category in FORECAST_TARGETS:
-        st.markdown(f"### 🔮 {category} Forecast (to 2032)")
-
-        fc = forecast_category(subtotals, category)
-
-        if fc.empty:
-            st.warning(f"No data available to forecast {category}")
-            continue
-
-        chart = (
-            alt.Chart(fc)
-            .mark_line(point=True)
-            .encode(
-                x="Year:O",
-                y="Amount:Q",
-                color="Type:N",
-                tooltip=["Year", "Amount", "Type"]
-            )
-            .properties(width=800, height=400)
-        )
-
-        st.altair_chart(chart, use_container_width=True)
+        sd_filtered = sd_df[sd_df["Year"].isin(selected_years)]
 
         st.dataframe(
-            fc.pivot_table(index="Year", columns="Type", values="Amount")
-              .fillna(0)
-              .style.format("{:,.2f}"),
+            sd_filtered.style.format({
+                "Total Income": "{:,.2f}",
+                "Total Expenses": "{:,.2f}",
+                "Surplus/Deficit": "{:,.2f}",
+                "YoY Change": "{:,.2f}"
+            }),
             use_container_width=True
         )
 
-        st.divider()
+    # -----------------------------------------------------
+    # TAB 5 — FORECASTING
+    # -----------------------------------------------------
+    with tab4:
+        st.subheader("📈 Forecasting Through 2032")
 
+        FORECAST_TARGETS = [
+            "Total Revenue",
+            "Total Income",
+            "Total Expenses",
+            "Net Income",
+            "Payroll",
+            "Utilities"
+        ]
 
-# -----------------------------------------------------
-# TAB 6 — BOARD PDF
-# -----------------------------------------------------
-with tab_pdf:
-    st.subheader("Board PDF Report")
+        for category in FORECAST_TARGETS:
+            st.markdown(f"### 🔮 {category} Forecast (to 2032)")
 
-    year_for_pdf = st.selectbox("Select Year for PDF", years)
+            fc = forecast_category(subtotals, category)
 
-    if st.button("Generate PDF"):
-        pdf_buffer = generate_pdf(subtotals, year_for_pdf)
-        st.download_button(
-            label="Download PDF",
-            data=pdf_buffer,
-            file_name=f"MECCA_Financial_Subtotals_{year_for_pdf}.pdf",
-            mime="application/pdf"
-        )
+            if fc.empty:
+                st.warning(f"No data available to forecast {category}")
+                continue
 
+            chart = (
+                alt.Chart(fc)
+                .mark_line(point=True)
+                .encode(
+                    x="Year:O",
+                    y="Amount:Q",
+                    color="Type:N",
+                    tooltip=["Year", "Amount", "Type"]
+                )
+                .properties(width=800, height=400)
+            )
 
+            st.altair_chart(chart, use_container_width=True)
+
+            st.dataframe(
+                fc.pivot_table(index="Year", columns="Type", values="Amount")
+                  .fillna(0)
+                  .style.format("{:,.2f}"),
+                use_container_width=True
+            )
+
+            st.divider()
+
+    # -----------------------------------------------------
+    # TAB 6 — BOARD PDF
+    # -----------------------------------------------------
+    with tab_pdf:
+        st.subheader("Board PDF Report")
+
+        year_for_pdf = st.selectbox("Select Year for PDF", years)
+
+        if st.button("Generate PDF"):
+            pdf_buffer = generate_pdf(subtotals, year_for_pdf)
+            st.download_button(
+                label="Download PDF",
+                data=pdf_buffer,
+                file_name=f"MECCA_Financial_Subtotals_{year_for_pdf}.pdf",
+                mime="application/pdf"
+            )
+# ---------------------------------------------------------
+# RUN APP
+# ---------------------------------------------------------
 if __name__ == "__main__":
     main()
