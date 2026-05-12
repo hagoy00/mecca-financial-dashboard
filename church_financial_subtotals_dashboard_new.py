@@ -14,7 +14,7 @@ from reportlab.lib import colors
 # PAGE CONFIG
 # ---------------------------------------------------------
 st.set_page_config(
-    page_title="Church Financial Subtotals Dashboard",
+    page_title="MekanSelam Medhanialem Ethiopian Orthodox Church → Financial Dashboard",
     layout="wide"
 )
 
