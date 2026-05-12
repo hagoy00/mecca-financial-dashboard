@@ -18,11 +18,6 @@ st.set_page_config(
     layout="wide"
 )
 
-st.set_page_config(
-    page_title="Mekan Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard",
-    layout="wide"
-)
-
 # ---------------------------------------------------------
 # REMOVE STREAMLIT DEFAULT TITLE BAR
 # ---------------------------------------------------------
@@ -62,16 +57,16 @@ div.block-container {
 st.markdown("""
 <style>
 html, body, div, span, p, label, h1, h2, h3, h4, h5, h6 {
-    font-size: 26px !important;
+    font-size: 24px !important;
 }
 .stMarkdown, .stText, .stDataFrame, .stTable, .stMetric, .stNumberInput, .stSlider {
-    font-size: 26px !important;
+    font-size: 24px !important;
 }
 .dataframe tbody tr td {
-    font-size: 26px !important;
+    font-size: 24px !important;
 }
 .dataframe thead tr th {
-    font-size: 26px !important;
+    font-size: 24px !important;
     font-weight: bold !important;
 }
 </style>
@@ -101,7 +96,6 @@ st.markdown(
     "<div class='big-dashboard-title'>Mekan Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard</div>",
     unsafe_allow_html=True
 )
-
 
 # ---------------------------------------------------------
 # FILE PATHS (LOCAL + CLOUD)
