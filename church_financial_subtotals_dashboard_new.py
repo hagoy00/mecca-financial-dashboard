@@ -29,17 +29,6 @@ header[data-testid="stHeader"] {
 """, unsafe_allow_html=True)
 
 # ---------------------------------------------------------
-# FORCE ROOT CONTAINER TO ALLOW STICKY
-# ---------------------------------------------------------
-st.markdown("""
-<style>
-html, body, [data-testid="stAppViewContainer"], [data-testid="stMain"], .block-container {
-    overflow: visible !important;
-}
-</style>
-""", unsafe_allow_html=True)
-
-# ---------------------------------------------------------
 # GLOBAL FONT OVERRIDE — 23px
 # ---------------------------------------------------------
 st.markdown("""
@@ -61,26 +50,29 @@ html, body, div, span, p, label, h1, h2, h3, h4, h5, h6 {
 """, unsafe_allow_html=True)
 
 # ---------------------------------------------------------
-# TRUE STICKY TITLE (ROOT LEVEL)
+# SAFE STICKY TITLE (DOES NOT FREEZE STREAMLIT)
 # ---------------------------------------------------------
 st.markdown("""
 <style>
-#sticky-title {
+.big-dashboard-title {
     position: sticky;
     top: 0;
-    z-index: 999999;
+    z-index: 10;
     background-color: white;
     padding: 14px 0 18px 0;
-    font-size: 48px;
-    font-weight: 900;
-    color: #1E90FF;
+    font-size: 48px !important;
+    font-weight: 900 !important;
+    color: #1E90FF !important;
     text-align: center;
     border-bottom: 2px solid #1E90FF;
 }
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown("<div id='sticky-title'>Mekan Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard</div>", unsafe_allow_html=True)
+st.markdown(
+    "<div class='big-dashboard-title'>Mekan Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard</div>",
+    unsafe_allow_html=True
+)
 # ---------------------------------------------------------
 # FILE PATHS (LOCAL + CLOUD)
 # ---------------------------------------------------------
