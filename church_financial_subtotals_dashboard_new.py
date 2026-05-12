@@ -17,7 +17,6 @@ st.set_page_config(
     page_title="Mekan Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard",
     layout="wide"
 )
-
 # ---------------------------------------------------------
 # REMOVE STREAMLIT DEFAULT TITLE BAR
 # ---------------------------------------------------------
@@ -30,7 +29,7 @@ header[data-testid="stHeader"] {
 """, unsafe_allow_html=True)
 
 # ---------------------------------------------------------
-# UNLOCK ALL STREAMLIT CONTAINERS SO STICKY WORKS
+# UNLOCK ALL STREAMLIT CONTAINERS (REQUIRED FOR STICKY)
 # ---------------------------------------------------------
 st.markdown("""
 <style>
@@ -48,39 +47,49 @@ div[data-testid="stMain"] {
 div.block-container {
     overflow: visible !important;
 }
+
+/* NEW: Unlock the scrolling wrapper that breaks sticky */
+section[data-testid="stSidebarContent"] {
+    overflow: visible !important;
+}
+
+/* NEW: Unlock the main scrolling wrapper */
+section.main {
+    overflow: visible !important;
+}
 </style>
 """, unsafe_allow_html=True)
 
 # ---------------------------------------------------------
-# RESTORE LARGE DASHBOARD FONTS (YOUR ORIGINAL SETTINGS)
+# RESTORE LARGE DASHBOARD FONTS
 # ---------------------------------------------------------
 st.markdown("""
 <style>
 html, body, div, span, p, label, h1, h2, h3, h4, h5, h6 {
-    font-size: 24px !important;
+    font-size: 23px !important;
 }
 .stMarkdown, .stText, .stDataFrame, .stTable, .stMetric, .stNumberInput, .stSlider {
-    font-size: 24px !important;
+    font-size: 23px !important;
 }
 .dataframe tbody tr td {
-    font-size: 24px !important;
+    font-size: 23px !important;
 }
 .dataframe thead tr th {
-    font-size: 24px !important;
+    font-size: 23px !important;
     font-weight: bold !important;
 }
 </style>
 """, unsafe_allow_html=True)
 
 # ---------------------------------------------------------
-# STICKY BLUE TITLE (NOW WORKS)
+# STICKY BLUE TITLE (THIS VERSION WORKS)
 # ---------------------------------------------------------
 st.markdown("""
 <style>
 .big-dashboard-title {
     position: sticky !important;
     top: 0 !important;
-    z-index: 99999 !important;
+    z-index: 999999 !important;
     background-color: white !important;
     padding: 12px 0 18px 0 !important;
     font-size: 48px !important;
@@ -96,19 +105,16 @@ st.markdown(
     "<div class='big-dashboard-title'>Mekan Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard</div>",
     unsafe_allow_html=True
 )
-
 # ---------------------------------------------------------
 # FILE PATHS (LOCAL + CLOUD)
 # ---------------------------------------------------------
 LOCAL_PATH = "/Users/yemanehagos/my_first_project/data/MECCA_Financial_Data.xlsx"
 CLOUD_PATH = "MECCA_Financial_Data.xlsx"
 
-
 def get_file_path():
     if os.path.exists(LOCAL_PATH):
         return LOCAL_PATH
     return CLOUD_PATH
-
 
 # ---------------------------------------------------------
 # HELPERS
@@ -127,7 +133,6 @@ def classify_row_kind(cat):
     if c in ["expenses", "net income", "net operating income"]:
         return "Header"
     return "Detail"
-
 
 # ---------------------------------------------------------
 # ASSIGN Income / Expense / Subtotal
