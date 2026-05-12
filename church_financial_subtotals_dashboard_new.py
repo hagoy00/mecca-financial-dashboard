@@ -622,13 +622,13 @@ def main():
     with tab2:
         st.subheader("📘 Year‑Over‑Year (YOY) Summary")
 
-    TARGET_ORDER = [
+        TARGET_ORDER = [
         "Total Revenue",
         "Total Expenses",
         "Net Income",
         "Payroll",
         "Utilities"
-    ]
+        ]
 
 
         yoy_rows = []
