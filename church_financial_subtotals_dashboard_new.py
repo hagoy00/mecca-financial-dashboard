@@ -623,7 +623,7 @@ def main():
 
         TARGET_ORDER = [
             "Total Revenue",
-            "Total Income",
+            #"Total Income",
             "Total Expenses",
             "Net Income",
             "Payroll",
@@ -806,8 +806,8 @@ def main():
         st.subheader("📈 Forecasting Through 2032")
 
         FORECAST_TARGETS = [
-            #"Total Revenue",
-            "Total Income",
+            "Total Revenue",
+            #"Total Income",
             "Total Expenses",
             "Net Income",
             "Payroll",
