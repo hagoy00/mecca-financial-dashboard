@@ -17,74 +17,92 @@ st.set_page_config(
     page_title="Mekan Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard",
     layout="wide"
 )
+
+st.set_page_config(
+    page_title="Mekan Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard",
+    layout="wide"
+)
+
 # ---------------------------------------------------------
 # REMOVE STREAMLIT DEFAULT TITLE BAR
 # ---------------------------------------------------------
 st.markdown("""
-    <style>
-        header[data-testid="stHeader"] {
-            display: none !important;
-        }
-    </style>
+<style>
+header[data-testid="stHeader"] {
+    display: none !important;
+}
+</style>
 """, unsafe_allow_html=True)
 
 # ---------------------------------------------------------
-# FIX STREAMLIT CONTAINER SO STICKY WORKS
+# UNLOCK ALL STREAMLIT CONTAINERS SO STICKY WORKS
 # ---------------------------------------------------------
 st.markdown("""
-    <style>
-        /* Allow sticky elements inside main container */
-        div[data-testid="stAppViewContainer"] {
-            overflow: visible !important;
-        }
-    </style>
+<style>
+/* Main app container */
+div[data-testid="stAppViewContainer"] {
+    overflow: visible !important;
+}
+
+/* Main content area */
+div[data-testid="stMain"] {
+    overflow: visible !important;
+}
+
+/* Block container where your content lives */
+div.block-container {
+    overflow: visible !important;
+}
+</style>
 """, unsafe_allow_html=True)
 
 # ---------------------------------------------------------
-# RESTORE LARGE DASHBOARD FONTS
+# RESTORE LARGE DASHBOARD FONTS (YOUR ORIGINAL SETTINGS)
 # ---------------------------------------------------------
 st.markdown("""
-    <style>
-        html, body, div, span, p, label, h1, h2, h3, h4, h5, h6 {
-            font-size: 26px !important;
-        }
-        .stMarkdown, .stText, .stDataFrame, .stTable, .stMetric, .stNumberInput, .stSlider {
-            font-size: 24px !important;
-        }
-        .dataframe tbody tr td {
-            font-size: 24px !important;
-        }
-        .dataframe thead tr th {
-            font-size: 24px !important;
-            font-weight: bold !important;
-        }
-    </style>
+<style>
+html, body, div, span, p, label, h1, h2, h3, h4, h5, h6 {
+    font-size: 26px !important;
+}
+.stMarkdown, .stText, .stDataFrame, .stTable, .stMetric, .stNumberInput, .stSlider {
+    font-size: 26px !important;
+}
+.dataframe tbody tr td {
+    font-size: 26px !important;
+}
+.dataframe thead tr th {
+    font-size: 26px !important;
+    font-weight: bold !important;
+}
+</style>
 """, unsafe_allow_html=True)
 
 # ---------------------------------------------------------
 # STICKY BLUE TITLE (NOW WORKS)
 # ---------------------------------------------------------
 st.markdown("""
-    <style>
-        .big-dashboard-title {
-            position: sticky !important;
-            top: 0 !important;
-            z-index: 9999 !important;
-            background-color: white !important;
-            padding: 12px 0 18px 0 !important;
-            font-size: 48px !important;
-            font-weight: 900 !important;
-            color: #1E90FF !important;
-            text-align: center !important;
-            border-bottom: 2px solid #1E90FF !important;
-        }
-    </style>
+<style>
+.big-dashboard-title {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 99999 !important;
+    background-color: white !important;
+    padding: 12px 0 18px 0 !important;
+    font-size: 48px !important;
+    font-weight: 900 !important;
+    color: #1E90FF !important;
+    text-align: center !important;
+    border-bottom: 2px solid #1E90FF !important;
+}
+</style>
 """, unsafe_allow_html=True)
 
 st.markdown(
     "<div class='big-dashboard-title'>Mekan Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard</div>",
     unsafe_allow_html=True
 )
+
+
 # ---------------------------------------------------------
 # FILE PATHS (LOCAL + CLOUD)
 # ---------------------------------------------------------
