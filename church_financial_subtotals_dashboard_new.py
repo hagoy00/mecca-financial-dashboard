@@ -753,108 +753,116 @@ with tab_top:
                 )
 
                 st.altair_chart(chart, use_container_width=True)
-    # -----------------------------------------------------
-    # TAB 4 — SURPLUS / DEFICIT
-    # -----------------------------------------------------
-    with tab3:
-        st.subheader("📉 Surplus / Deficit Summary")
+# -----------------------------------------------------
+# TAB 4 — SURPLUS / DEFICIT
+# -----------------------------------------------------
+with tab3:
+    st.subheader("📉 Surplus / Deficit Summary")
 
-        income_df_sd = subtotals[subtotals["Category"] == "Total Income"].sort_values("Year")
-        expense_df_sd = subtotals[subtotals["Category"] == "Total Expenses"].sort_values("Year")
+    income_df_sd = subtotals[subtotals["Category"] == "Total Income"].sort_values("Year")
+    expense_df_sd = subtotals[subtotals["Category"] == "Total Expenses"].sort_values("Year")
 
-        years_income = income_df_sd["Year"].tolist()
-        income_vals = income_df_sd["Amount"].tolist()
-        expense_vals = expense_df_sd["Amount"].tolist()
+    years_income = income_df_sd["Year"].tolist()
+    income_vals = income_df_sd["Amount"].tolist()
+    expense_vals = expense_df_sd["Amount"].tolist()
 
-        sd_rows = []
+    sd_rows = []
 
-        for i in range(len(years_income)):
-            year = years_income[i]
-            inc = income_vals[i]
-            exp = expense_vals[i]
-            surplus = inc - exp
+    for i in range(len(years_income)):
+        year = years_income[i]
+        inc = income_vals[i]
+        exp = expense_vals[i]
+        surplus = inc - exp
 
-            if i == 0:
-                yoy_change = 0
-            else:
-                prev_surplus = income_vals[i - 1] - expense_vals[i - 1]
-                yoy_change = surplus - prev_surplus
+        if i == 0:
+            yoy_change = 0
+        else:
+            prev_surplus = income_vals[i - 1] - expense_vals[i - 1]
+            yoy_change = surplus - prev_surplus
 
-            sd_rows.append([year, inc, exp, surplus, yoy_change])
+        sd_rows.append([year, inc, exp, surplus, yoy_change])
 
-        sd_df = pd.DataFrame(sd_rows, columns=[
-            "Year", "Total Income", "Total Expenses", "Surplus/Deficit", "YoY Change"
-        ])
+    sd_df = pd.DataFrame(sd_rows, columns=[
+        "Year", "Total Income", "Total Expenses", "Surplus/Deficit", "YoY Change"
+    ])
 
-        sd_filtered = sd_df[sd_df["Year"].isin(selected_years)]
+    sd_filtered = sd_df[sd_df["Year"].isin(selected_years)]
 
-        st.dataframe(
-            sd_filtered.style.format({
-                "Total Income": "{:,.2f}",
-                "Total Expenses": "{:,.2f}",
-                "Surplus/Deficit": "{:,.2f}",
-                "YoY Change": "{:,.2f}"
-            }),
-            use_container_width=True
-        )
+    st.dataframe(
+        sd_filtered.style.format({
+            "Total Income": "{:,.2f}",
+            "Total Expenses": "{:,.2f}",
+            "Surplus/Deficit": "{:,.2f}",
+            "YoY Change": "{:,.2f}"
+        }),
+        use_container_width=True
+    )
 
-    # -----------------------------------------------------
-    # TAB 5 — FORECASTING
-    # -----------------------------------------------------
-    with tab4:
-        st.subheader("📈 Forecasting Through 2032")
 
-        FORECAST_TARGETS = [
-            "Total Revenue",
-            "Total Income",
-            "Total Expenses",
-            "Net Income",
-            "Payroll",
-            "Utilities"
-        ]
+# -----------------------------------------------------
+# TAB 5 — FORECASTING
+# -----------------------------------------------------
+with tab4:
+    st.subheader("📈 Forecasting Through 2032")
 
-        for category in FORECAST_TARGETS:
-            st.markdown(f"### 🔮 {category} Forecast (to 2032)")
+    FORECAST_TARGETS = [
+        "Total Revenue",
+        "Total Income",
+        "Total Expenses",
+        "Net Income",
+        "Payroll",
+        "Utilities"
+    ]
 
-            fc = forecast_category(subtotals, category)
+    for category in FORECAST_TARGETS:
+        st.markdown(f"### 🔮 {category} Forecast (to 2032)")
 
-            if fc.empty:
-                st.warning(f"No data available to forecast {category}")
-                continue
+        fc = forecast_category(subtotals, category)
 
-            chart = alt.Chart(fc).mark_line(point=True).encode(
+        if fc.empty:
+            st.warning(f"No data available to forecast {category}")
+            continue
+
+        chart = (
+            alt.Chart(fc)
+            .mark_line(point=True)
+            .encode(
                 x="Year:O",
                 y="Amount:Q",
                 color="Type:N",
                 tooltip=["Year", "Amount", "Type"]
-            ).properties(width=800, height=400)
-
-            st.altair_chart(chart, use_container_width=True)
-
-            st.dataframe(
-                fc.pivot_table(index="Year", columns="Type", values="Amount")
-                  .fillna(0)
-                  .style.format("{:,.2f}"),
-                use_container_width=True
             )
+            .properties(width=800, height=400)
+        )
 
-            st.divider()
+        st.altair_chart(chart, use_container_width=True)
 
-    # -----------------------------------------------------
-    # TAB 6 — BOARD PDF
-    # -----------------------------------------------------
-    with tab_pdf:
-        st.subheader("Board PDF Report")
+        st.dataframe(
+            fc.pivot_table(index="Year", columns="Type", values="Amount")
+              .fillna(0)
+              .style.format("{:,.2f}"),
+            use_container_width=True
+        )
 
-        year_for_pdf = st.selectbox("Select Year for PDF", years)
-        if st.button("Generate PDF"):
-            pdf_buffer = generate_pdf(subtotals, year_for_pdf)
-            st.download_button(
-                label="Download PDF",
-                data=pdf_buffer,
-                file_name=f"MECCA_Financial_Subtotals_{year_for_pdf}.pdf",
-                mime="application/pdf"
-            )
+        st.divider()
+
+
+# -----------------------------------------------------
+# TAB 6 — BOARD PDF
+# -----------------------------------------------------
+with tab_pdf:
+    st.subheader("Board PDF Report")
+
+    year_for_pdf = st.selectbox("Select Year for PDF", years)
+
+    if st.button("Generate PDF"):
+        pdf_buffer = generate_pdf(subtotals, year_for_pdf)
+        st.download_button(
+            label="Download PDF",
+            data=pdf_buffer,
+            file_name=f"MECCA_Financial_Subtotals_{year_for_pdf}.pdf",
+            mime="application/pdf"
+        )
 
 
 if __name__ == "__main__":
