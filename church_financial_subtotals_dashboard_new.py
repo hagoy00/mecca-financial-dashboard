@@ -806,7 +806,7 @@ def main():
         st.subheader("📈 Forecasting Through 2032")
 
         FORECAST_TARGETS = [
-            "Total Revenue",
+            #"Total Revenue",
             "Total Income",
             "Total Expenses",
             "Net Income",
