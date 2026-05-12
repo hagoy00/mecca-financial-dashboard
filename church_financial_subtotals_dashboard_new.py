@@ -808,7 +808,6 @@ def main():
 
         FORECAST_TARGETS = [
             "Total Revenue",
-            "Total Income",
             "Total Expenses",
             "Net Income",
             "Payroll",
