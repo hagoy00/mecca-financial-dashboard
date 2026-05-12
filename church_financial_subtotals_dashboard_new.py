@@ -135,7 +135,7 @@ def assign_income_expense(df):
     df["Type"] = None
 
     for year, group in df.groupby("Year"):
-        income_total_idx = group[group["Category"].str.lower() == "total for income"].index
+        #income_total_idx = group[group["Category"].str.lower() == "total for income"].index
         expense_total_idx = group[group["Category"].str.lower() == "total for expenses"].index
 
         if len(income_total_idx) == 0 or len(expense_total_idx) == 0:
