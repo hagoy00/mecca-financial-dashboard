@@ -700,8 +700,25 @@ def main():
                         color="Type:N",
                         tooltip=["Year", "Amount", "Type"]
                     ).properties(title=f"Forecast — {selected_inc}", width=400, height=300)
-                    st.altair_chart(chart, use_container_width=True)
+                    st.altair_chart(chart, use_container_width=True)      
+    chart = alt.Chart(df).mark_line().encode(
+    chart = alt.Chart(df).mark_line().encode(
+    x='Year:O',
+    y='Amount:Q'
+).properties(
+    width='container',
+    height=400
+)
 
+# ⭐ ADD THIS PART RIGHT HERE ⭐
+chart = chart.configure_axis(
+    labelFontSize=18,     # Y-axis label font
+    titleFontSize=20,     # Y-axis title font
+    tickCount=12          # Increase number of Y-axis ticks
+)
+
+# Then display it
+st.altair_chart(chart, use_container_width=True)
         with col2:
             st.markdown("### Top Expense Categories")
             st.dataframe(exp_year, use_container_width=True)
