@@ -19,10 +19,10 @@ st.set_page_config(
 st.markdown("""
     <style>
         html, body, [class*="css"]  {
-            font-size: 20px !important;
+            font-size: 26px !important;
         }
         .stMarkdown, .stText, .stDataFrame, .stTable {
-            font-size: 20px !important;
+            font-size: 26px !important;
         }
     </style>
 """, unsafe_allow_html=True)
