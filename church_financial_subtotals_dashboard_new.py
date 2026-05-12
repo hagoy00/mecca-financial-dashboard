@@ -97,13 +97,6 @@ st.markdown("""
     text-align: center;
     border-bottom: 2px solid #1E90FF;
 }
-</style>
-""", unsafe_allow_html=True)
-
-st.markdown(
-    "<div class='big-dashboard-title'>📊Mekan Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard</div>",
-    unsafe_allow_html=True
-)
 # ---------------------------------------------------------
 # FILE PATHS (LOCAL + CLOUD)
 # ---------------------------------------------------------
