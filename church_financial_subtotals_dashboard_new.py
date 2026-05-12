@@ -82,11 +82,22 @@ html, body, div, span, p, label, h1, h2, h3, h4, h5, h6 {
 # ---------------------------------------------------------
 # SAFE STICKY TITLE (DOES NOT FREEZE STREAMLIT)
 # ---------------------------------------------------------
-Script execution error
-File "/mount/src/mecca-financial-dashboard/church_financial_subtotals_dashboard_new.py", line 86
-  st.markdown("""
-              ^
-SyntaxError: unterminated triple-quoted string literal (detected at line 825)
+st.markdown("""
+<style>
+.big-dashboard-title {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: white;
+    padding: 14px 0 18px 0;
+    font-size: 48px !important;
+    font-weight: 900 !important;
+    color: #1E90FF !important;
+    text-align: center;
+    border-bottom: 2px solid #1E90FF;
+}
+</style>
+""", unsafe_allow_html=True)
 
 # ---------------------------------------------------------
 # FILE PATHS (LOCAL + CLOUD)
