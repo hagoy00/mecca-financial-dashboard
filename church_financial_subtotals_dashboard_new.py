@@ -10,14 +10,12 @@ from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, 
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib import colors
 
-# ---------------------------------------------------------
-# PAGE CONFIG
-# ---------------------------------------------------------
 st.set_page_config(
     page_title="MekanSelam Medhanialem Ethiopian Orthodox Church → Financial Dashboard",
     layout="wide"
 )
 
+# 🔥 GLOBAL FONT OVERRIDE FOR DASHBOARD
 st.markdown("""
     <style>
         html, body, [class*="css"]  {
