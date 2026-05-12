@@ -14,7 +14,7 @@ from reportlab.lib import colors
 # PAGE CONFIG
 # ---------------------------------------------------------
 st.set_page_config(
-    page_title="Mekan Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard",
+    page_title="📊 Mekan Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard",
     layout="wide"
 )
 # ---------------------------------------------------------
@@ -455,7 +455,7 @@ def add_forecast_icons(df):
 # MAIN APP
 # ---------------------------------------------------------
 def main():
-    st.title("📊 Mekan Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard")
+    #st.title("📊 Mekan Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard")#
 
     # Load data
     df = load_data()
