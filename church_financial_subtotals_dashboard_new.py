@@ -317,8 +317,7 @@ def generate_pdf(subtotals, year):
     table_data = [["Category", "Amount"]]
     for _, row in df_year.iterrows():
         table_data.append([row["Category"], f"${row['Amount']:,.2f}"])
-
-    table = Table(table_data, colWidths=[300, 150])
+table = Table(table_data, colWidths=[300, 150])
     style = TableStyle([
         ("BACKGROUND", (0, 0), (-1, 0), colors.lightgrey),
         ("TEXTCOLOR", (0, 0), (-1, 0), colors.black),
@@ -327,6 +326,16 @@ def generate_pdf(subtotals, year):
         ("FONTSIZE", (0, 0), (-1, -1), 9),
         ("GRID", (0, 0), (-1, -1), 0.25, colors.grey),
     ])
+
+    table.setStyle(TableStyle([
+    ("FONTNAME", (0, 0), (-1, -1), "Helvetica-Bold"),
+    ("FONTSIZE", (0, 0), (-1, -1), 16),   # ← bigger font
+    ("TEXTCOLOR", (0, 0), (-1, -1), colors.black),
+    ("ALIGN", (0, 0), (-1, -1), "LEFT"),
+    ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+    ("BOTTOMPADDING", (0, 0), (-1, -1), 8),
+    ("TOPPADDING", (0, 0), (-1, -1), 8),
+]))
 
     for i, row in enumerate(df_year.itertuples(), start=1):
         if str(row.Category).lower().startswith("total for "):
