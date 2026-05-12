@@ -536,7 +536,8 @@ def main():
             ]["Amount"].sum()
 
             summary_rows.append(["Total Revenue", year, revenue])
-            summary_rows.append(["Total Income", year, total_income])
+            # HIDE Total Income from UI (still used internally)
+            # summary_rows.append(["Total Income", year, total_income])
             summary_rows.append(["Total Expenses", year, total_expenses])
             summary_rows.append(["Net Income", year, net_income])
             summary_rows.append(["Payroll", year, payroll])
@@ -621,14 +622,14 @@ def main():
     with tab2:
         st.subheader("📘 Year‑Over‑Year (YOY) Summary")
 
-        TARGET_ORDER = [
-            "Total Revenue",
-            "Total Income",
-            "Total Expenses",
-            "Net Income",
-            "Payroll",
-            "Utilities"
-        ]
+    TARGET_ORDER = [
+        "Total Revenue",
+        "Total Expenses",
+        "Net Income",
+        "Payroll",
+        "Utilities"
+    ]
+
 
         yoy_rows = []
 
