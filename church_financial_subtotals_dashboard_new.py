@@ -614,60 +614,61 @@ def main():
 
         st.dataframe(style_top5(add_rank_icons(top_expense_pivot)), use_container_width=True)
 
-    # -----------------------------------------------------
-    # TAB 2 — CLEAN YOY SUMMARY
-    # -----------------------------------------------------
-    with tab2:
-        st.subheader("📘 Year‑Over‑Year (YOY) Summary")
+   # -----------------------------------------------------
+# TAB 2 — CLEAN YOY SUMMARY
+# -----------------------------------------------------
+with tab2:
+    st.subheader("📘 Year‑Over‑Year (YOY) Summary")
 
-        TARGET_ORDER = [
-            "Total Revenue",
-            "Total Income",
-            "Total Expenses",
-            "Net Income",
-            "Payroll",
-            "Utilities"
-        ]
+    TARGET_ORDER = [
+        "Total Revenue",
+        "Total Income",
+        "Total Expenses",
+        "Net Income",
+        "Payroll",
+        "Utilities"
+    ]
 
-        yoy_rows = []
+    yoy_rows = []
 
-        for cat in TARGET_ORDER:
-            cat_data = subtotals[subtotals["Category"] == cat].sort_values("Year")
-            years_cat = cat_data["Year"].tolist()
-            amounts = cat_data["Amount"].tolist()
+    for cat in TARGET_ORDER:
+        cat_data = subtotals[subtotals["Category"] == cat].sort_values("Year")
+        years_cat = cat_data["Year"].tolist()
+        amounts = cat_data["Amount"].tolist()
 
-            for i in range(len(years_cat)):
-                year = years_cat[i]
-                amount = amounts[i]
+        for i in range(len(years_cat)):
+            year = years_cat[i]
+            amount = amounts[i]
 
-                prev_year = year - 1
+            prev_year = year - 1
 
-                if prev_year not in years_cat:
-                    yoy_change = 0
-                    yoy_pct = 0
-                else:
-                    prev_index = years_cat.index(prev_year)
-                    prev = amounts[prev_index]
+            if prev_year not in years_cat:
+                yoy_change = 0
+                yoy_pct = 0
+            else:
+                prev_index = years_cat.index(prev_year)
+                prev = amounts[prev_index]
 
-                    yoy_change = amount - prev
-                    yoy_pct = (yoy_change / prev * 100) if prev != 0 else 0
+                yoy_change = amount - prev
+                yoy_pct = (yoy_change / prev * 100) if prev != 0 else 0
 
-                yoy_rows.append([cat, year, amount, yoy_change, yoy_pct])
+            yoy_rows.append([cat, year, amount, yoy_change, yoy_pct])
 
-        yoy_clean = pd.DataFrame(yoy_rows, columns=[
-            "Category", "Year", "Amount", "YoY Change", "YoY %"
-        ])
+    yoy_clean = pd.DataFrame(yoy_rows, columns=[
+        "Category", "Year", "Amount", "YoY Change", "YoY %"
+    ])
 
-        yoy_clean = add_yoy_icons(yoy_clean)
+    yoy_clean = add_yoy_icons(yoy_clean)
 
-        yoy_pivot = yoy_clean.pivot_table(
-            index="Category",
-            columns="Year",
-            values="YoY Change",
-            aggfunc="sum"
-        ).fillna(0)
+    yoy_pivot = yoy_clean.pivot_table(
+        index="Category",
+        columns="Year",
+        values="YoY Change",
+        aggfunc="sum"
+    ).fillna(0)
 
-        st.dataframe(yoy_pivot.style.format("{:,.2f}"), use_container_width=True)
+    st.dataframe(yoy_pivot.style.format("{:,.2f}"), use_container_width=True)
+
 
 # -----------------------------------------------------
 # TAB 3 — TOP INCOME & EXPENSES (FORECASTING)
@@ -711,9 +712,7 @@ with tab_top:
                         width=400,
                         height=300
                     )
-                )
-
-                chart = chart.configure_axis(
+                ).configure_axis(
                     labelFontSize=18,
                     titleFontSize=20,
                     tickCount=12
@@ -747,16 +746,13 @@ with tab_top:
                         width=400,
                         height=300
                     )
-                )
-
-                chart = chart.configure_axis(
+                ).configure_axis(
                     labelFontSize=18,
                     titleFontSize=20,
                     tickCount=12
                 )
 
-                st.altair_chart(chart, use_container_width=True) 
-   
+                st.altair_chart(chart, use_container_width=True)
     # -----------------------------------------------------
     # TAB 4 — SURPLUS / DEFICIT
     # -----------------------------------------------------
