@@ -102,8 +102,8 @@ st.markdown("""
 # ---------------------------------------------------------
 # FILE PATHS (LOCAL + CLOUD)
 # ---------------------------------------------------------
-LOCAL_PATH = "/Users/yemanehagos/my_first_project/data/MECCA_Financial_Data.xlsx"
-CLOUD_PATH = "MECCA_Financial_Data.xlsx"
+LOCAL_PATH = "/Users/yemanehagos/my_first_project/data/MSMAEOC_Financial_Data.xlsx"
+CLOUD_PATH = "MSMAEOC_Financial_Data.xlsx"
 
 def get_file_path():
     if os.path.exists(LOCAL_PATH):
@@ -363,7 +363,7 @@ def generate_pdf(subtotals, year):
     styles = getSampleStyleSheet()
     story = []
 
-    title = Paragraph(f"<b>MECCA Financial Subtotals Report – {year}</b>", styles["Title"])
+    title = Paragraph(f"<b>MSMAEOC_Financial Subtotals Report – {year}</b>", styles["Title"])
     story.append(title)
     story.append(Spacer(1, 12))
 
@@ -859,7 +859,7 @@ def main():
             st.download_button(
                 label="Download PDF",
                 data=pdf_buffer,
-                file_name=f"MECCA_Financial_Subtotals_{year_for_pdf}.pdf",
+                file_name=f"MSMAEOC_Financial_Subtotals_{year_for_pdf}.pdf",
                 mime="application/pdf"
             )
 # ---------------------------------------------------------
