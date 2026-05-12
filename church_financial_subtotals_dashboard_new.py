@@ -689,51 +689,71 @@ def main():
 with col1:
     st.markdown("### Top Income Categories")
     st.dataframe(inc_year, use_container_width=True)
-if not inc_year.empty:
-    selected_inc = st.selectbox("Forecast Income Category", inc_year["Category"])
-    inc_forecast = forecast_category(df, selected_inc)
 
-    if not inc_forecast.empty:
-        chart = (
-            alt.Chart(inc_forecast)
-            .mark_line(point=True)
-            .encode(
-                x=alt.X("Year:O"),
-                y=alt.Y("Amount:Q"),
-                color="Type:N",
-                tooltip=["Year", "Amount", "Type"]
+    if not inc_year.empty:
+        selected_inc = st.selectbox("Forecast Income Category", inc_year["Category"])
+        inc_forecast = forecast_category(df, selected_inc)
+
+        if not inc_forecast.empty:
+            chart = (
+                alt.Chart(inc_forecast)
+                .mark_line(point=True)
+                .encode(
+                    x=alt.X("Year:O"),
+                    y=alt.Y("Amount:Q"),
+                    color="Type:N",
+                    tooltip=["Year", "Amount", "Type"]
+                )
+                .properties(
+                    title=f"Forecast — {selected_inc}",
+                    width=400,
+                    height=300
+                )
             )
-            .properties(
-                title=f"Forecast — {selected_inc}",
-                width=400,
-                height=300
+
+            # ⭐ EXPAND Y‑AXIS TICKS ⭐
+            chart = chart.configure_axis(
+                labelFontSize=18,
+                titleFontSize=20,
+                tickCount=12
             )
-        )
 
-        # ⭐ EXPAND Y‑AXIS TICKS ⭐
-        chart = chart.configure_axis(
-            labelFontSize=18,
-            titleFontSize=20,
-            tickCount=12
-        )
+            st.altair_chart(chart, use_container_width=True)
 
-        st.altair_chart(chart, use_container_width=True)
+
 with col2:
-            st.markdown("### Top Expense Categories")
-            st.dataframe(exp_year, use_container_width=True)
+    st.markdown("### Top Expense Categories")
+    st.dataframe(exp_year, use_container_width=True)
 
-            if not exp_year.empty:
-                selected_exp = st.selectbox("Forecast Expense Category", exp_year["Category"])
-                exp_forecast = forecast_category(df, selected_exp)
-                if not exp_forecast.empty:
-                    chart = alt.Chart(exp_forecast).mark_line(point=True).encode(
-                        x=alt.X("Year:O"),
-                        y=alt.Y("Amount:Q"),
-                        color="Type:N",
-                        tooltip=["Year", "Amount", "Type"]
-                    ).properties(title=f"Forecast — {selected_exp}", width=400, height=300)
-                    st.altair_chart(chart, use_container_width=True)
+    if not exp_year.empty:
+        selected_exp = st.selectbox("Forecast Expense Category", exp_year["Category"])
+        exp_forecast = forecast_category(df, selected_exp)
 
+        if not exp_forecast.empty:
+            chart = (
+                alt.Chart(exp_forecast)
+                .mark_line(point=True)
+                .encode(
+                    x=alt.X("Year:O"),
+                    y=alt.Y("Amount:Q"),
+                    color="Type:N",
+                    tooltip=["Year", "Amount", "Type"]
+                )
+                .properties(
+                    title=f"Forecast — {selected_exp}",
+                    width=400,
+                    height=300
+                )
+            )
+
+            # ⭐ EXPAND Y‑AXIS TICKS ⭐
+            chart = chart.configure_axis(
+                labelFontSize=18,
+                titleFontSize=20,
+                tickCount=12
+            )
+
+            st.altair_chart(chart, use_container_width=True)
     # -----------------------------------------------------
     # TAB 4 — SURPLUS / DEFICIT
     # -----------------------------------------------------
