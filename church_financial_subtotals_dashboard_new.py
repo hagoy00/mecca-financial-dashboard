@@ -65,10 +65,10 @@ header[data-testid="stHeader"] {
 st.markdown("""
 <style>
 html, body, div, span, p, label, h1, h2, h3, h4, h5, h6 {
-    font-size: 40px !important;
+    font-size: 35px !important;
 }
 .stMarkdown, .stText, .stDataFrame, .stTable, .stMetric, .stNumberInput, .stSlider {
-    font-size: 40px !important;
+    font-size: 35px !important;
 }
 .dataframe tbody tr td {
     font-size: 40px !important;
