@@ -49,13 +49,13 @@ st.markdown("""
             font-size: 26px !important;
         }
         .stMarkdown, .stText, .stDataFrame, .stTable, .stMetric, .stNumberInput, .stSlider {
-            font-size: 26px !important;
+            font-size: 24px !important;
         }
         .dataframe tbody tr td {
-            font-size: 26px !important;
+            font-size: 24px !important;
         }
         .dataframe thead tr th {
-            font-size: 26px !important;
+            font-size: 24px !important;
             font-weight: bold !important;
         }
     </style>
