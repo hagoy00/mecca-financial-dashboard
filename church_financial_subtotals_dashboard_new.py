@@ -71,10 +71,10 @@ html, body, div, span, p, label, h1, h2, h3, h4, h5, h6 {
     font-size: 35px !important;
 }
 .dataframe tbody tr td {
-    font-size: 40px !important;
+    font-size: 35px !important;
 }
 .dataframe thead tr th {
-    font-size: 40px !important;
+    font-size: 35px !important;
     font-weight: bold !important;
 }
 </style>
