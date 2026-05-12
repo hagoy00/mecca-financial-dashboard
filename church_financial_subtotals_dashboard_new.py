@@ -68,7 +68,7 @@ html, body, div, span, p, label, h1, h2, h3, h4, h5, h6 {
     font-size: 25px !important;
 }
 .stMarkdown, .stText, .stDataFrame, .stTable, .stMetric, .stNumberInput, .stSlider {
-    font-size: 25px !important;
+    font-size: 20px !important;
 }
 .dataframe tbody tr td {
     font-size: 25px !important;
