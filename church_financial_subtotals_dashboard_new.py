@@ -29,42 +29,32 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ---------------------------------------------------------
-# GLOBAL FONT OVERRIDE FOR DASHBOARD
+# MAKE THE MAIN CONTENT CONTAINER ALLOW STICKY ELEMENTS
 # ---------------------------------------------------------
 st.markdown("""
     <style>
-        html, body, div, span, p, label, h1, h2, h3, h4, h5, h6 {
-            font-size: 26px !important;
-        }
-        .stMarkdown, .stText, .stDataFrame, .stTable, .stMetric, .stNumberInput, .stSlider {
-            font-size: 26px !important;
-        }
-        .dataframe tbody tr td {
-            font-size: 26px !important;
-        }
-        .dataframe thead tr th {
-            font-size: 26px !important;
-            font-weight: bold !important;
+        div[data-testid="stAppViewContainer"] {
+            overflow: visible !important;
         }
     </style>
 """, unsafe_allow_html=True)
 
 # ---------------------------------------------------------
-# STICKY BLUE CUSTOM TITLE
+# STICKY BLUE TITLE (THIS ONE WILL NOW STICK)
 # ---------------------------------------------------------
 st.markdown("""
     <style>
         .big-dashboard-title {
-            position: sticky;
-            top: 0;
-            z-index: 9999;
-            background-color: white;
-            padding: 12px 0 18px 0;
+            position: sticky !important;
+            top: 0 !important;
+            z-index: 9999 !important;
+            background-color: white !important;
+            padding: 12px 0 18px 0 !important;
             font-size: 48px !important;
             font-weight: 900 !important;
             color: #1E90FF !important;
             text-align: center !important;
-            border-bottom: 2px solid #1E90FF;
+            border-bottom: 2px solid #1E90FF !important;
         }
     </style>
 """, unsafe_allow_html=True)
