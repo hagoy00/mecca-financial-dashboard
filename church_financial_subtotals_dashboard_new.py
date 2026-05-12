@@ -317,7 +317,7 @@ def generate_pdf(subtotals, year):
     table_data = [["Category", "Amount"]]
     for _, row in df_year.iterrows():
         table_data.append([row["Category"], f"${row['Amount']:,.2f}"])
-table = Table(table_data, colWidths=[300, 150])
+    table = Table(table_data, colWidths=[300, 150])
     style = TableStyle([
         ("BACKGROUND", (0, 0), (-1, 0), colors.lightgrey),
         ("TEXTCOLOR", (0, 0), (-1, 0), colors.black),
