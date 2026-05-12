@@ -18,6 +18,13 @@ st.set_page_config(
     layout="wide"
 )
 
+# Hide Streamlit default title
+st.markdown("""
+    <style>
+        header {visibility: hidden;}
+    </style>
+""", unsafe_allow_html=True)
+
 # 🔥 GLOBAL FONT OVERRIDE FOR DASHBOARD
 st.markdown("""
     <style>
@@ -37,21 +44,24 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# ---------------------------------------------------------
-# GLOBAL CSS FOR TITLES (PUT THIS RIGHT AFTER THE ABOVE)
-# ---------------------------------------------------------
+# BIG CUSTOM TITLE
 st.markdown("""
     <style>
-        .report-title, .report-title * {
-            font-size: 60px !important;      /* ← HUGE TITLE */
-            font-weight: 900 !important;     /* ← EXTRA BOLD */
-            color: #1E90FF !important;       /* ← BLUE */
-            line-height: 1.1 !important;
+        .big-dashboard-title {
+            font-size: 80px !important;
+            font-weight: 900 !important;
+            color: #1E90FF !important;
+            text-align: center !important;
             margin-top: 20px !important;
-            margin-bottom: 30px !important;
+            margin-bottom: 40px !important;
         }
     </style>
 """, unsafe_allow_html=True)
+
+st.markdown(
+    "<div class='big-dashboard-title'>MekanSelam Medhanialem Ethiopian Orthodox Church → Financial Dashboard</div>",
+    unsafe_allow_html=True
+)
 
 # ---------------------------------------------------------
 # FILE PATHS (LOCAL + CLOUD)
