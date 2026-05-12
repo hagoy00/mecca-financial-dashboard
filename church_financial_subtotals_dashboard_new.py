@@ -37,7 +37,7 @@ body {
 </style>
 
 <div id="outside-sticky-title">
-    Mekan Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard
+    📊 Mekan Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard
 </div>
 """, unsafe_allow_html=True)
 
