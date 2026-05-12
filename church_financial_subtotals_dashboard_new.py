@@ -686,9 +686,9 @@ def main():
 
         col1, col2 = st.columns(2)
 
-        with col1:
-            st.markdown("### Top Income Categories")
-            st.dataframe(inc_year, use_container_width=True)
+with col1:
+    st.markdown("### Top Income Categories")
+    st.dataframe(inc_year, use_container_width=True)
 if not inc_year.empty:
     selected_inc = st.selectbox("Forecast Income Category", inc_year["Category"])
     inc_forecast = forecast_category(df, selected_inc)
