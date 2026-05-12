@@ -70,7 +70,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.markdown(
-    "<div class='big-dashboard-title'📊Mekan Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard</div>",
+    "<div class='big-dashboard-title'>📊Mekan Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard</div>",
     unsafe_allow_html=True
 )
 # ---------------------------------------------------------
