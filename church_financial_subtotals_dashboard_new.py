@@ -277,8 +277,8 @@ def compute_yoy(subtotals):
 def compute_surplus_deficit(subtotals):
     df = subtotals.copy()
 
-    total_income = df[df["Category"] == "Total Income"][["Year", "Amount"]]
-    total_income = total_income.rename(columns={"Amount": "Total Income"})
+    #total_income = df[df["Category"] == "Total Income"][["Year", "Amount"]]
+    #total_income = total_income.rename(columns={"Amount": "Total Income"})
 
     total_expenses = df[df["Category"] == "Total Expenses"][["Year", "Amount"]]
     total_expenses = total_expenses.rename(columns={"Amount": "Total Expenses"})
@@ -536,7 +536,7 @@ def main():
             ]["Amount"].sum()
 
             summary_rows.append(["Total Revenue", year, revenue])
-            summary_rows.append(["Total Income", year, total_income])
+            #summary_rows.append(["Total Income", year, total_income])
             summary_rows.append(["Total Expenses", year, total_expenses])
             summary_rows.append(["Net Income", year, net_income])
             summary_rows.append(["Payroll", year, payroll])
