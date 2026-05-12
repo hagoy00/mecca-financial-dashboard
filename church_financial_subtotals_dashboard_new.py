@@ -135,7 +135,7 @@ def assign_income_expense(df):
     df["Type"] = None
 
     for year, group in df.groupby("Year"):
-        #income_total_idx = group[group["Category"].str.lower() == "total for income"].index
+        income_total_idx = group[group["Category"].str.lower() == "total for income"].index
         expense_total_idx = group[group["Category"].str.lower() == "total for expenses"].index
 
         if len(income_total_idx) == 0 or len(expense_total_idx) == 0:
@@ -536,7 +536,7 @@ def main():
             ]["Amount"].sum()
 
             summary_rows.append(["Total Revenue", year, revenue])
-            #summary_rows.append(["Total Income", year, total_income])
+            summary_rows.append(["Total Income", year, total_income])
             summary_rows.append(["Total Expenses", year, total_expenses])
             summary_rows.append(["Net Income", year, net_income])
             summary_rows.append(["Payroll", year, payroll])
