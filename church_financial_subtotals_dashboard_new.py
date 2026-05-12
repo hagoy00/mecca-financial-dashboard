@@ -669,91 +669,94 @@ def main():
 
         st.dataframe(yoy_pivot.style.format("{:,.2f}"), use_container_width=True)
 
-    
-    # -----------------------------------------------------
-    # TAB 3 — TOP INCOME & EXPENSES (FORECASTING)
-    # -----------------------------------------------------
-    with tab_top:
-        st.subheader("Top Income & Top Expenses")
+# -----------------------------------------------------
+# TAB 3 — TOP INCOME & EXPENSES (FORECASTING)
+# -----------------------------------------------------
+with tab_top:
+    st.subheader("Top Income & Top Expenses")
 
-        top_income = get_top_income(df)
-        top_expense = get_top_expense(df)
+    top_income = get_top_income(df)
+    top_expense = get_top_expense(df)
 
-        year_sel = st.selectbox("Select Year", years)
+    year_sel = st.selectbox("Select Year", years)
 
-        inc_year = top_income[top_income["Year"] == year_sel].sort_values("Amount", ascending=False).head(5)
-        exp_year = top_expense[top_expense["Year"] == year_sel].sort_values("Amount", ascending=False).head(5)
+    inc_year = top_income[top_income["Year"] == year_sel].sort_values("Amount", ascending=False).head(5)
+    exp_year = top_expense[top_expense["Year"] == year_sel].sort_values("Amount", ascending=False).head(5)
 
-        col1, col2 = st.columns(2)
+    col1, col2 = st.columns(2)
 
-with col1:
-    st.markdown("### Top Income Categories")
-    st.dataframe(inc_year, use_container_width=True)
+    # -----------------------------
+    # LEFT COLUMN — INCOME FORECAST
+    # -----------------------------
+    with col1:
+        st.markdown("### Top Income Categories")
+        st.dataframe(inc_year, use_container_width=True)
 
-    if not inc_year.empty:
-        selected_inc = st.selectbox("Forecast Income Category", inc_year["Category"])
-        inc_forecast = forecast_category(df, selected_inc)
+        if not inc_year.empty:
+            selected_inc = st.selectbox("Forecast Income Category", inc_year["Category"])
+            inc_forecast = forecast_category(df, selected_inc)
 
-        if not inc_forecast.empty:
-            chart = (
-                alt.Chart(inc_forecast)
-                .mark_line(point=True)
-                .encode(
-                    x=alt.X("Year:O"),
-                    y=alt.Y("Amount:Q"),
-                    color="Type:N",
-                    tooltip=["Year", "Amount", "Type"]
+            if not inc_forecast.empty:
+                chart = (
+                    alt.Chart(inc_forecast)
+                    .mark_line(point=True)
+                    .encode(
+                        x=alt.X("Year:O"),
+                        y=alt.Y("Amount:Q"),
+                        color="Type:N",
+                        tooltip=["Year", "Amount", "Type"]
+                    )
+                    .properties(
+                        title=f"Forecast — {selected_inc}",
+                        width=400,
+                        height=300
+                    )
                 )
-                .properties(
-                    title=f"Forecast — {selected_inc}",
-                    width=400,
-                    height=300
+
+                chart = chart.configure_axis(
+                    labelFontSize=18,
+                    titleFontSize=20,
+                    tickCount=12
                 )
-            )
 
-            # ⭐ EXPAND Y‑AXIS TICKS ⭐
-            chart = chart.configure_axis(
-                labelFontSize=18,
-                titleFontSize=20,
-                tickCount=12
-            )
+                st.altair_chart(chart, use_container_width=True)
 
-            st.altair_chart(chart, use_container_width=True)
+    # -----------------------------
+    # RIGHT COLUMN — EXPENSE FORECAST
+    # -----------------------------
+    with col2:
+        st.markdown("### Top Expense Categories")
+        st.dataframe(exp_year, use_container_width=True)
 
+        if not exp_year.empty:
+            selected_exp = st.selectbox("Forecast Expense Category", exp_year["Category"])
+            exp_forecast = forecast_category(df, selected_exp)
 
-with col2:
-    st.markdown("### Top Expense Categories")
-    st.dataframe(exp_year, use_container_width=True)
-
-    if not exp_year.empty:
-        selected_exp = st.selectbox("Forecast Expense Category", exp_year["Category"])
-        exp_forecast = forecast_category(df, selected_exp)
-
-        if not exp_forecast.empty:
-            chart = (
-                alt.Chart(exp_forecast)
-                .mark_line(point=True)
-                .encode(
-                    x=alt.X("Year:O"),
-                    y=alt.Y("Amount:Q"),
-                    color="Type:N",
-                    tooltip=["Year", "Amount", "Type"]
+            if not exp_forecast.empty:
+                chart = (
+                    alt.Chart(exp_forecast)
+                    .mark_line(point=True)
+                    .encode(
+                        x=alt.X("Year:O"),
+                        y=alt.Y("Amount:Q"),
+                        color="Type:N",
+                        tooltip=["Year", "Amount", "Type"]
+                    )
+                    .properties(
+                        title=f"Forecast — {selected_exp}",
+                        width=400,
+                        height=300
+                    )
                 )
-                .properties(
-                    title=f"Forecast — {selected_exp}",
-                    width=400,
-                    height=300
+
+                chart = chart.configure_axis(
+                    labelFontSize=18,
+                    titleFontSize=20,
+                    tickCount=12
                 )
-            )
 
-            # ⭐ EXPAND Y‑AXIS TICKS ⭐
-            chart = chart.configure_axis(
-                labelFontSize=18,
-                titleFontSize=20,
-                tickCount=12
-            )
-
-            st.altair_chart(chart, use_container_width=True)
+                st.altair_chart(chart, use_container_width=True) 
+   
     # -----------------------------------------------------
     # TAB 4 — SURPLUS / DEFICIT
     # -----------------------------------------------------
