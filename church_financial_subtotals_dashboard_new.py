@@ -9,6 +9,7 @@ from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib import colors
+
 # ---------------------------------------------------------
 # PAGE CONFIG
 # ---------------------------------------------------------
@@ -37,16 +38,17 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ---------------------------------------------------------
-# GLOBAL CSS FOR TITLES
+# GLOBAL CSS FOR TITLES (PUT THIS RIGHT AFTER THE ABOVE)
 # ---------------------------------------------------------
 st.markdown("""
     <style>
-        .report-title {
-            font-size: 36px !important;
-            font-weight: 800 !important;
-            color: #1E90FF !important;
-            margin-top: 10px !important;
-            margin-bottom: 20px !important;
+        .report-title, .report-title * {
+            font-size: 60px !important;      /* ← HUGE TITLE */
+            font-weight: 900 !important;     /* ← EXTRA BOLD */
+            color: #1E90FF !important;       /* ← BLUE */
+            line-height: 1.1 !important;
+            margin-top: 20px !important;
+            margin-bottom: 30px !important;
         }
     </style>
 """, unsafe_allow_html=True)
