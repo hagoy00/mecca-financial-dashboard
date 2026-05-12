@@ -9,7 +9,9 @@ from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib import colors
-
+# ---------------------------------------------------------
+# PAGE CONFIG
+# ---------------------------------------------------------
 st.set_page_config(
     page_title="MekanSelam Medhanialem Ethiopian Orthodox Church → Financial Dashboard",
     layout="wide"
@@ -18,11 +20,18 @@ st.set_page_config(
 # 🔥 GLOBAL FONT OVERRIDE FOR DASHBOARD
 st.markdown("""
     <style>
-        html, body, [class*="css"]  {
+        html, body, div, span, p, label, h1, h2, h3, h4, h5, h6 {
             font-size: 26px !important;
         }
-        .stMarkdown, .stText, .stDataFrame, .stTable {
+        .stMarkdown, .stText, .stDataFrame, .stTable, .stMetric, .stNumberInput, .stSlider {
             font-size: 26px !important;
+        }
+        .dataframe tbody tr td {
+            font-size: 26px !important;
+        }
+        .dataframe thead tr th {
+            font-size: 26px !important;
+            font-weight: bold !important;
         }
     </style>
 """, unsafe_allow_html=True)
