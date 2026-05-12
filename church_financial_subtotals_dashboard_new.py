@@ -689,8 +689,7 @@ def main():
         with col1:
             st.markdown("### Top Income Categories")
             st.dataframe(inc_year, use_container_width=True)
-
-            if not inc_year.empty:
+if not inc_year.empty:
     selected_inc = st.selectbox("Forecast Income Category", inc_year["Category"])
     inc_forecast = forecast_category(df, selected_inc)
 
@@ -711,7 +710,7 @@ def main():
             )
         )
 
-        # ⭐ EXPAND Y‑AXIS TICKS + CLEAN FONTS ⭐
+        # ⭐ EXPAND Y‑AXIS TICKS ⭐
         chart = chart.configure_axis(
             labelFontSize=18,
             titleFontSize=20,
