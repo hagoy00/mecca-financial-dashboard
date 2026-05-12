@@ -13,10 +13,29 @@ from reportlab.lib import colors
 # ---------------------------------------------------------
 # PAGE CONFIG
 # ---------------------------------------------------------
+
+# ---------------------------------------------------------
+# PAGE CONFIG
+# ---------------------------------------------------------
 st.set_page_config(
     page_title="MekanSelam Medhanialem Ethiopian Orthodox Church → Financial Dashboard",
     layout="wide"
 )
+
+# ---------------------------------------------------------
+# GLOBAL CSS FOR TITLES
+# ---------------------------------------------------------
+st.markdown("""
+    <style>
+        .report-title {
+            font-size: 36px !important;
+            font-weight: 800 !important;
+            color: #1E90FF !important;
+            margin-top: 10px !important;
+            margin-bottom: 20px !important;
+        }
+    </style>
+""", unsafe_allow_html=True)
 
 # ---------------------------------------------------------
 # FILE PATHS (LOCAL + CLOUD)
