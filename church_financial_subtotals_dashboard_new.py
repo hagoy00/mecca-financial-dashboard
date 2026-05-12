@@ -79,7 +79,6 @@ html, body, div, span, p, label, h1, h2, h3, h4, h5, h6 {
 }
 </style>
 """, unsafe_allow_html=True)
-
 # ---------------------------------------------------------
 # SAFE STICKY TITLE (DOES NOT FREEZE STREAMLIT)
 # ---------------------------------------------------------
@@ -87,7 +86,9 @@ Script execution error
 File "/mount/src/mecca-financial-dashboard/church_financial_subtotals_dashboard_new.py", line 86
   st.markdown("""
               ^
-SyntaxError: unterminated triple-quoted string literal (detected at line 825)# ---------------------------------------------------------
+SyntaxError: unterminated triple-quoted string literal (detected at line 825)
+
+# ---------------------------------------------------------
 # FILE PATHS (LOCAL + CLOUD)
 # ---------------------------------------------------------
 LOCAL_PATH = "/Users/yemanehagos/my_first_project/data/MECCA_Financial_Data.xlsx"
@@ -106,7 +107,6 @@ def df_to_excel_bytes(df, sheet_name="Sheet1"):
     with pd.ExcelWriter(output, engine="openpyxl") as writer:
         df.to_excel(writer, index=False, sheet_name=sheet_name)
     return output.getvalue()
-
 
 def classify_row_kind(cat):
     c = str(cat).strip().lower()
