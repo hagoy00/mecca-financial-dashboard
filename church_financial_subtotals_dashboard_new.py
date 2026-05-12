@@ -11,6 +11,37 @@ from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib import colors
 
 # ---------------------------------------------------------
+# REAL STICKY TITLE (OUTSIDE STREAMLIT APP)
+# ---------------------------------------------------------
+st.markdown("""
+<style>
+#outside-sticky-title {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 999999;
+    background-color: white;
+    padding: 14px 0 18px 0;
+    font-size: 48px;
+    font-weight: 900;
+    color: #1E90FF;
+    text-align: center;
+    border-bottom: 2px solid #1E90FF;
+}
+
+/* Push the whole Streamlit app down so title doesn't overlap */
+body {
+    padding-top: 110px !important;
+}
+</style>
+
+<div id="outside-sticky-title">
+    Mekan Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard
+</div>
+""", unsafe_allow_html=True)
+
+# ---------------------------------------------------------
 # PAGE CONFIG
 # ---------------------------------------------------------
 st.set_page_config(
