@@ -475,6 +475,7 @@ def add_forecast_icons(df):
     icons = ["🔼" if amt > mean_val else "🔽" for amt in df["Amount"]]
     df.insert(0, "Trend", icons)
     return df
+    
 # ---------------------------------------------------------
 # MAIN APP
 # ---------------------------------------------------------
@@ -670,7 +671,6 @@ def main():
         ).fillna(0)
 
         st.dataframe(yoy_pivot.style.format("{:,.2f}"), use_container_width=True)
-
 
 # -----------------------------------------------------
 # TAB 3 — TOP INCOME & EXPENSES (FORECASTING)
