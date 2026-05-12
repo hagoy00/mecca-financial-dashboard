@@ -23,21 +23,21 @@ st.markdown("""
     z-index: 999999;
     background-color: white;
     padding: 14px 0 18px 0;
-    font-size: 48px;
-    font-weight: 900;
-    color: #1E90FF;
+    font-size: 48px !important;   /* MAKE IT BIG */
+    font-weight: 900 !important;
+    color: #1E90FF !important;
     text-align: center;
     border-bottom: 2px solid #1E90FF;
 }
 
-/* Push the whole Streamlit app down so title doesn't overlap */
+/* Push Streamlit app down so title doesn't overlap */
 body {
     padding-top: 110px !important;
 }
 </style>
 
 <div id="outside-sticky-title">
-    📊 Mekan Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard
+    Mekan Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard
 </div>
 """, unsafe_allow_html=True)
 
