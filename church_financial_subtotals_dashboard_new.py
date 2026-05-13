@@ -75,6 +75,7 @@ html, body, div, span, p, label, h1, h2, h3, h4, h5, h6 {
 }
 </style>
 """, unsafe_allow_html=True)
+
 # ---------------------------------------------------------
 # SAFE STICKY TITLE (DOES NOT FREEZE STREAMLIT)
 # ---------------------------------------------------------
@@ -97,6 +98,17 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ---------------------------------------------------------
+# REMOVE EXTRA STREAMLIT TOP/BOTTOM PADDING  ← MUST BE HERE
+# ---------------------------------------------------------
+st.markdown("""
+<style>
+.block-container {
+    padding-top: 0.2rem !important;
+}
+</style>
+""", unsafe_allow_html=True)
+
+# ---------------------------------------------------------
 # THIS IS THE ONLY TITLE THAT WILL STICK
 # ---------------------------------------------------------
 st.markdown(
@@ -105,13 +117,10 @@ st.markdown(
 )
 
 # ---------------------------------------------------------
-# SELECT YEAR WIDGET
+# SELECT YEAR WIDGET (ADD UNIQUE KEY)
 # ---------------------------------------------------------
 years = [2021, 2022, 2023, 2024, 2025]
-selected_year = st.selectbox("Select Years", years)
-# ---------------------------------------------------------
-# REMOVE EXTRA STREAMLIT TOP/BOTTOM PADDING
-# ---------------------------------------------------------
+selected_year = st.selectbox("Select Years", years, key="year_selector_main")
 st.markdown("""
 <style>
 .block-container {
