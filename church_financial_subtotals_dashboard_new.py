@@ -11,7 +11,7 @@ from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib import colors
 
 # ---------------------------------------------------------
-# REAL STICKY TITLE (OUTSIDE STREAMLIT APP) — WORKING VERSION
+# REAL STICKY TITLE (OUTSIDE STREAMLIT APP) — 37px VERSION
 # ---------------------------------------------------------
 st.markdown("""
 <style>
@@ -24,7 +24,7 @@ st.markdown("""
     z-index: 999999;
     background-color: white;
     padding: 14px 0 18px 0;
-    font-size: 37px !important;
+    font-size: 37px !important;   /* 37px TITLE */
     font-weight: 900 !important;
     color: #1E90FF !important;
     text-align: center;
@@ -36,7 +36,7 @@ body {
     padding-top: 110px !important;
 }
 
-</style
+</style>
 
 <div id="outside-sticky-title">
 📊 Mekan Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard
@@ -47,7 +47,7 @@ body {
 # PAGE CONFIG
 # ---------------------------------------------------------
 st.set_page_config(
-    page_title="📊 Mekan Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard",
+    page_title="Church Financial Dashboard",
     layout="wide"
 )
 
@@ -85,25 +85,6 @@ html, body, div, span, p, label, h1, h2, h3, h4, h5, h6 {
     font-weight: bold !important;
 }
 
-</style>
-""", unsafe_allow_html=True)
-
-# ---------------------------------------------------------
-# THE ONLY TITLE (THIS ONE WILL STICK)
-# ---------------------------------------------------------
-st.markdown(
-    "<div class='big-dashboard-title'>📊 Mekan Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard</div>",
-    unsafe_allow_html=True
-)
-
-# ---------------------------------------------------------
-# GLOBAL FONT OVERRIDE
-# ---------------------------------------------------------
-st.markdown("""
-<style>
-html, body, div, span, p, label, h1, h2, h3, h4, h5, h6 {
-    font-size: 28px !important;
-}
 </style>
 """, unsafe_allow_html=True)
 
