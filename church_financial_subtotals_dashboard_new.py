@@ -60,7 +60,7 @@ header[data-testid="stHeader"] {
 """, unsafe_allow_html=True)
 
 # ---------------------------------------------------------
-# GLOBAL FONT OVERRIDE — 23px
+# GLOBAL FONT OVERRIDE — 28px
 # ---------------------------------------------------------
 st.markdown("""
 <style>
@@ -95,6 +95,7 @@ st.markdown("""
     color: #1E90FF !important;
     text-align: center;
     border-bottom: 2px solid #1E90FF;
+    margin-bottom: 5px !important;   /* ↓↓↓ reduced spacing here */
 }
 </style>
 """, unsafe_allow_html=True)
