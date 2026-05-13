@@ -464,7 +464,9 @@ def add_yoy_icons(df):
     icons = ["▲"] * min(3, n) + ["▼"] * max(0, n - 3)
 
     df.insert(0, "YoY Trend", icons)
-    return dfdef add_forecast_icons(df):
+    return df
+    
+def add_forecast_icons(df):
     df = df.copy()
     mean_val = df["Amount"].mean()
     icons = ["🔼" if amt > mean_val else "🔽" for amt in df["Amount"]]
