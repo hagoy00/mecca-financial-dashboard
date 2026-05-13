@@ -413,8 +413,9 @@ def generate_pdf(subtotals, year):
 
 
 # ---------------------------------------------------------
-# STYLING HELPERS
+# STYLING HELPERS (CLEAN VERSION — ONLY ▲ and ▼)
 # ---------------------------------------------------------
+
 def style_top5(df):
     df = df.copy()
 
@@ -436,11 +437,8 @@ def add_rank_icons(df):
     df = df.copy()
     n = len(df)
 
-    base_icons = ["🥇", "🥈", "🥉", "⭐", "⭐"]
-    if n > 5:
-        icons = base_icons + ["⭐"] * (n - 5)
-    else:
-        icons = base_icons[:n]
+    # Top 3 = ▲, Rest = ▼
+    icons = ["▲"] * min(3, n) + ["▼"] * max(0, n - 3)
 
     df.insert(0, "Rank", icons)
     return df
@@ -450,10 +448,11 @@ def add_summary_icons(df):
     df = df.copy()
     n = len(df)
 
+    # Same logic: Top = ▲, Bottom = ▼
     icons = ["▲"] * min(3, n) + ["▼"] * max(0, n - 3)
+
     df.insert(0, "Trend", icons)
     return df
-
 
 def add_yoy_icons(df):
     df = df.copy()
