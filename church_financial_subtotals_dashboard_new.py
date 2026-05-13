@@ -433,17 +433,15 @@ def style_top5(df):
     return styler
 
 # ---------------------------------------------------------
-# CLEAN WORKING VERSION — COLORED ▲▼ INSIDE TABLE
+# SIMPLE CLEAN VERSION — BLACK ▲ AND ▼ ONLY
 # ---------------------------------------------------------
 
 def add_rank_icons(df):
     df = df.copy()
     n = len(df)
 
-    icons = (
-        ['<span style="color: green; font-weight:900;">▲</span>'] * min(3, n)
-        + ['<span style="color: red; font-weight:900;">▼</span>'] * max(0, n - 3)
-    )
+    # Top 3 = ▲, Rest = ▼
+    icons = ["▲"] * min(3, n) + ["▼"] * max(0, n - 3)
 
     df.insert(0, "Rank", icons)
     return df
@@ -453,10 +451,7 @@ def add_summary_icons(df):
     df = df.copy()
     n = len(df)
 
-    icons = (
-        ['<span style="color: green; font-weight:900;">▲</span>'] * min(3, n)
-        + ['<span style="color: red; font-weight:900;">▼</span>'] * max(0, n - 3)
-    )
+    icons = ["▲"] * min(3, n) + ["▼"] * max(0, n - 3)
 
     df.insert(0, "Trend", icons)
     return df
@@ -466,15 +461,10 @@ def add_yoy_icons(df):
     df = df.copy()
     n = len(df)
 
-    icons = (
-        ['<span style="color: green; font-weight:900;">▲</span>'] * min(3, n)
-        + ['<span style="color: red; font-weight:900;">▼</span>'] * max(0, n - 3)
-    )
+    icons = ["▲"] * min(3, n) + ["▼"] * max(0, n - 3)
 
     df.insert(0, "YoY Trend", icons)
-    return df
-
-def add_forecast_icons(df):
+    return dfdef add_forecast_icons(df):
     df = df.copy()
     mean_val = df["Amount"].mean()
     icons = ["🔼" if amt > mean_val else "🔽" for amt in df["Amount"]]
