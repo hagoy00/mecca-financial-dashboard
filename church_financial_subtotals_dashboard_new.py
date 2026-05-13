@@ -89,16 +89,41 @@ st.markdown("""
     top: 0;
     z-index: 10;
     background-color: white;
-    padding: 14px 0 18px 0;
+    padding: 14px 0 10px 0;          /* slightly reduced bottom padding */
     font-size: 40px !important;
     font-weight: 900 !important;
     color: #1E90FF !important;
     text-align: center;
     border-bottom: 2px solid #1E90FF;
-    margin-bottom: 5px !important;   /* ↓↓↓ reduced spacing here */
+    margin-bottom: 0px !important;   /* remove extra space under title */
 }
 </style>
 """, unsafe_allow_html=True)
+
+# ---------------------------------------------------------
+# REMOVE EXTRA STREAMLIT TOP/BOTTOM PADDING
+# ---------------------------------------------------------
+st.markdown("""
+<style>
+.block-container {
+    padding-top: 0.5rem !important;   /* reduce space above widgets */
+}
+</style>
+""", unsafe_allow_html=True)
+
+# ---------------------------------------------------------
+# TITLE ITSELF
+# ---------------------------------------------------------
+st.markdown(
+    "<div class='big-dashboard-title'>Mekan Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard</div>",
+    unsafe_allow_html=True
+)
+
+# ---------------------------------------------------------
+# SELECT YEAR WIDGET
+# ---------------------------------------------------------
+years = [2021, 2022, 2023, 2024, 2025]
+selected_year = st.selectbox("Select Years", years)
 
 # ---------------------------------------------------------
 # FILE PATHS (LOCAL + CLOUD)
