@@ -85,17 +85,30 @@ st.markdown("""
     top: 0;
     z-index: 10;
     background-color: white;
-    padding: 14px 0 10px 0;          /* slightly reduced bottom padding */
+    padding: 14px 0 10px 0;
     font-size: 40px !important;
     font-weight: 900 !important;
     color: #1E90FF !important;
     text-align: center;
     border-bottom: 2px solid #1E90FF;
-    margin-bottom: 0px !important;   /* remove extra space under title */
+    margin-bottom: 0px !important;
 }
 </style>
 """, unsafe_allow_html=True)
 
+# ---------------------------------------------------------
+# THIS IS THE ONLY TITLE THAT WILL STICK
+# ---------------------------------------------------------
+st.markdown(
+    "<div class='big-dashboard-title'>Mekan Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard</div>",
+    unsafe_allow_html=True
+)
+
+# ---------------------------------------------------------
+# SELECT YEAR WIDGET
+# ---------------------------------------------------------
+years = [2021, 2022, 2023, 2024, 2025]
+selected_year = st.selectbox("Select Years", years)
 # ---------------------------------------------------------
 # REMOVE EXTRA STREAMLIT TOP/BOTTOM PADDING
 # ---------------------------------------------------------
