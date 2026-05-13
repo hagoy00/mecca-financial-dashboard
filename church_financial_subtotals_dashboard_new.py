@@ -413,7 +413,7 @@ def generate_pdf(subtotals, year):
 
 
 # ---------------------------------------------------------
-# STYLING HELPERS — PROFESSIONAL (GREEN ▲ / RED ▼)
+# STYLING HELPERS — COLORED ▲ AND ▼ INSIDE TABLE
 # ---------------------------------------------------------
 
 def style_top5(df):
