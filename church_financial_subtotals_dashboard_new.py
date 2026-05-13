@@ -11,11 +11,10 @@ from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib import colors
 
 # ---------------------------------------------------------
-# REAL STICKY TITLE (OUTSIDE STREAMLIT APP) — 37px VERSION
+# REAL STICKY TITLE (OUTSIDE STREAMLIT APP)
 # ---------------------------------------------------------
 st.markdown("""
 <style>
-
 #outside-sticky-title {
     position: fixed;
     top: 0;
@@ -24,7 +23,7 @@ st.markdown("""
     z-index: 999999;
     background-color: white;
     padding: 14px 0 18px 0;
-    font-size: 37px !important;   /* 37px TITLE */
+    font-size: 48px !important;   /* MAKE IT BIG */
     font-weight: 900 !important;
     color: #1E90FF !important;
     text-align: center;
@@ -35,11 +34,10 @@ st.markdown("""
 body {
     padding-top: 110px !important;
 }
-
 </style>
 
 <div id="outside-sticky-title">
-📊 Mekan Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard
+    📊 Mekan Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard
 </div>
 """, unsafe_allow_html=True)
 
@@ -47,10 +45,9 @@ body {
 # PAGE CONFIG
 # ---------------------------------------------------------
 st.set_page_config(
-    page_title="Church Financial Dashboard",
+    page_title="📊 Mekan Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard",
     layout="wide"
 )
-
 # ---------------------------------------------------------
 # REMOVE STREAMLIT DEFAULT TITLE BAR
 # ---------------------------------------------------------
@@ -67,43 +64,40 @@ header[data-testid="stHeader"] {
 # ---------------------------------------------------------
 st.markdown("""
 <style>
-
 html, body, div, span, p, label, h1, h2, h3, h4, h5, h6 {
-    font-size: 26px !important;
+    font-size: 23px !important;
 }
-
 .stMarkdown, .stText, .stDataFrame, .stTable, .stMetric, .stNumberInput, .stSlider {
-    font-size: 26px !important;
+    font-size: 23px !important;
 }
-
 .dataframe tbody tr td {
-    font-size: 26px !important;
+    font-size: 23px !important;
 }
-
 .dataframe thead tr th {
-    font-size: 26px !important;
+    font-size: 23px !important;
     font-weight: bold !important;
 }
-
 </style>
 """, unsafe_allow_html=True)
-
 # ---------------------------------------------------------
-# REMOVE EXTRA STREAMLIT TOP/BOTTOM PADDING
+# SAFE STICKY TITLE (DOES NOT FREEZE STREAMLIT)
 # ---------------------------------------------------------
 st.markdown("""
 <style>
-.block-container {
-    padding-top: 0.2rem !important;
+.big-dashboard-title {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: white;
+    padding: 14px 0 18px 0;
+    font-size: 48px !important;
+    font-weight: 900 !important;
+    color: #1E90FF !important;
+    text-align: center;
+    border-bottom: 2px solid #1E90FF;
 }
 </style>
 """, unsafe_allow_html=True)
-
-# ---------------------------------------------------------
-# SELECT YEAR WIDGET
-# ---------------------------------------------------------
-years = [2021, 2022, 2023, 2024, 2025]
-selected_year = st.selectbox("Select Years", years, key="year_selector_main")
 
 # ---------------------------------------------------------
 # FILE PATHS (LOCAL + CLOUD)
@@ -413,9 +407,8 @@ def generate_pdf(subtotals, year):
 
 
 # ---------------------------------------------------------
-# STYLING HELPERS — COLORED ▲ AND ▼ INSIDE TABLE
+# STYLING HELPERS
 # ---------------------------------------------------------
-
 def style_top5(df):
     df = df.copy()
 
@@ -432,16 +425,16 @@ def style_top5(df):
 
     return styler
 
-# ---------------------------------------------------------
-# SIMPLE CLEAN VERSION — BLACK ▲ AND ▼ ONLY
-# ---------------------------------------------------------
 
 def add_rank_icons(df):
     df = df.copy()
     n = len(df)
 
-    # Top 3 = ▲, Rest = ▼
-    icons = ["▲"] * min(3, n) + ["▼"] * max(0, n - 3)
+    base_icons = ["🥇", "🥈", "🥉", "⭐", "⭐"]
+    if n > 5:
+        icons = base_icons + ["⭐"] * (n - 5)
+    else:
+        icons = base_icons[:n]
 
     df.insert(0, "Rank", icons)
     return df
@@ -452,20 +445,28 @@ def add_summary_icons(df):
     n = len(df)
 
     icons = ["▲"] * min(3, n) + ["▼"] * max(0, n - 3)
-
     df.insert(0, "Trend", icons)
     return df
 
 
 def add_yoy_icons(df):
     df = df.copy()
-    n = len(df)
+    icons = []
 
-    icons = ["▲"] * min(3, n) + ["▼"] * max(0, n - 3)
+    for change in df["YoY Change"]:
+        if pd.isna(change):
+            icons.append("⏺️")
+        elif change > 0:
+            icons.append("📈")
+        elif change < 0:
+            icons.append("📉")
+        else:
+            icons.append("⏺️")
 
-    df.insert(0, "YoY Trend", icons)
+    df.insert(0, "Trend", icons)
     return df
-    
+
+
 def add_forecast_icons(df):
     df = df.copy()
     mean_val = df["Amount"].mean()
