@@ -36,12 +36,11 @@ body {
 }
 
 """, unsafe_allow_html=True)
-
 # ---------------------------------------------------------
 # PAGE CONFIG
 # ---------------------------------------------------------
 st.set_page_config(
-    page_title="Church Financial Dashboard",
+    page_title="Church Financial Dashboard",   # ← neutral tab title (prevents duplicate)
     layout="wide"
 )
 
@@ -57,7 +56,7 @@ header[data-testid="stHeader"] {
 """, unsafe_allow_html=True)
 
 # ---------------------------------------------------------
-# GLOBAL FONT OVERRIDE — 28px
+# GLOBAL FONT OVERRIDE
 # ---------------------------------------------------------
 st.markdown("""
 <style>
@@ -100,7 +99,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ---------------------------------------------------------
-# THIS IS THE ONLY TITLE THAT WILL STICK
+# THE ONLY TITLE (THIS ONE WILL STICK)
 # ---------------------------------------------------------
 st.markdown(
     "<div class='big-dashboard-title'>📊 Mekan Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard</div>",
@@ -108,18 +107,10 @@ st.markdown(
 )
 
 # ---------------------------------------------------------
-# TITLE ITSELF
-# ---------------------------------------------------------
-st.markdown(
-    "<div class='big-dashboard-title'>📊 Mekan Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard</div>",
-    unsafe_allow_html=True
-)
-
-# ---------------------------------------------------------
-# SELECT YEAR WIDGET
+# SELECT YEAR WIDGET (UNIQUE KEY)
 # ---------------------------------------------------------
 years = [2021, 2022, 2023, 2024, 2025]
-selected_year = st.selectbox("Select Years", years)
+selected_year = st.selectbox("Select Years", years, key="year_selector_main")
 
 # ---------------------------------------------------------
 # FILE PATHS (LOCAL + CLOUD)
