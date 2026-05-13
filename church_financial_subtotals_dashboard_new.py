@@ -430,11 +430,13 @@ def add_rank_icons(df):
     df = df.copy()
     n = len(df)
 
-    #base_icons = ["🥇", "🥈", "🥉", "⭐", "⭐"]
-    #if n > 5:
-        #icons = base_icons + ["⭐"] * (n - 5)
-    #else:
-        #icons = base_icons[:n]
+    # Always generate icons matching the number of rows
+    icons = []
+    for i in range(n):
+        if i < 3:
+            icons.append("▲")
+        else:
+            icons.append("▼")
 
     df.insert(0, "Rank", icons)
     return df
@@ -444,7 +446,13 @@ def add_summary_icons(df):
     df = df.copy()
     n = len(df)
 
-    icons = ["▲"] * min(3, n) + ["▼"] * max(0, n - 3)
+    icons = []
+    for i in range(n):
+        if i < 3:
+            icons.append("▲")
+        else:
+            icons.append("▼")
+
     df.insert(0, "Trend", icons)
     return df
 
@@ -453,15 +461,16 @@ def add_yoy_icons(df):
     df = df.copy()
     icons = []
 
+    # YoY Change column must exist
     for change in df["YoY Change"]:
         if pd.isna(change):
-            icons.append("⏺️")
+            icons.append("•")
         elif change > 0:
-            icons.append("📈")
+            icons.append("▲")
         elif change < 0:
-            icons.append("📉")
+            icons.append("▼")
         else:
-            icons.append("⏺️")
+            icons.append("•")
 
     df.insert(0, "Trend", icons)
     return df
@@ -470,10 +479,16 @@ def add_yoy_icons(df):
 def add_forecast_icons(df):
     df = df.copy()
     mean_val = df["Amount"].mean()
-    icons = ["🔼" if amt > mean_val else "🔽" for amt in df["Amount"]]
+
+    icons = []
+    for amt in df["Amount"]:
+        if amt > mean_val:
+            icons.append("▲")
+        else:
+            icons.append("▼")
+
     df.insert(0, "Trend", icons)
     return df
-    
 # ---------------------------------------------------------
 # MAIN APP
 # ---------------------------------------------------------
