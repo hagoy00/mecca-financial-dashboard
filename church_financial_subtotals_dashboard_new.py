@@ -24,7 +24,7 @@ st.markdown("""
     z-index: 999999;
     background-color: white;
     padding: 14px 0 18px 0;
-    font-size: 48px !important;
+    font-size: 37px !important;
     font-weight: 900 !important;
     color: #1E90FF !important;
     text-align: center;
@@ -36,7 +36,7 @@ body {
     padding-top: 110px !important;
 }
 
-</style>
+</style
 
 <div id="outside-sticky-title">
 📊 Mekan Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard
