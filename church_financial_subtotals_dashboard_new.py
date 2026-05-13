@@ -432,14 +432,17 @@ def style_top5(df):
 
     return styler
 
+# ---------------------------------------------------------
+# CLEAN WORKING VERSION — COLORED ▲▼ INSIDE TABLE
+# ---------------------------------------------------------
 
 def add_rank_icons(df):
     df = df.copy()
     n = len(df)
 
     icons = (
-        ['<div style="color: green; font-weight:900; text-align:center;">▲</div>'] * min(3, n)
-        + ['<div style="color: red; font-weight:900; text-align:center;">▼</div>'] * max(0, n - 3)
+        ['<span style="color: green; font-weight:900;">▲</span>'] * min(3, n)
+        + ['<span style="color: red; font-weight:900;">▼</span>'] * max(0, n - 3)
     )
 
     df.insert(0, "Rank", icons)
@@ -451,8 +454,8 @@ def add_summary_icons(df):
     n = len(df)
 
     icons = (
-        ['<div style="color: green; font-weight:900; text-align:center;">▲</div>'] * min(3, n)
-        + ['<div style="color: red; font-weight:900; text-align:center;">▼</div>'] * max(0, n - 3)
+        ['<span style="color: green; font-weight:900;">▲</span>'] * min(3, n)
+        + ['<span style="color: red; font-weight:900;">▼</span>'] * max(0, n - 3)
     )
 
     df.insert(0, "Trend", icons)
@@ -464,8 +467,8 @@ def add_yoy_icons(df):
     n = len(df)
 
     icons = (
-        ['<div style="color: green; font-weight:900; text-align:center;">▲</div>'] * min(3, n)
-        + ['<div style="color: red; font-weight:900; text-align:center;">▼</div>'] * max(0, n - 3)
+        ['<span style="color: green; font-weight:900;">▲</span>'] * min(3, n)
+        + ['<span style="color: red; font-weight:900;">▼</span>'] * max(0, n - 3)
     )
 
     df.insert(0, "YoY Trend", icons)
