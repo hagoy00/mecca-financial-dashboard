@@ -41,9 +41,10 @@ body {
 # PAGE CONFIG
 # ---------------------------------------------------------
 st.set_page_config(
-    page_title="📊 Mekan Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard",
+    page_title="Church Financial Dashboard",
     layout="wide"
 )
+
 # ---------------------------------------------------------
 # REMOVE STREAMLIT DEFAULT TITLE BAR
 # ---------------------------------------------------------
@@ -63,21 +64,11 @@ st.markdown("""
 html, body, div, span, p, label, h1, h2, h3, h4, h5, h6 {
     font-size: 28px !important;
 }
-.stMarkdown, .stText, .stDataFrame, .stTable, .stMetric, .stNumberInput, .stSlider {
-    font-size: 25px !important;
-}
-.dataframe tbody tr td {
-    font-size: 25px !important;
-}
-.dataframe thead tr th {
-    font-size: 25px !important;
-    font-weight: bold !important;
-}
 </style>
 """, unsafe_allow_html=True)
 
 # ---------------------------------------------------------
-# SAFE STICKY TITLE (DOES NOT FREEZE STREAMLIT)
+# SAFE STICKY TITLE
 # ---------------------------------------------------------
 st.markdown("""
 <style>
@@ -98,7 +89,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ---------------------------------------------------------
-# REMOVE EXTRA STREAMLIT TOP/BOTTOM PADDING  ← MUST BE HERE
+# REMOVE EXTRA STREAMLIT TOP/BOTTOM PADDING
 # ---------------------------------------------------------
 st.markdown("""
 <style>
@@ -112,22 +103,9 @@ st.markdown("""
 # THIS IS THE ONLY TITLE THAT WILL STICK
 # ---------------------------------------------------------
 st.markdown(
-    "<div class='big-dashboard-title'>Mekan Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard</div>",
+    "<div class='big-dashboard-title'>📊 Mekan Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard</div>",
     unsafe_allow_html=True
 )
-
-# ---------------------------------------------------------
-# SELECT YEAR WIDGET (ADD UNIQUE KEY)
-# ---------------------------------------------------------
-years = [2021, 2022, 2023, 2024, 2025]
-selected_year = st.selectbox("Select Years", years, key="year_selector_main")
-st.markdown("""
-<style>
-.block-container {
-    padding-top: 0.5rem !important;   /* reduce space above widgets */
-}
-</style>
-""", unsafe_allow_html=True)
 
 # ---------------------------------------------------------
 # TITLE ITSELF
