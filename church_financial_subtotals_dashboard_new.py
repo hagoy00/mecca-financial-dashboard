@@ -34,11 +34,7 @@ st.markdown("""
 body {
     padding-top: 110px !important;
 }
-</style>
 
-#<div id="outside-sticky-title">
-    📊 Mekan Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard
-</div>
 """, unsafe_allow_html=True)
 
 # ---------------------------------------------------------
