@@ -11,52 +11,43 @@ from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib import colors
 
 # ---------------------------------------------------------
-# PAGE CONFIG
-# ---------------------------------------------------------
-st.set_page_config(
-    page_title="Church Financial Dashboard",
-    layout="wide"
-)
-
-# ---------------------------------------------------------
-# TRUE STICKY TITLE (ONLY THIS VERSION WORKS)
+# REAL STICKY TITLE (OUTSIDE STREAMLIT APP) — WORKING VERSION
 # ---------------------------------------------------------
 st.markdown("""
 <style>
 
-/* Hide Streamlit's default header */
-header[data-testid="stHeader"] {
-    display: none !important;
-}
-
-/* Sticky title bar ABOVE the block-container */
-div.sticky-title {
-    position: sticky;
+#outside-sticky-title {
+    position: fixed;
     top: 0;
-    z-index: 9999;
+    left: 0;
+    width: 100%;
+    z-index: 999999;
     background-color: white;
-    padding: 14px 0 10px 0;
-    font-size: 37px;
-    font-weight: 900;
-    color: #1E90FF;
+    padding: 14px 0 18px 0;
+    font-size: 48px !important;
+    font-weight: 900 !important;
+    color: #1E90FF !important;
     text-align: center;
     border-bottom: 2px solid #1E90FF;
-    box-shadow: 0px 4px 8px rgba(0,0,0,0.15);
+}
+
+/* Push Streamlit app down so title doesn't overlap */
+body {
+    padding-top: 110px !important;
 }
 
 </style>
 
-<div class="sticky-title">
+<div id="outside-sticky-title">
 📊 Mekan Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard
 </div>
 """, unsafe_allow_html=True)
-
 
 # ---------------------------------------------------------
 # PAGE CONFIG
 # ---------------------------------------------------------
 st.set_page_config(
-    page_title="Church Financial Dashboard",
+    page_title="📊 Mekan Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard",
     layout="wide"
 )
 
@@ -72,23 +63,28 @@ header[data-testid="stHeader"] {
 """, unsafe_allow_html=True)
 
 # ---------------------------------------------------------
-# SAFE STICKY TITLE  ← MUST COME BEFORE ANY OTHER CSS
+# GLOBAL FONT OVERRIDE — 23px
 # ---------------------------------------------------------
 st.markdown("""
 <style>
-.big-dashboard-title {
-    position: sticky;
-    top: 0;
-    z-index: 999;
-    background-color: white;
-    padding: 14px 0 10px 0;
-    font-size: 37px !important;
-    font-weight: 900 !important;
-    color: #1E90FF !important;
-    text-align: center;
-    border-bottom: 2px solid #1E90FF;
-    margin-bottom: 0px !important;
+
+html, body, div, span, p, label, h1, h2, h3, h4, h5, h6 {
+    font-size: 23px !important;
 }
+
+.stMarkdown, .stText, .stDataFrame, .stTable, .stMetric, .stNumberInput, .stSlider {
+    font-size: 23px !important;
+}
+
+.dataframe tbody tr td {
+    font-size: 23px !important;
+}
+
+.dataframe thead tr th {
+    font-size: 23px !important;
+    font-weight: bold !important;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
