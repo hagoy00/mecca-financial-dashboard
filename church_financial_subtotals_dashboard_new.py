@@ -36,11 +36,12 @@ body {
 }
 
 """, unsafe_allow_html=True)
+
 # ---------------------------------------------------------
 # PAGE CONFIG
 # ---------------------------------------------------------
 st.set_page_config(
-    page_title="Church Financial Dashboard",   # ← neutral tab title (prevents duplicate)
+    page_title="Church Financial Dashboard",
     layout="wide"
 )
 
@@ -56,25 +57,14 @@ header[data-testid="stHeader"] {
 """, unsafe_allow_html=True)
 
 # ---------------------------------------------------------
-# GLOBAL FONT OVERRIDE
-# ---------------------------------------------------------
-st.markdown("""
-<style>
-html, body, div, span, p, label, h1, h2, h3, h4, h5, h6 {
-    font-size: 28px !important;
-}
-</style>
-""", unsafe_allow_html=True)
-
-# ---------------------------------------------------------
-# SAFE STICKY TITLE
+# SAFE STICKY TITLE  ← MUST COME BEFORE ANY OTHER CSS
 # ---------------------------------------------------------
 st.markdown("""
 <style>
 .big-dashboard-title {
     position: sticky;
     top: 0;
-    z-index: 10;
+    z-index: 999;
     background-color: white;
     padding: 14px 0 10px 0;
     font-size: 37px !important;
@@ -83,6 +73,25 @@ st.markdown("""
     text-align: center;
     border-bottom: 2px solid #1E90FF;
     margin-bottom: 0px !important;
+}
+</style>
+""", unsafe_allow_html=True)
+
+# ---------------------------------------------------------
+# THE ONLY TITLE (THIS ONE WILL STICK)
+# ---------------------------------------------------------
+st.markdown(
+    "<div class='big-dashboard-title'>📊 Mekan Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard</div>",
+    unsafe_allow_html=True
+)
+
+# ---------------------------------------------------------
+# GLOBAL FONT OVERRIDE
+# ---------------------------------------------------------
+st.markdown("""
+<style>
+html, body, div, span, p, label, h1, h2, h3, h4, h5, h6 {
+    font-size: 28px !important;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -99,15 +108,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ---------------------------------------------------------
-# THE ONLY TITLE (THIS ONE WILL STICK)
-# ---------------------------------------------------------
-st.markdown(
-    "<div class='big-dashboard-title'>📊 Mekan Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard</div>",
-    unsafe_allow_html=True
-)
-
-# ---------------------------------------------------------
-# SELECT YEAR WIDGET (UNIQUE KEY)
+# SELECT YEAR WIDGET
 # ---------------------------------------------------------
 years = [2021, 2022, 2023, 2024, 2025]
 selected_year = st.selectbox("Select Years", years, key="year_selector_main")
