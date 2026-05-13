@@ -11,31 +11,46 @@ from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib import colors
 
 # ---------------------------------------------------------
-# REAL STICKY TITLE (OUTSIDE STREAMLIT APP)
+# PAGE CONFIG
+# ---------------------------------------------------------
+st.set_page_config(
+    page_title="Church Financial Dashboard",
+    layout="wide"
+)
+
+# ---------------------------------------------------------
+# TRUE STICKY TITLE (ONLY THIS VERSION WORKS)
 # ---------------------------------------------------------
 st.markdown("""
 <style>
-#outside-sticky-title {
-    position: fixed;
+
+/* Hide Streamlit's default header */
+header[data-testid="stHeader"] {
+    display: none !important;
+}
+
+/* Sticky title bar ABOVE the block-container */
+div.sticky-title {
+    position: sticky;
     top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 999999;
+    z-index: 9999;
     background-color: white;
-    padding: 14px 0 18px 0;
-    font-size: 37px !important;   /* MAKE IT BIG */
-    font-weight: 900 !important;
-    color: #1E90FF !important;
+    padding: 14px 0 10px 0;
+    font-size: 37px;
+    font-weight: 900;
+    color: #1E90FF;
     text-align: center;
     border-bottom: 2px solid #1E90FF;
+    box-shadow: 0px 4px 8px rgba(0,0,0,0.15);
 }
 
-/* Push Streamlit app down so title doesn't overlap */
-body {
-    padding-top: 110px !important;
-}
+</style>
 
+<div class="sticky-title">
+📊 Mekan Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard
+</div>
 """, unsafe_allow_html=True)
+
 
 # ---------------------------------------------------------
 # PAGE CONFIG
