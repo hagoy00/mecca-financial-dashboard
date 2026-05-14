@@ -363,7 +363,7 @@ def generate_pdf(subtotals, year):
     styles = getSampleStyleSheet()
     story = []
 
-    title = Paragraph(f"<b>MECCA Financial Subtotals Report – {year}</b>", styles["Title"])
+    title = Paragraph(f"<b>MSMAEOC Financial Subtotals Report – {year}</b>", styles["Title"])
     story.append(title)
     story.append(Spacer(1, 12))
 
