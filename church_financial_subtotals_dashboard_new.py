@@ -874,7 +874,7 @@ def main():
             st.download_button(
                 label="Download PDF",
                 data=pdf_buffer,
-                file_name=f"MECCA_Financial_Subtotals_{year_for_pdf}.pdf",
+                file_name=f"Mekan Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard.pdf",
                 mime="application/pdf"
             )
 # ---------------------------------------------------------
