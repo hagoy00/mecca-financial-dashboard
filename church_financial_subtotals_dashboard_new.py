@@ -511,8 +511,7 @@ def main():
         "Board PDF"
     ])
     
-
-        # -----------------------------------------------------
+    # -----------------------------------------------------
     # TAB 1 — UNIFIED SUBTOTAL SUMMARY + TOP 5 FIXED
     # -----------------------------------------------------
     with tab1:
@@ -546,17 +545,9 @@ def main():
             summary_rows.append(["Utilities", year, utilities])
 
         summary_df = pd.DataFrame(summary_rows, columns=["Category", "Year", "Amount"])
-
-        # REMOVE DECIMALS
         summary_df["Amount"] = summary_df["Amount"].astype(float).round(0).astype(int)
 
-        summary_pivot = summary_df.pivot_table(
-            index="Category",
-            columns="Year",
-            values="Amount",
-            aggfunc="sum"
-        ).fillna(0)
-
+        summary_pivot = summary_df.pivot(index="Category", columns="Year", values="Amount").fillna(0)
         summary_pivot.index.name = None
 
         summary_styled = summary_pivot.style.hide(axis="index").set_properties(**{
@@ -577,15 +568,9 @@ def main():
         top_income = get_top_income(df, n=5).copy()
         top_income["Amount"] = top_income["Amount"].astype(float).round(0).astype(int)
 
-        income_pivot = top_income.pivot_table(
-            index="Category",
-            columns="Year",
-            values="Amount",
-            aggfunc="sum"
-        ).fillna(0)
-
-        income_pivot = income_pivot.apply(lambda col: col.astype(int))
+        income_pivot = top_income.pivot(index="Category", columns="Year", values="Amount").fillna(0)
         income_pivot.index.name = None
+        income_pivot = income_pivot.apply(lambda col: col.astype(int))
 
         styled_income = income_pivot.style.hide(axis="index").set_properties(**{
             "text-align": "left",
@@ -605,15 +590,9 @@ def main():
         top_expense = get_top_expense(df, n=5).copy()
         top_expense["Amount"] = top_expense["Amount"].astype(float).round(0).astype(int)
 
-        expense_pivot = top_expense.pivot_table(
-            index="Category",
-            columns="Year",
-            values="Amount",
-            aggfunc="sum"
-        ).fillna(0)
-
-        expense_pivot = expense_pivot.apply(lambda col: col.astype(int))
+        expense_pivot = top_expense.pivot(index="Category", columns="Year", values="Amount").fillna(0)
         expense_pivot.index.name = None
+        expense_pivot = expense_pivot.apply(lambda col: col.astype(int))
 
         styled_expense = expense_pivot.style.hide(axis="index").set_properties(**{
             "text-align": "left",
@@ -622,7 +601,7 @@ def main():
         })
 
         st.dataframe(styled_expense, use_container_width=True)
-
+  
     # -----------------------------------------------------
     # TAB 2 — CLEAN YOY SUMMARY
     # -----------------------------------------------------
