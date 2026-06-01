@@ -511,6 +511,7 @@ def main():
         "Board PDF"
     ])
 
+
     # -----------------------------------------------------
     # TAB 1 — UNIFIED SUBTOTAL SUMMARY (NEW)
     # -----------------------------------------------------
@@ -556,9 +557,7 @@ def main():
 
         summary_df = pd.DataFrame(summary_rows, columns=["Category", "Year", "Amount"])
 
-        # Remove decimals globally
-        summary_df["Amount"] = summary_df["Amount"].astype(float).round(0).astype(int)
-
+        # KEEP DECIMALS — DO NOT ROUND
         summary_pivot = summary_df.pivot_table(
             index="Category",
             columns="Year",
@@ -568,8 +567,11 @@ def main():
 
         summary_pivot.index.name = None
 
+        # HIDE FIRST COLUMN (INDEX)
+        summary_styled = summary_pivot.style.hide(axis="index")
+
         st.markdown("### 📘 Main Financial Summary")
-        st.dataframe(style_top5(add_summary_icons(summary_pivot)), use_container_width=True)
+        st.dataframe(summary_styled, use_container_width=True)
 
         st.divider()
 
@@ -585,11 +587,8 @@ def main():
 
         income_grouped = income_df.groupby(["Category", "Year"])["Amount"].sum().reset_index()
 
-        # Remove index column
+        # REMOVE FIRST COLUMN
         income_grouped = income_grouped.reset_index(drop=True)
-
-        # Remove decimals
-        income_grouped["Amount"] = income_grouped["Amount"].astype(float).round(0).astype(int)
 
         top_income_categories = (
             income_grouped.groupby("Category")["Amount"]
@@ -611,13 +610,8 @@ def main():
         top_income_pivot.index.name = None
         top_income_pivot.columns = top_income_pivot.columns.astype(str)
 
-        styled_income = style_top5(add_rank_icons(top_income_pivot))
-        styled_income = styled_income.format(
-            lambda x: f"{float(x):,.2f}"
-            if str(x).replace('.', '', 1).isdigit()
-            else x
-        )
-        styled_income = styled_income.hide(axis="index")
+        # HIDE FIRST COLUMN — KEEP DECIMALS
+        styled_income = top_income_pivot.style.hide(axis="index")
 
         st.dataframe(styled_income, use_container_width=True)
 
@@ -636,11 +630,8 @@ def main():
 
         expense_grouped = expense_df.groupby(["Category", "Year"])["Amount"].sum().reset_index()
 
-        # Remove index column
+        # REMOVE FIRST COLUMN
         expense_grouped = expense_grouped.reset_index(drop=True)
-
-        # Remove decimals
-        expense_grouped["Amount"] = expense_grouped["Amount"].astype(float).round(0).astype(int)
 
         top_expense_categories = (
             expense_grouped.groupby("Category")["Amount"]
@@ -662,13 +653,9 @@ def main():
         top_expense_pivot.index.name = None
         top_expense_pivot.columns = top_expense_pivot.columns.astype(str)
 
-        styled_expense = style_top5(add_rank_icons(top_expense_pivot))
-        styled_expense = styled_expense.format(
-            lambda x: f"{float(x):,.2f}"
-            if str(x).replace('.', '', 1).isdigit()
-            else x
-        )
-        styled_expense = styled_expense.hide(axis="index")
+        # HIDE FIRST COLUMN — KEEP DECIMALS
+        styled_expense = top_expense_pivot.style.hide(axis="index")
+
         st.dataframe(styled_expense, use_container_width=True)
 
     # -----------------------------------------------------
