@@ -596,8 +596,8 @@ def main():
             aggfunc="sum"
         ).fillna(0)
 
-        # 🔥 Force numeric columns back to numeric
-        top_income_pivot = top_income_pivot.apply(pd.to_numeric, errors="ignore")
+        # 🔥 Convert column names (years) to strings so formatting works
+        top_income_pivot.columns = top_income_pivot.columns.astype(str)
 
         styled_income = style_top5(add_rank_icons(top_income_pivot))
 
@@ -607,8 +607,7 @@ def main():
         st.dataframe(styled_income, use_container_width=True)
 
         st.divider()
-
-                # TOP 5 EXPENSE PIVOT
+        # TOP 5 EXPENSE PIVOT
         st.markdown("### 📉 Top 5 Expense Categories (All Years)")
 
         expense_df = df[
@@ -636,8 +635,8 @@ def main():
             aggfunc="sum"
         ).fillna(0)
 
-        # 🔥 Force numeric columns back to numeric
-        top_expense_pivot = top_expense_pivot.apply(pd.to_numeric, errors="ignore")
+        # 🔥 Convert column names (years) to strings so formatting works
+        top_expense_pivot.columns = top_expense_pivot.columns.astype(str)
 
         styled_expense = style_top5(add_rank_icons(top_expense_pivot))
 
@@ -645,6 +644,7 @@ def main():
         styled_expense = styled_expense.format({col: "{:,.0f}" for col in numeric_cols})
 
         st.dataframe(styled_expense, use_container_width=True)
+
 
     # -----------------------------------------------------
     # TAB 2 — CLEAN YOY SUMMARY
