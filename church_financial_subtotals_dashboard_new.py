@@ -569,7 +569,7 @@ def main():
 
         st.divider()
 
-                # TOP 5 INCOME PIVOT
+        # TOP 5 INCOME PIVOT
         st.markdown("### 💰 Top 5 Income Categories (All Years)")
 
         income_df = df[
@@ -596,17 +596,19 @@ def main():
             aggfunc="sum"
         ).fillna(0)
 
-        # 🔥 Convert column names (years) to strings so formatting works
+        # Convert pivot column names to strings
         top_income_pivot.columns = top_income_pivot.columns.astype(str)
 
+        # Apply styling + remove decimals
         styled_income = style_top5(add_rank_icons(top_income_pivot))
-
-        numeric_cols = top_income_pivot.select_dtypes(include="number").columns
-        styled_income = styled_income.format({col: "{:,.0f}" for col in numeric_cols})
+        styled_income = styled_income.format(
+            lambda x: f"{float(x):,.0f}" 
+            if str(x).replace('.', '', 1).isdigit() 
+            else x
+        )
 
         st.dataframe(styled_income, use_container_width=True)
 
-        st.divider()
         # TOP 5 EXPENSE PIVOT
         st.markdown("### 📉 Top 5 Expense Categories (All Years)")
 
@@ -635,16 +637,18 @@ def main():
             aggfunc="sum"
         ).fillna(0)
 
-        # 🔥 Convert column names (years) to strings so formatting works
+        # Convert pivot column names to strings
         top_expense_pivot.columns = top_expense_pivot.columns.astype(str)
 
+        # Apply styling + remove decimals
         styled_expense = style_top5(add_rank_icons(top_expense_pivot))
-
-        numeric_cols = top_expense_pivot.select_dtypes(include="number").columns
-        styled_expense = styled_expense.format({col: "{:,.0f}" for col in numeric_cols})
+        styled_expense = styled_expense.format(
+            lambda x: f"{float(x):,.0f}" 
+            if str(x).replace('.', '', 1).isdigit() 
+            else x
+        )
 
         st.dataframe(styled_expense, use_container_width=True)
-
 
     # -----------------------------------------------------
     # TAB 2 — CLEAN YOY SUMMARY
