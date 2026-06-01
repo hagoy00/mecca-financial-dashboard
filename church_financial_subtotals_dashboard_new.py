@@ -612,12 +612,12 @@ def main():
         top_income_pivot.columns = top_income_pivot.columns.astype(str)
 
         styled_income = style_top5(add_rank_icons(top_income_pivot))
-
         styled_income = styled_income.format(
-            lambda x: f"{float(x):,.0f}"
+            lambda x: f"{float(x):,.2f}"
             if str(x).replace('.', '', 1).isdigit()
             else x
         )
+        styled_income = styled_income.hide(axis="index")
 
         st.dataframe(styled_income, use_container_width=True)
 
@@ -663,13 +663,12 @@ def main():
         top_expense_pivot.columns = top_expense_pivot.columns.astype(str)
 
         styled_expense = style_top5(add_rank_icons(top_expense_pivot))
-
         styled_expense = styled_expense.format(
-            lambda x: f"{float(x):,.0f}"
+            lambda x: f"{float(x):,.2f}"
             if str(x).replace('.', '', 1).isdigit()
             else x
         )
-
+        styled_expense = styled_expense.hide(axis="index")
         st.dataframe(styled_expense, use_container_width=True)
 
     # -----------------------------------------------------
