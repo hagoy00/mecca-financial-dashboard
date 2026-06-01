@@ -553,7 +553,7 @@ def main():
 
         summary_styled = summary_pivot.style.hide(axis="index").set_table_styles([
             {"selector": "table", "props": [("table-layout", "fixed"), ("width", "100%")]},
-            {"selector": "th.col_heading", "props": [("text-align", "left"), ("width", "200px")]},
+            {"selector": "th.col_heading", "props": [("text-align", "left"), ("width", "280px")]},
             {"selector": "td", "props": [("text-align", "left"), ("width", "200px"), ("padding-left", "10px")]}
         ])
 
@@ -588,7 +588,7 @@ def main():
 
         styled_income = income_yearly.style.hide(axis="index").set_table_styles([
             {"selector": "table", "props": [("table-layout", "fixed"), ("width", "100%")]},
-            {"selector": "th.col_heading", "props": [("text-align", "left"), ("width", "200px")]},
+            {"selector": "th.col_heading", "props": [("text-align", "left"), ("width", "280px")]},
             {"selector": "td", "props": [("text-align", "left"), ("width", "200px"), ("padding-left", "10px")]}
         ])
 
@@ -624,7 +624,7 @@ def main():
 
         styled_expense = expense_yearly.style.hide(axis="index").set_table_styles([
             {"selector": "table", "props": [("table-layout", "fixed"), ("width", "100%")]},
-            {"selector": "th.col_heading", "props": [("text-align", "left"), ("width", "200px")]},
+            {"selector": "th.col_heading", "props": [("text-align", "left"), ("width", "280px")]},
             {"selector": "td", "props": [("text-align", "left"), ("width", "200px"), ("padding-left", "10px")]}
         ])
 
