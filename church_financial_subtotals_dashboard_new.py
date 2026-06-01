@@ -508,12 +508,10 @@ def main():
     ])
 
     # -----------------------------------------------------
-    # TAB 1 — UNIFIED SUBTOTAL SUMMARY
-    # -----------------------------------------------------
-    with tab1:
-        st.subheader("📘 Unified Subtotal Summary (Pivot View)")
-
-        # your entire Tab 1 code goes here
+# TAB 1 — UNIFIED SUBTOTAL SUMMARY (NEW)
+# -----------------------------------------------------
+with tab1:
+    st.subheader("📘 Unified Subtotal Summary (Pivot View)")
 
     summary_rows = []
 
@@ -550,12 +548,19 @@ def main():
         summary_rows.append(["Utilities", year, utilities])
 
     summary_df = pd.DataFrame(summary_rows, columns=["Category", "Year", "Amount"])
+
+    # Remove decimals
+    summary_df["Amount"] = summary_df["Amount"].astype(float).round(0).astype(int)
+
     summary_pivot = summary_df.pivot_table(
         index="Category",
         columns="Year",
         values="Amount",
         aggfunc="sum"
     ).fillna(0)
+
+    # Remove index name
+    summary_pivot.index.name = None
 
     st.markdown("### 📘 Main Financial Summary")
     st.dataframe(style_top5(add_summary_icons(summary_pivot)), use_container_width=True)
@@ -574,7 +579,7 @@ def main():
 
     income_grouped = income_df.groupby(["Category", "Year"])["Amount"].sum().reset_index()
 
-    # 🔥 Remove decimals at the grouped level
+    # 🔥 Remove decimals at grouped level
     income_grouped["Amount"] = income_grouped["Amount"].astype(float).round(0).astype(int)
 
     top_income_categories = (
@@ -594,14 +599,18 @@ def main():
         aggfunc="sum"
     ).fillna(0)
 
+    # Remove index name
+    top_income_pivot.index.name = None
+
+    # Convert pivot column names to strings
     top_income_pivot.columns = top_income_pivot.columns.astype(str)
 
     styled_income = style_top5(add_rank_icons(top_income_pivot))
 
-    # 🔥 Remove decimals even if values become strings
+    # 🔥 Remove decimals even if values became strings
     styled_income = styled_income.format(
-        lambda x: f"{float(x):,.0f}" 
-        if str(x).replace('.', '', 1).isdigit() 
+        lambda x: f"{float(x):,.0f}"
+        if str(x).replace('.', '', 1).isdigit()
         else x
     )
 
@@ -622,7 +631,7 @@ def main():
 
     expense_grouped = expense_df.groupby(["Category", "Year"])["Amount"].sum().reset_index()
 
-    # 🔥 Remove decimals at the grouped level
+    # 🔥 Remove decimals at grouped level
     expense_grouped["Amount"] = expense_grouped["Amount"].astype(float).round(0).astype(int)
 
     top_expense_categories = (
@@ -642,18 +651,21 @@ def main():
         aggfunc="sum"
     ).fillna(0)
 
+    # Remove index name
+    top_expense_pivot.index.name = None
+
+    # Convert pivot column names to strings
     top_expense_pivot.columns = top_expense_pivot.columns.astype(str)
 
     styled_expense = style_top5(add_rank_icons(top_expense_pivot))
 
     styled_expense = styled_expense.format(
-        lambda x: f"{float(x):,.0f}" 
-        if str(x).replace('.', '', 1).isdigit() 
+        lambda x: f"{float(x):,.0f}"
+        if str(x).replace('.', '', 1).isdigit()
         else x
     )
 
     st.dataframe(styled_expense, use_container_width=True)
-
 
     # -----------------------------------------------------
     # TAB 2 — CLEAN YOY SUMMARY
