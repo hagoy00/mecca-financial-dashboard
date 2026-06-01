@@ -512,7 +512,7 @@ def main():
     ])
     
     # -----------------------------------------------------
-    # TAB 1 — UNIFIED SUBTOTAL SUMMARY + TOP 5 FIXED
+    # TAB 1 — FIXED SUMMARY + FIXED TOP 5 INCOME/EXPENSE
     # -----------------------------------------------------
     with tab1:
         st.subheader("📘 Unified Subtotal Summary (Pivot View)")
@@ -552,7 +552,7 @@ def main():
 
         summary_styled = summary_pivot.style.hide(axis="index").set_properties(**{
             "text-align": "left",
-            "padding-left": "12px",
+            "padding-left": "10px",
             "white-space": "nowrap"
         })
 
@@ -561,25 +561,31 @@ def main():
         st.divider()
 
         # -----------------------------------------------------
-        # 2. TOP 5 INCOME — FIXED SHAPE + FIXED PIVOT
+        # 2. TOP 5 INCOME — FULLY FIXED
         # -----------------------------------------------------
         st.markdown("### 💰 Top 5 Income Categories (All Years)")
 
-        top_income = get_top_income(df, n=5).copy()
+        income_df = df[
+            (df["Type"] == "Income") &
+            (~df["Category"].str.lower().str.startswith("total for"))
+        ]
 
-        # FIX: reshape BEFORE pivot
-        top_income = top_income[["Category", "Year", "Amount"]]
+        income_grouped = income_df.groupby("Category")["Amount"].sum().reset_index()
+        income_grouped["Amount"] = income_grouped["Amount"].astype(float).round(0).astype(int)
 
-        # Remove decimals
-        top_income["Amount"] = top_income["Amount"].astype(float).round(0).astype(int)
+        top_income = income_grouped.sort_values("Amount", ascending=False).head(5)
 
-        income_pivot = top_income.pivot(index="Category", columns="Year", values="Amount").fillna(0)
-        income_pivot.index.name = None
-        income_pivot = income_pivot.apply(lambda col: col.astype(int))
+        # Pivot properly
+        income_yearly = df[
+            df["Category"].isin(top_income["Category"])
+        ].groupby(["Category", "Year"])["Amount"].sum().unstack(fill_value=0)
 
-        styled_income = income_pivot.style.hide(axis="index").set_properties(**{
+        income_yearly = income_yearly.apply(lambda col: col.astype(int))
+        income_yearly.index.name = None
+
+        styled_income = income_yearly.style.hide(axis="index").set_properties(**{
             "text-align": "left",
-            "padding-left": "12px",
+            "padding-left": "10px",
             "white-space": "nowrap"
         })
 
@@ -588,25 +594,32 @@ def main():
         st.divider()
 
         # -----------------------------------------------------
-        # 3. TOP 5 EXPENSE — FIXED SHAPE + FIXED PIVOT
+        # 3. TOP 5 EXPENSE — FULLY FIXED
         # -----------------------------------------------------
         st.markdown("### 📉 Top 5 Expense Categories (All Years)")
 
-        top_expense = get_top_expense(df, n=5).copy()
+        expense_df = df[
+            (df["Type"] == "Expense") &
+            (~df["Category"].str.lower().str.startswith("total for")) &
+            (~df["Category"].str.contains("depreciat", case=False, na=False))
+        ]
 
-        # FIX: reshape BEFORE pivot
-        top_expense = top_expense[["Category", "Year", "Amount"]]
+        expense_grouped = expense_df.groupby("Category")["Amount"].sum().reset_index()
+        expense_grouped["Amount"] = expense_grouped["Amount"].astype(float).round(0).astype(int)
 
-        # Remove decimals
-        top_expense["Amount"] = top_expense["Amount"].astype(float).round(0).astype(int)
+        top_expense = expense_grouped.sort_values("Amount", ascending=False).head(5)
 
-        expense_pivot = top_expense.pivot(index="Category", columns="Year", values="Amount").fillna(0)
-        expense_pivot.index.name = None
-        expense_pivot = expense_pivot.apply(lambda col: col.astype(int))
+        # Pivot properly
+        expense_yearly = df[
+            df["Category"].isin(top_expense["Category"])
+        ].groupby(["Category", "Year"])["Amount"].sum().unstack(fill_value=0)
 
-        styled_expense = expense_pivot.style.hide(axis="index").set_properties(**{
+        expense_yearly = expense_yearly.apply(lambda col: col.astype(int))
+        expense_yearly.index.name = None
+
+        styled_expense = expense_yearly.style.hide(axis="index").set_properties(**{
             "text-align": "left",
-            "padding-left": "12px",
+            "padding-left": "10px",
             "white-space": "nowrap"
         })
 
