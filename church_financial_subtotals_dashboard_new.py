@@ -449,8 +449,8 @@ def main():
         "Forecasting",
         "Board PDF"
     ])
-    
-    # -----------------------------------------------------
+
+        # -----------------------------------------------------
     # TAB 1 — FIXED SUMMARY + FIXED TOP 5 INCOME/EXPENSE
     # -----------------------------------------------------
     with tab1:
@@ -489,11 +489,16 @@ def main():
         summary_pivot = summary_df.pivot(index="Category", columns="Year", values="Amount").fillna(0)
         summary_pivot.index.name = None
 
-        # Convert to HTML with fixed column width
+        # Convert to HTML
         summary_html = summary_pivot.to_html(classes="wide-table", border=0)
 
+        # Inject CSS
         st.markdown("""
             <style>
+                .scroll-box {
+                    overflow-x: auto;
+                    padding-bottom: 10px;
+                }
                 .wide-table th, .wide-table td {
                     text-align: left !important;
                     padding: 8px 12px !important;
@@ -504,7 +509,7 @@ def main():
             </style>
         """, unsafe_allow_html=True)
 
-        st.markdown(summary_html, unsafe_allow_html=True)
+        st.markdown(f"<div class='scroll-box'>{summary_html}</div>", unsafe_allow_html=True)
 
         st.divider()
 
@@ -534,7 +539,7 @@ def main():
         income_yearly.index.name = None
 
         income_html = income_yearly.to_html(classes="wide-table", border=0)
-        st.markdown(income_html, unsafe_allow_html=True)
+        st.markdown(f"<div class='scroll-box'>{income_html}</div>", unsafe_allow_html=True)
 
         st.divider()
 
@@ -565,9 +570,8 @@ def main():
         expense_yearly.index.name = None
 
         expense_html = expense_yearly.to_html(classes="wide-table", border=0)
-        st.markdown(expense_html, unsafe_allow_html=True)
+        st.markdown(f"<div class='scroll-box'>{expense_html}</div>", unsafe_allow_html=True)
 
-    
     
     # -----------------------------------------------------
     # TAB 2 — CLEAN YOY SUMMARY
