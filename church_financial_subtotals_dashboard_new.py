@@ -486,18 +486,11 @@ def add_forecast_icons(df):
             icons.append("▼")
 
     df.insert(0, "Trend", icons)
-    return df
-# ---------------------------------------------------------
-# MAIN APP
-# ---------------------------------------------------------
 def main():
 
-    # -----------------------------------------
-    # Load data and compute subtotals FIRST
-    # -----------------------------------------
     df = load_data()
     subtotals = extract_subtotals(df)
-    yoy_df = compute_yoy(subtotals)  # optional
+    yoy_df = compute_yoy(subtotals)
 
     years = sorted(df["Year"].unique())
     selected_years = st.multiselect("Select Years", years, default=years)
@@ -514,11 +507,13 @@ def main():
         "Board PDF"
     ])
 
-# -----------------------------------------------------
-# TAB 1 — UNIFIED SUBTOTAL SUMMARY (NEW)
-# -----------------------------------------------------
-with tab1:
-    st.subheader("📘 Unified Subtotal Summary (Pivot View)")
+    # -----------------------------------------------------
+    # TAB 1 — UNIFIED SUBTOTAL SUMMARY
+    # -----------------------------------------------------
+    with tab1:
+        st.subheader("📘 Unified Subtotal Summary (Pivot View)")
+
+        # your entire Tab 1 code goes here
 
     summary_rows = []
 
