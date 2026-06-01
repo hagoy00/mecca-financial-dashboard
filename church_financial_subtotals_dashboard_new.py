@@ -553,7 +553,7 @@ def main():
 
         summary_styled = summary_pivot.style.hide(axis="index").set_table_styles([
             {"selector": "th.col_heading", "props": [("text-align", "left"), ("min-width", "180px")]},
-            {"selector": "td", "props": [("text-align", "left"), ("min-width", "140px"), ("padding-left", "10px")]}
+            {"selector": "td", "props": [("text-align", "left"), ("min-width", "180px"), ("padding-left", "10px")]}
         ])
 
         st.dataframe(summary_styled, use_container_width=True)
@@ -587,7 +587,7 @@ def main():
 
         styled_income = income_yearly.style.hide(axis="index").set_table_styles([
             {"selector": "th.col_heading", "props": [("text-align", "left"), ("min-width", "180px")]},
-            {"selector": "td", "props": [("text-align", "left"), ("min-width", "140px"), ("padding-left", "10px")]}
+            {"selector": "td", "props": [("text-align", "left"), ("min-width", "180px"), ("padding-left", "10px")]}
         ])
 
         st.dataframe(styled_income, use_container_width=True)
@@ -622,7 +622,7 @@ def main():
 
         styled_expense = expense_yearly.style.hide(axis="index").set_table_styles([
             {"selector": "th.col_heading", "props": [("text-align", "left"), ("min-width", "180px")]},
-            {"selector": "td", "props": [("text-align", "left"), ("min-width", "140px"), ("padding-left", "10px")]}
+            {"selector": "td", "props": [("text-align", "left"), ("min-width", "180px"), ("padding-left", "10px")]}
         ])
 
         st.dataframe(styled_expense, use_container_width=True)
