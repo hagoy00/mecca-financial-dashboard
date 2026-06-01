@@ -510,14 +510,16 @@ def main():
         "Forecasting",
         "Board PDF"
     ])
-    # -----------------------------------------------------
+    
+
+        # -----------------------------------------------------
     # TAB 1 — UNIFIED SUBTOTAL SUMMARY + TOP 5 FIXED
     # -----------------------------------------------------
     with tab1:
         st.subheader("📘 Unified Subtotal Summary (Pivot View)")
 
         # -----------------------------------------
-        # 1. SUMMARY TABLE (works fine)
+        # 1. SUMMARY TABLE
         # -----------------------------------------
         summary_rows = []
 
@@ -544,6 +546,8 @@ def main():
             summary_rows.append(["Utilities", year, utilities])
 
         summary_df = pd.DataFrame(summary_rows, columns=["Category", "Year", "Amount"])
+
+        # REMOVE DECIMALS
         summary_df["Amount"] = summary_df["Amount"].astype(float).round(0).astype(int)
 
         summary_pivot = summary_df.pivot_table(
@@ -553,7 +557,14 @@ def main():
             aggfunc="sum"
         ).fillna(0)
 
-        summary_styled = summary_pivot.style.hide(axis="index")
+        summary_pivot.index.name = None
+
+        summary_styled = summary_pivot.style.hide(axis="index").set_properties(**{
+            "text-align": "left",
+            "padding-left": "12px",
+            "white-space": "nowrap"
+        })
+
         st.dataframe(summary_styled, use_container_width=True)
 
         st.divider()
@@ -576,7 +587,12 @@ def main():
         income_pivot = income_pivot.apply(lambda col: col.astype(int))
         income_pivot.index.name = None
 
-        styled_income = income_pivot.style.hide(axis="index")
+        styled_income = income_pivot.style.hide(axis="index").set_properties(**{
+            "text-align": "left",
+            "padding-left": "12px",
+            "white-space": "nowrap"
+        })
+
         st.dataframe(styled_income, use_container_width=True)
 
         st.divider()
@@ -599,7 +615,12 @@ def main():
         expense_pivot = expense_pivot.apply(lambda col: col.astype(int))
         expense_pivot.index.name = None
 
-        styled_expense = expense_pivot.style.hide(axis="index")
+        styled_expense = expense_pivot.style.hide(axis="index").set_properties(**{
+            "text-align": "left",
+            "padding-left": "12px",
+            "white-space": "nowrap"
+        })
+
         st.dataframe(styled_expense, use_container_width=True)
 
     # -----------------------------------------------------
