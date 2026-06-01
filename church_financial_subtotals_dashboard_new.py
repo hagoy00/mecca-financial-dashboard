@@ -563,7 +563,6 @@ def main():
             aggfunc="sum"
         ).fillna(0)
 
-        # Remove index name
         summary_pivot.index.name = None
 
         st.markdown("### 📘 Main Financial Summary")
@@ -583,7 +582,6 @@ def main():
 
         income_grouped = income_df.groupby(["Category", "Year"])["Amount"].sum().reset_index()
 
-        # 🔥 Remove decimals at grouped level
         income_grouped["Amount"] = income_grouped["Amount"].astype(float).round(0).astype(int)
 
         top_income_categories = (
@@ -603,15 +601,11 @@ def main():
             aggfunc="sum"
         ).fillna(0)
 
-        # Remove index name
         top_income_pivot.index.name = None
-
-        # Convert pivot column names to strings
         top_income_pivot.columns = top_income_pivot.columns.astype(str)
 
         styled_income = style_top5(add_rank_icons(top_income_pivot))
 
-        # 🔥 Remove decimals even if values became strings
         styled_income = styled_income.format(
             lambda x: f"{float(x):,.0f}"
             if str(x).replace('.', '', 1).isdigit()
@@ -635,7 +629,6 @@ def main():
 
         expense_grouped = expense_df.groupby(["Category", "Year"])["Amount"].sum().reset_index()
 
-        # 🔥 Remove decimals at grouped level
         expense_grouped["Amount"] = expense_grouped["Amount"].astype(float).round(0).astype(int)
 
         top_expense_categories = (
@@ -655,10 +648,7 @@ def main():
             aggfunc="sum"
         ).fillna(0)
 
-        # Remove index name
         top_expense_pivot.index.name = None
-
-        # Convert pivot column names to strings
         top_expense_pivot.columns = top_expense_pivot.columns.astype(str)
 
         styled_expense = style_top5(add_rank_icons(top_expense_pivot))
