@@ -486,6 +486,7 @@ def add_forecast_icons(df):
             icons.append("▼")
 
     df.insert(0, "Trend", icons)
+
 def main():
 
     df = load_data()
@@ -494,27 +495,28 @@ def main():
 
     years = sorted(df["Year"].unique())
     selected_years = st.multiselect("Select Years", years, default=years)
-# -----------------------------------------
-# Tabs (must NOT be indented deeper)
-# -----------------------------------------
-tab1, tab2, tab_top, tab3, tab4, tab_pdf = st.tabs([
-    "Subtotal Summary",
-    "YOY Summary",
-    "Top Income & Expenses",
-    "Surplus / Deficit",
-    "Forecasting",
-    "Board PDF"
-])
 
-# -----------------------------------------------------
-# TAB 1 — UNIFIED SUBTOTAL SUMMARY (NEW)
-# -----------------------------------------------------
-with tab1:
-    st.subheader("📘 Unified Subtotal Summary (Pivot View)")
+    # -----------------------------------------
+    # Tabs (must NOT be indented deeper)
+    # -----------------------------------------
+    tab1, tab2, tab_top, tab3, tab4, tab_pdf = st.tabs([
+        "Subtotal Summary",
+        "YOY Summary",
+        "Top Income & Expenses",
+        "Surplus / Deficit",
+        "Forecasting",
+        "Board PDF"
+    ])
 
-    summary_rows = []
+    # -----------------------------------------------------
+    # TAB 1 — UNIFIED SUBTOTAL SUMMARY (NEW)
+    # -----------------------------------------------------
+    with tab1:
+        st.subheader("📘 Unified Subtotal Summary (Pivot View)")
 
-    for year, group in subtotals.groupby("Year"):
+        summary_rows = []
+
+        for year, group in subtotals.groupby("Year"):
 
         revenue = group.loc[
             group["Category"].str.lower() == "total for income",
