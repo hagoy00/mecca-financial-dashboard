@@ -510,7 +510,7 @@ def main():
         "Forecasting",
         "Board PDF"
     ])
-    
+
     # -----------------------------------------------------
     # TAB 1 — FIXED SUMMARY + FIXED TOP 5 INCOME/EXPENSE
     # -----------------------------------------------------
@@ -570,17 +570,26 @@ def main():
             (~df["Category"].str.lower().str.startswith("total for"))
         ]
 
-        income_grouped = income_df.groupby("Category")["Amount"].sum().reset_index()
-        income_grouped["Amount"] = income_grouped["Amount"].astype(float).round(0).astype(int)
+        # Total by category
+        income_totals = income_df.groupby("Category")["Amount"].sum().reset_index()
+        income_totals["Amount"] = income_totals["Amount"].astype(float).round(0).astype(int)
 
-        top_income = income_grouped.sort_values("Amount", ascending=False).head(5)
+        top_income = income_totals.sort_values("Amount", ascending=False).head(5)
 
-        # Pivot properly
-        income_yearly = df[
-            df["Category"].isin(top_income["Category"])
-        ].groupby(["Category", "Year"])["Amount"].sum().unstack(fill_value=0)
+        # Yearly breakdown
+        income_yearly = (
+            income_df[income_df["Category"].isin(top_income["Category"])]
+            .groupby(["Category", "Year"])["Amount"]
+            .sum()
+            .unstack(fill_value=0)
+        )
 
+        # FORCE CLEAN DATAFRAME
+        income_yearly = pd.DataFrame(income_yearly)
+
+        # Remove decimals
         income_yearly = income_yearly.apply(lambda col: col.astype(int))
+
         income_yearly.index.name = None
 
         styled_income = income_yearly.style.hide(axis="index").set_properties(**{
@@ -604,15 +613,20 @@ def main():
             (~df["Category"].str.contains("depreciat", case=False, na=False))
         ]
 
-        expense_grouped = expense_df.groupby("Category")["Amount"].sum().reset_index()
-        expense_grouped["Amount"] = expense_grouped["Amount"].astype(float).round(0).astype(int)
+        expense_totals = expense_df.groupby("Category")["Amount"].sum().reset_index()
+        expense_totals["Amount"] = expense_totals["Amount"].astype(float).round(0).astype(int)
 
-        top_expense = expense_grouped.sort_values("Amount", ascending=False).head(5)
+        top_expense = expense_totals.sort_values("Amount", ascending=False).head(5)
 
-        # Pivot properly
-        expense_yearly = df[
-            df["Category"].isin(top_expense["Category"])
-        ].groupby(["Category", "Year"])["Amount"].sum().unstack(fill_value=0)
+        expense_yearly = (
+            expense_df[expense_df["Category"].isin(top_expense["Category"])]
+            .groupby(["Category", "Year"])["Amount"]
+            .sum()
+            .unstack(fill_value=0)
+        )
+
+        # FORCE CLEAN DATAFRAME
+        expense_yearly = pd.DataFrame(expense_yearly)
 
         expense_yearly = expense_yearly.apply(lambda col: col.astype(int))
         expense_yearly.index.name = None
@@ -624,7 +638,7 @@ def main():
         })
 
         st.dataframe(styled_expense, use_container_width=True)
-  
+
     # -----------------------------------------------------
     # TAB 2 — CLEAN YOY SUMMARY
     # -----------------------------------------------------
