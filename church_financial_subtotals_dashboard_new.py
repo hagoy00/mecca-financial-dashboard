@@ -457,7 +457,6 @@ def add_summary_icons(df):
     df.insert(0, "Trend", icons)
     return df
 
-
 def add_yoy_icons(df):
     df = df.copy()
     icons = []
@@ -475,7 +474,6 @@ def add_yoy_icons(df):
 
     df.insert(0, "Trend", icons)
     return df
-
 
 def add_forecast_icons(df):
     df = df.copy()
@@ -514,7 +512,7 @@ def main():
         "Board PDF"
     ])
 
-    # -----------------------------------------------------
+       # -----------------------------------------------------
     # TAB 1 — FIXED SUMMARY + FIXED TOP 5 INCOME/EXPENSE
     # -----------------------------------------------------
     with tab1:
@@ -548,37 +546,22 @@ def main():
             summary_rows.append(["Utilities", year, utilities])
 
         summary_df = pd.DataFrame(summary_rows, columns=["Category", "Year", "Amount"])
-        summary_df["Amount"] = summary_df["Amount"].astype(float).round(0).astype(int)
+        summary_df["Amount"] = summary_df["Amount"].astype(int)
 
         summary_pivot = summary_df.pivot(index="Category", columns="Year", values="Amount").fillna(0)
         summary_pivot.index.name = None
 
-        summary_styled = summary_pivot.style.hide(axis="index").set_properties(**{
-            "text-align": "left",
-            "padding-left": "10px",
-            "white-space": "nowrap"
-        })
+        summary_styled = summary_pivot.style.hide(axis="index").set_table_styles([
+            {"selector": "th.col_heading", "props": [("text-align", "left"), ("min-width", "140px")]},
+            {"selector": "td", "props": [("text-align", "left"), ("min-width", "140px"), ("padding-left", "12px")]}
+        ])
 
         st.dataframe(summary_styled, use_container_width=True)
 
         st.divider()
 
-        # ---------------------------------------------------------
-        # FORCE CLEAN AMOUNT COLUMN (THIS FIXES EVERYTHING)
-        # ---------------------------------------------------------
-        df["Amount"] = (
-            df["Amount"]
-            .astype(str)
-            .str.replace(",", "", regex=False)
-            .str.replace(" ", "", regex=False)
-            .str.replace("\u00A0", "", regex=False)  # non-breaking space
-        )
-
-        df["Amount"] = pd.to_numeric(df["Amount"], errors="coerce").fillna(0).astype(int)
-
-
         # -----------------------------------------------------
-        # 2. TOP 5 INCOME — FULLY FIXED
+        # 2. TOP 5 INCOME — FIXED + WIDE COLUMNS
         # -----------------------------------------------------
         st.markdown("### 💰 Top 5 Income Categories (All Years)")
 
@@ -587,13 +570,11 @@ def main():
             (~df["Category"].str.lower().str.startswith("total for"))
         ]
 
-        # Total by category
         income_totals = income_df.groupby("Category")["Amount"].sum().reset_index()
-        income_totals["Amount"] = income_totals["Amount"].astype(float).round(0).astype(int)
+        income_totals["Amount"] = income_totals["Amount"].astype(int)
 
         top_income = income_totals.sort_values("Amount", ascending=False).head(5)
 
-        # Yearly breakdown
         income_yearly = (
             income_df[income_df["Category"].isin(top_income["Category"])]
             .groupby(["Category", "Year"])["Amount"]
@@ -601,26 +582,20 @@ def main():
             .unstack(fill_value=0)
         )
 
-        # FORCE CLEAN DATAFRAME
-        income_yearly = pd.DataFrame(income_yearly)
-
-        # Remove decimals
-        income_yearly = income_yearly.apply(lambda col: col.astype(int))
-
+        income_yearly = pd.DataFrame(income_yearly).astype(int)
         income_yearly.index.name = None
 
-        styled_income = income_yearly.style.hide(axis="index").set_properties(**{
-            "text-align": "left",
-            "padding-left": "10px",
-            "white-space": "nowrap"
-        })
+        styled_income = income_yearly.style.hide(axis="index").set_table_styles([
+            {"selector": "th.col_heading", "props": [("text-align", "left"), ("min-width", "140px")]},
+            {"selector": "td", "props": [("text-align", "left"), ("min-width", "140px"), ("padding-left", "12px")]}
+        ])
 
         st.dataframe(styled_income, use_container_width=True)
 
         st.divider()
 
         # -----------------------------------------------------
-        # 3. TOP 5 EXPENSE — FULLY FIXED
+        # 3. TOP 5 EXPENSE — FIXED + WIDE COLUMNS
         # -----------------------------------------------------
         st.markdown("### 📉 Top 5 Expense Categories (All Years)")
 
@@ -631,7 +606,7 @@ def main():
         ]
 
         expense_totals = expense_df.groupby("Category")["Amount"].sum().reset_index()
-        expense_totals["Amount"] = expense_totals["Amount"].astype(float).round(0).astype(int)
+        expense_totals["Amount"] = expense_totals["Amount"].astype(int)
 
         top_expense = expense_totals.sort_values("Amount", ascending=False).head(5)
 
@@ -642,17 +617,13 @@ def main():
             .unstack(fill_value=0)
         )
 
-        # FORCE CLEAN DATAFRAME
-        expense_yearly = pd.DataFrame(expense_yearly)
-
-        expense_yearly = expense_yearly.apply(lambda col: col.astype(int))
+        expense_yearly = pd.DataFrame(expense_yearly).astype(int)
         expense_yearly.index.name = None
 
-        styled_expense = expense_yearly.style.hide(axis="index").set_properties(**{
-            "text-align": "left",
-            "padding-left": "10px",
-            "white-space": "nowrap"
-        })
+        styled_expense = expense_yearly.style.hide(axis="index").set_table_styles([
+            {"selector": "th.col_heading", "props": [("text-align", "left"), ("min-width", "140px")]},
+            {"selector": "td", "props": [("text-align", "left"), ("min-width", "140px"), ("padding-left", "12px")]}
+        ])
 
         st.dataframe(styled_expense, use_container_width=True)
 
