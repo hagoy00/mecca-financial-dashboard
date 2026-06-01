@@ -512,7 +512,7 @@ def main():
         "Board PDF"
     ])
 
-    # -----------------------------------------------------
+        # -----------------------------------------------------
     # TAB 1 — FIXED SUMMARY + FIXED TOP 5 INCOME/EXPENSE
     # -----------------------------------------------------
     with tab1:
@@ -552,8 +552,9 @@ def main():
         summary_pivot.index.name = None
 
         summary_styled = summary_pivot.style.hide(axis="index").set_table_styles([
-            {"selector": "th.col_heading", "props": [("text-align", "left"), ("min-width", "180px")]},
-            {"selector": "td", "props": [("text-align", "left"), ("min-width", "180px"), ("padding-left", "10px")]}
+            {"selector": "table", "props": [("table-layout", "fixed"), ("width", "100%")]},
+            {"selector": "th.col_heading", "props": [("text-align", "left"), ("width", "200px")]},
+            {"selector": "td", "props": [("text-align", "left"), ("width", "200px"), ("padding-left", "10px")]}
         ])
 
         st.dataframe(summary_styled, use_container_width=True)
@@ -586,11 +587,10 @@ def main():
         income_yearly.index.name = None
 
         styled_income = income_yearly.style.hide(axis="index").set_table_styles([
-    {"selector": "table", "props": [("table-layout", "fixed"), ("width", "100%")]},
-    {"selector": "th.col_heading", "props": [("text-align", "left"), ("width", "200px")]},
-    {"selector": "td", "props": [("text-align", "left"), ("width", "200px"), ("padding-left", "10px")]}
-])
-
+            {"selector": "table", "props": [("table-layout", "fixed"), ("width", "100%")]},
+            {"selector": "th.col_heading", "props": [("text-align", "left"), ("width", "200px")]},
+            {"selector": "td", "props": [("text-align", "left"), ("width", "200px"), ("padding-left", "10px")]}
+        ])
 
         st.dataframe(styled_income, use_container_width=True)
 
@@ -623,12 +623,14 @@ def main():
         expense_yearly.index.name = None
 
         styled_expense = expense_yearly.style.hide(axis="index").set_table_styles([
-            {"selector": "th.col_heading", "props": [("text-align", "left"), ("min-width", "180px")]},
-            {"selector": "td", "props": [("text-align", "left"), ("min-width", "180px"), ("padding-left", "10px")]}
+            {"selector": "table", "props": [("table-layout", "fixed"), ("width", "100%")]},
+            {"selector": "th.col_heading", "props": [("text-align", "left"), ("width", "200px")]},
+            {"selector": "td", "props": [("text-align", "left"), ("width", "200px"), ("padding-left", "10px")]}
         ])
 
         st.dataframe(styled_expense, use_container_width=True)
 
+    
     # -----------------------------------------------------
     # TAB 2 — CLEAN YOY SUMMARY
     # -----------------------------------------------------
