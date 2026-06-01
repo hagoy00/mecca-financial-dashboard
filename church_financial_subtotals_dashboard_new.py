@@ -612,8 +612,6 @@ def main():
             "Category", "Year", "Amount", "YoY Change", "YoY %"
         ])
 
-        yoy_clean = add_yoy_icons(yoy_clean)
-
         yoy_pivot = yoy_clean.pivot_table(
             index="Category",
             columns="Year",
