@@ -554,7 +554,7 @@ def main():
 
         summary_df = pd.DataFrame(summary_rows, columns=["Category", "Year", "Amount"])
 
-        # REMOVE DECIMALS (WHOLE NUMBERS)
+        # REMOVE DECIMALS
         summary_df["Amount"] = summary_df["Amount"].astype(float).round(0).astype(int)
 
         summary_pivot = summary_df.pivot_table(
@@ -566,9 +566,7 @@ def main():
 
         summary_pivot.index.name = None
 
-        # REMOVE INDEX COLUMN
         summary_styled = summary_pivot.style.hide(axis="index")
-
         st.markdown("### 📘 Main Financial Summary")
         st.dataframe(summary_styled, use_container_width=True)
 
@@ -590,28 +588,30 @@ def main():
         income_grouped = income_grouped.reset_index(drop=True)
         income_grouped["Amount"] = income_grouped["Amount"].astype(float).round(0).astype(int)
 
+        # FIX: ensure categories exist
         top_income_categories = (
             income_grouped.groupby("Category")["Amount"]
             .sum()
             .sort_values(ascending=False)
             .head(5)
-            .index
+            .index.tolist()
         )
 
-        top_income_pivot = income_grouped[
-            income_grouped["Category"].isin(top_income_categories)
-        ].pivot_table(
+        # FIX: pivot must use correct index/columns
+        top_income_pivot = income_grouped.pivot_table(
             index="Category",
             columns="Year",
             values="Amount",
             aggfunc="sum"
         ).fillna(0)
 
+        # FILTER AFTER pivot (fixes missing rows)
+        top_income_pivot = top_income_pivot.loc[top_income_categories]
+
+        # CLEAN
+        top_income_pivot = top_income_pivot.apply(lambda col: col.astype(int))
         top_income_pivot.index.name = None
         top_income_pivot.columns = top_income_pivot.columns.astype(str)
-
-        # REMOVE DECIMALS AGAIN AFTER PIVOT
-        top_income_pivot = top_income_pivot.apply(lambda col: col.astype(int))
 
         styled_income = top_income_pivot.style.hide(axis="index")
         st.dataframe(styled_income, use_container_width=True)
@@ -640,23 +640,22 @@ def main():
             .sum()
             .sort_values(ascending=False)
             .head(5)
-            .index
+            .index.tolist()
         )
 
-        top_expense_pivot = expense_grouped[
-            expense_grouped["Category"].isin(top_expense_categories)
-        ].pivot_table(
+        top_expense_pivot = expense_grouped.pivot_table(
             index="Category",
             columns="Year",
             values="Amount",
             aggfunc="sum"
         ).fillna(0)
 
+        # FILTER AFTER pivot
+        top_expense_pivot = top_expense_pivot.loc[top_expense_categories]
+
+        top_expense_pivot = top_expense_pivot.apply(lambda col: col.astype(int))
         top_expense_pivot.index.name = None
         top_expense_pivot.columns = top_expense_pivot.columns.astype(str)
-
-        # REMOVE DECIMALS AGAIN AFTER PIVOT
-        top_expense_pivot = top_expense_pivot.apply(lambda col: col.astype(int))
 
         styled_expense = top_expense_pivot.style.hide(axis="index")
         st.dataframe(styled_expense, use_container_width=True)
