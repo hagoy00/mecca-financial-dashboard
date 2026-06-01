@@ -4,6 +4,7 @@ import numpy as np
 import altair as alt
 from io import BytesIO
 import os
+st.set_page_config(layout="wide")
 
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
