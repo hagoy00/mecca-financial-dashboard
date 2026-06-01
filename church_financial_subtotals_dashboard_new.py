@@ -425,7 +425,6 @@ def style_top5(df):
 
     return styler
 
-#############
 def add_rank_icons(df):
     df = df.copy()
     n = len(df)
@@ -440,7 +439,6 @@ def add_rank_icons(df):
 
     df.insert(0, "Rank", icons)
     return df
-#############
 
 def add_summary_icons(df):
     df = df.copy()
