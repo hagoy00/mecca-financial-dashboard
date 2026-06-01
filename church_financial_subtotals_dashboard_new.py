@@ -372,7 +372,7 @@ def generate_pdf(subtotals, year):
 
     table_data = [["Category", "Amount"]]
     for _, row in df_year.iterrows():
-        table_data.append([row["Category"], f"${row['Amount']:,.2f}"])
+        table_data.append([row["Category"], f"${row['Amount']:,.0f}"])
     table = Table(table_data, colWidths=[300, 150])
     style = TableStyle([
         ("BACKGROUND", (0, 0), (-1, 0), colors.lightgrey),
@@ -421,7 +421,7 @@ def style_top5(df):
         return [color] * len(row)
 
     styler = df.style.apply(highlight, axis=1)
-    styler = styler.format("{:,.2f}", subset=numeric_cols)
+    styler = styler.format("{:,.0f}", subset=numeric_cols)
 
     return styler
 
@@ -682,7 +682,7 @@ def main():
             aggfunc="sum"
         ).fillna(0)
 
-        st.dataframe(yoy_pivot.style.format("{:,.2f}"), use_container_width=True)
+        st.dataframe(yoy_pivot.style.format("{:,.0f}"), use_container_width=True)
 
     # -----------------------------------------------------
     # TAB 3 — TOP INCOME & EXPENSES (FORECASTING)
@@ -805,10 +805,10 @@ def main():
 
         st.dataframe(
             sd_filtered.style.format({
-                "Total Income": "{:,.2f}",
-                "Total Expenses": "{:,.2f}",
-                "Surplus/Deficit": "{:,.2f}",
-                "YoY Change": "{:,.2f}"
+                "Total Income": "{:,.0f}",
+                "Total Expenses": "{:,.0f}",
+                "Surplus/Deficit": "{:,.0f}",
+                "YoY Change": "{:,.0f}"
             }),
             use_container_width=True
         )
@@ -853,7 +853,7 @@ def main():
             st.dataframe(
                 fc.pivot_table(index="Year", columns="Type", values="Amount")
                   .fillna(0)
-                  .style.format("{:,.2f}"),
+                  .style.format("{:,.0f}"),
                 use_container_width=True
             )
 
