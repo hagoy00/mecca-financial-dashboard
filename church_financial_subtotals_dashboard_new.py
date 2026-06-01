@@ -561,11 +561,16 @@ def main():
         st.divider()
 
         # -----------------------------------------------------
-        # 2. TOP 5 INCOME — USING YOUR FUNCTION
+        # 2. TOP 5 INCOME — FIXED SHAPE + FIXED PIVOT
         # -----------------------------------------------------
         st.markdown("### 💰 Top 5 Income Categories (All Years)")
 
         top_income = get_top_income(df, n=5).copy()
+
+        # FIX: reshape BEFORE pivot
+        top_income = top_income[["Category", "Year", "Amount"]]
+
+        # Remove decimals
         top_income["Amount"] = top_income["Amount"].astype(float).round(0).astype(int)
 
         income_pivot = top_income.pivot(index="Category", columns="Year", values="Amount").fillna(0)
@@ -583,11 +588,16 @@ def main():
         st.divider()
 
         # -----------------------------------------------------
-        # 3. TOP 5 EXPENSE — USING YOUR FUNCTION
+        # 3. TOP 5 EXPENSE — FIXED SHAPE + FIXED PIVOT
         # -----------------------------------------------------
         st.markdown("### 📉 Top 5 Expense Categories (All Years)")
 
         top_expense = get_top_expense(df, n=5).copy()
+
+        # FIX: reshape BEFORE pivot
+        top_expense = top_expense[["Category", "Year", "Amount"]]
+
+        # Remove decimals
         top_expense["Amount"] = top_expense["Amount"].astype(float).round(0).astype(int)
 
         expense_pivot = top_expense.pivot(index="Category", columns="Year", values="Amount").fillna(0)
