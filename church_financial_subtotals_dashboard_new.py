@@ -596,17 +596,18 @@ def main():
             aggfunc="sum"
         ).fillna(0)
 
-        #st.dataframe(style_top5(add_rank_icons(top_income_pivot)), use_container_width=True)
-        st.dataframe(
-            style_top5(add_rank_icons(top_income_pivot))
-                .format("{:,.0f}"),
-        use_container_width=True
-        )
+        # Apply styling + remove decimals safely
+        styled_income = style_top5(add_rank_icons(top_income_pivot))
+        numeric_cols = top_income_pivot.select_dtypes(include="number").columns
+        styled_income = styled_income.format({col: "{:,.0f}" for col in numeric_cols})
+
+        st.dataframe(styled_income, use_container_width=True)
 
         st.divider()
 
         # TOP 5 EXPENSE PIVOT
         st.markdown("### 📉 Top 5 Expense Categories (All Years)")
+
         expense_df = df[
             (df["Type"] == "Expense") &
             (~df["Category"].str.lower().str.startswith("total for")) &
@@ -632,12 +633,12 @@ def main():
             aggfunc="sum"
         ).fillna(0)
 
-        #st.dataframe(style_top5(add_rank_icons(top_expense_pivot)), use_container_width=True)
-        st.dataframe(
-            style_top5(add_rank_icons(top_expense_pivot))
-                .format("{:,.0f}"),
-        use_container_width=True
-        )    
+        # Apply styling + remove decimals safely
+        styled_expense = style_top5(add_rank_icons(top_expense_pivot))
+        numeric_cols = top_expense_pivot.select_dtypes(include="number").columns
+        styled_expense = styled_expense.format({col: "{:,.0f}" for col in numeric_cols})
+
+        st.dataframe(styled_expense, use_container_width=True)
 
     # -----------------------------------------------------
     # TAB 2 — CLEAN YOY SUMMARY
