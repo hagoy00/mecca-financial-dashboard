@@ -510,30 +510,21 @@ def main():
         "Forecasting",
         "Board PDF"
     ])
-
-        # -----------------------------------------------------
-    # TAB 1 — UNIFIED SUBTOTAL SUMMARY (CLEAN + FIXED)
+    # -----------------------------------------------------
+    # TAB 1 — UNIFIED SUBTOTAL SUMMARY + TOP 5 FIXED
     # -----------------------------------------------------
     with tab1:
         st.subheader("📘 Unified Subtotal Summary (Pivot View)")
 
         # -----------------------------------------
-        # 1. BUILD SUMMARY TABLE
+        # 1. SUMMARY TABLE (works fine)
         # -----------------------------------------
         summary_rows = []
 
         for year, group in subtotals.groupby("Year"):
 
-            revenue = group.loc[
-                group["Category"].str.lower() == "total for income",
-                "Amount"
-            ].sum()
-
-            total_expenses = group.loc[
-                group["Category"].str.lower() == "total for expenses",
-                "Amount"
-            ].sum()
-
+            revenue = group.loc[group["Category"].str.lower() == "total for income", "Amount"].sum()
+            total_expenses = group.loc[group["Category"].str.lower() == "total for expenses", "Amount"].sum()
             net_income = revenue - total_expenses
 
             payroll = df[
@@ -553,8 +544,6 @@ def main():
             summary_rows.append(["Utilities", year, utilities])
 
         summary_df = pd.DataFrame(summary_rows, columns=["Category", "Year", "Amount"])
-
-        # REMOVE DECIMALS
         summary_df["Amount"] = summary_df["Amount"].astype(float).round(0).astype(int)
 
         summary_pivot = summary_df.pivot_table(
@@ -564,100 +553,53 @@ def main():
             aggfunc="sum"
         ).fillna(0)
 
-        summary_pivot.index.name = None
-
         summary_styled = summary_pivot.style.hide(axis="index")
-        st.markdown("### 📘 Main Financial Summary")
         st.dataframe(summary_styled, use_container_width=True)
 
         st.divider()
 
         # -----------------------------------------------------
-        # 2. TOP 5 INCOME — FIXED
+        # 2. TOP 5 INCOME — USING YOUR FUNCTION
         # -----------------------------------------------------
         st.markdown("### 💰 Top 5 Income Categories (All Years)")
 
-        income_df = df[
-            (df["Type"] == "Income") &
-            (~df["Category"].str.lower().str.startswith("total for"))
-        ]
+        top_income = get_top_income(df, n=5).copy()
+        top_income["Amount"] = top_income["Amount"].astype(float).round(0).astype(int)
 
-        income_grouped = income_df.groupby(["Category", "Year"])["Amount"].sum().reset_index()
-
-        # CLEAN GROUPED DATA
-        income_grouped = income_grouped.reset_index(drop=True)
-        income_grouped["Amount"] = income_grouped["Amount"].astype(float).round(0).astype(int)
-
-        # FIX: ensure categories exist
-        top_income_categories = (
-            income_grouped.groupby("Category")["Amount"]
-            .sum()
-            .sort_values(ascending=False)
-            .head(5)
-            .index.tolist()
-        )
-
-        # FIX: pivot must use correct index/columns
-        top_income_pivot = income_grouped.pivot_table(
+        income_pivot = top_income.pivot_table(
             index="Category",
             columns="Year",
             values="Amount",
             aggfunc="sum"
         ).fillna(0)
 
-        # FILTER AFTER pivot (fixes missing rows)
-        top_income_pivot = top_income_pivot.loc[top_income_categories]
+        income_pivot = income_pivot.apply(lambda col: col.astype(int))
+        income_pivot.index.name = None
 
-        # CLEAN
-        top_income_pivot = top_income_pivot.apply(lambda col: col.astype(int))
-        top_income_pivot.index.name = None
-        top_income_pivot.columns = top_income_pivot.columns.astype(str)
-
-        styled_income = top_income_pivot.style.hide(axis="index")
+        styled_income = income_pivot.style.hide(axis="index")
         st.dataframe(styled_income, use_container_width=True)
 
         st.divider()
 
         # -----------------------------------------------------
-        # 3. TOP 5 EXPENSE — FIXED
+        # 3. TOP 5 EXPENSE — USING YOUR FUNCTION
         # -----------------------------------------------------
         st.markdown("### 📉 Top 5 Expense Categories (All Years)")
 
-        expense_df = df[
-            (df["Type"] == "Expense") &
-            (~df["Category"].str.lower().str.startswith("total for")) &
-            (~df["Category"].str.contains("depreciat", case=False, na=False))
-        ]
+        top_expense = get_top_expense(df, n=5).copy()
+        top_expense["Amount"] = top_expense["Amount"].astype(float).round(0).astype(int)
 
-        expense_grouped = expense_df.groupby(["Category", "Year"])["Amount"].sum().reset_index()
-
-        # CLEAN GROUPED DATA
-        expense_grouped = expense_grouped.reset_index(drop=True)
-        expense_grouped["Amount"] = expense_grouped["Amount"].astype(float).round(0).astype(int)
-
-        top_expense_categories = (
-            expense_grouped.groupby("Category")["Amount"]
-            .sum()
-            .sort_values(ascending=False)
-            .head(5)
-            .index.tolist()
-        )
-
-        top_expense_pivot = expense_grouped.pivot_table(
+        expense_pivot = top_expense.pivot_table(
             index="Category",
             columns="Year",
             values="Amount",
             aggfunc="sum"
         ).fillna(0)
 
-        # FILTER AFTER pivot
-        top_expense_pivot = top_expense_pivot.loc[top_expense_categories]
+        expense_pivot = expense_pivot.apply(lambda col: col.astype(int))
+        expense_pivot.index.name = None
 
-        top_expense_pivot = top_expense_pivot.apply(lambda col: col.astype(int))
-        top_expense_pivot.index.name = None
-        top_expense_pivot.columns = top_expense_pivot.columns.astype(str)
-
-        styled_expense = top_expense_pivot.style.hide(axis="index")
+        styled_expense = expense_pivot.style.hide(axis="index")
         st.dataframe(styled_expense, use_container_width=True)
 
     # -----------------------------------------------------
