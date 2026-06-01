@@ -596,7 +596,12 @@ def main():
             aggfunc="sum"
         ).fillna(0)
 
-        st.dataframe(style_top5(add_rank_icons(top_income_pivot)), use_container_width=True)
+        #st.dataframe(style_top5(add_rank_icons(top_income_pivot)), use_container_width=True)
+        st.dataframe(
+            style_top5(add_rank_icons(top_income_pivot))
+                .format("{:,.0f}"),
+        use_container_width=True
+        )
 
         st.divider()
 
@@ -627,7 +632,12 @@ def main():
             aggfunc="sum"
         ).fillna(0)
 
-        st.dataframe(style_top5(add_rank_icons(top_expense_pivot)), use_container_width=True)
+        #st.dataframe(style_top5(add_rank_icons(top_expense_pivot)), use_container_width=True)
+        st.dataframe(
+            style_top5(add_rank_icons(top_expense_pivot))
+                .format("{:,.0f}"),
+        use_container_width=True
+        )    
 
     # -----------------------------------------------------
     # TAB 2 — CLEAN YOY SUMMARY
