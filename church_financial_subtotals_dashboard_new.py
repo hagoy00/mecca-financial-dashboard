@@ -517,6 +517,9 @@ def main():
     with tab1:
         st.subheader("📘 Unified Subtotal Summary (Pivot View)")
 
+        # -----------------------------------------
+        # 1. BUILD SUMMARY TABLE
+        # -----------------------------------------
         summary_rows = []
 
         for year, group in subtotals.groupby("Year"):
@@ -553,7 +556,7 @@ def main():
 
         summary_df = pd.DataFrame(summary_rows, columns=["Category", "Year", "Amount"])
 
-        # Remove decimals
+        # Remove decimals globally
         summary_df["Amount"] = summary_df["Amount"].astype(float).round(0).astype(int)
 
         summary_pivot = summary_df.pivot_table(
@@ -571,7 +574,7 @@ def main():
         st.divider()
 
         # -----------------------------------------------------
-        # TOP 5 INCOME PIVOT
+        # 2. TOP 5 INCOME
         # -----------------------------------------------------
         st.markdown("### 💰 Top 5 Income Categories (All Years)")
 
@@ -582,6 +585,10 @@ def main():
 
         income_grouped = income_df.groupby(["Category", "Year"])["Amount"].sum().reset_index()
 
+        # Remove index column
+        income_grouped = income_grouped.reset_index(drop=True)
+
+        # Remove decimals
         income_grouped["Amount"] = income_grouped["Amount"].astype(float).round(0).astype(int)
 
         top_income_categories = (
@@ -617,7 +624,7 @@ def main():
         st.divider()
 
         # -----------------------------------------------------
-        # TOP 5 EXPENSE PIVOT
+        # 3. TOP 5 EXPENSES
         # -----------------------------------------------------
         st.markdown("### 📉 Top 5 Expense Categories (All Years)")
 
@@ -629,6 +636,10 @@ def main():
 
         expense_grouped = expense_df.groupby(["Category", "Year"])["Amount"].sum().reset_index()
 
+        # Remove index column
+        expense_grouped = expense_grouped.reset_index(drop=True)
+
+        # Remove decimals
         expense_grouped["Amount"] = expense_grouped["Amount"].astype(float).round(0).astype(int)
 
         top_expense_categories = (
@@ -674,7 +685,6 @@ def main():
         "Payroll",
         "Utilities"
         ]
-
 
         yoy_rows = []
 
