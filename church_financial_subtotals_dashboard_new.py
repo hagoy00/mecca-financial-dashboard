@@ -486,7 +486,10 @@ def add_forecast_icons(df):
             icons.append("▼")
 
     df.insert(0, "Trend", icons)
-
+    
+#-----------------------------------------------
+# Main 
+#-----------------------------------------------
 def main():
 
     df = load_data()
@@ -518,155 +521,155 @@ def main():
 
         for year, group in subtotals.groupby("Year"):
 
-        revenue = group.loc[
-            group["Category"].str.lower() == "total for income",
-            "Amount"
-        ].sum()
+            revenue = group.loc[
+                group["Category"].str.lower() == "total for income",
+                "Amount"
+            ].sum()
 
-        total_income = revenue
+            total_income = revenue
 
-        total_expenses = group.loc[
-            group["Category"].str.lower() == "total for expenses",
-            "Amount"
-        ].sum()
+            total_expenses = group.loc[
+                group["Category"].str.lower() == "total for expenses",
+                "Amount"
+            ].sum()
 
-        net_income = total_income - total_expenses
+            net_income = total_income - total_expenses
 
-        payroll = df[
-            (df["Year"] == year) &
-            (df["Category"].isin(["Salaries & Wages", "Payroll Tax Expense"]))
-        ]["Amount"].sum()
+            payroll = df[
+                (df["Year"] == year) &
+                (df["Category"].isin(["Salaries & Wages", "Payroll Tax Expense"]))
+            ]["Amount"].sum()
 
-        utilities = df[
-            (df["Year"] == year) &
-            (df["Category"].str.contains("Utilit", case=False, na=False))
-        ]["Amount"].sum()
+            utilities = df[
+                (df["Year"] == year) &
+                (df["Category"].str.contains("Utilit", case=False, na=False))
+            ]["Amount"].sum()
 
-        summary_rows.append(["Total Revenue", year, revenue])
-        summary_rows.append(["Total Expenses", year, total_expenses])
-        summary_rows.append(["Net Income", year, net_income])
-        summary_rows.append(["Payroll", year, payroll])
-        summary_rows.append(["Utilities", year, utilities])
+            summary_rows.append(["Total Revenue", year, revenue])
+            summary_rows.append(["Total Expenses", year, total_expenses])
+            summary_rows.append(["Net Income", year, net_income])
+            summary_rows.append(["Payroll", year, payroll])
+            summary_rows.append(["Utilities", year, utilities])
 
-    summary_df = pd.DataFrame(summary_rows, columns=["Category", "Year", "Amount"])
+        summary_df = pd.DataFrame(summary_rows, columns=["Category", "Year", "Amount"])
 
-    # Remove decimals
-    summary_df["Amount"] = summary_df["Amount"].astype(float).round(0).astype(int)
+        # Remove decimals
+        summary_df["Amount"] = summary_df["Amount"].astype(float).round(0).astype(int)
 
-    summary_pivot = summary_df.pivot_table(
-        index="Category",
-        columns="Year",
-        values="Amount",
-        aggfunc="sum"
-    ).fillna(0)
+        summary_pivot = summary_df.pivot_table(
+            index="Category",
+            columns="Year",
+            values="Amount",
+            aggfunc="sum"
+        ).fillna(0)
 
-    # Remove index name
-    summary_pivot.index.name = None
+        # Remove index name
+        summary_pivot.index.name = None
 
-    st.markdown("### 📘 Main Financial Summary")
-    st.dataframe(style_top5(add_summary_icons(summary_pivot)), use_container_width=True)
+        st.markdown("### 📘 Main Financial Summary")
+        st.dataframe(style_top5(add_summary_icons(summary_pivot)), use_container_width=True)
 
-    st.divider()
+        st.divider()
 
-    # -----------------------------------------------------
-    # TOP 5 INCOME PIVOT
-    # -----------------------------------------------------
-    st.markdown("### 💰 Top 5 Income Categories (All Years)")
+        # -----------------------------------------------------
+        # TOP 5 INCOME PIVOT
+        # -----------------------------------------------------
+        st.markdown("### 💰 Top 5 Income Categories (All Years)")
 
-    income_df = df[
-        (df["Type"] == "Income") &
-        (~df["Category"].str.lower().str.startswith("total for"))
-    ]
+        income_df = df[
+            (df["Type"] == "Income") &
+            (~df["Category"].str.lower().str.startswith("total for"))
+        ]
 
-    income_grouped = income_df.groupby(["Category", "Year"])["Amount"].sum().reset_index()
+        income_grouped = income_df.groupby(["Category", "Year"])["Amount"].sum().reset_index()
 
-    # 🔥 Remove decimals at grouped level
-    income_grouped["Amount"] = income_grouped["Amount"].astype(float).round(0).astype(int)
+        # 🔥 Remove decimals at grouped level
+        income_grouped["Amount"] = income_grouped["Amount"].astype(float).round(0).astype(int)
 
-    top_income_categories = (
-        income_grouped.groupby("Category")["Amount"]
-        .sum()
-        .sort_values(ascending=False)
-        .head(5)
-        .index
-    )
+        top_income_categories = (
+            income_grouped.groupby("Category")["Amount"]
+            .sum()
+            .sort_values(ascending=False)
+            .head(5)
+            .index
+        )
 
-    top_income_pivot = income_grouped[
-        income_grouped["Category"].isin(top_income_categories)
-    ].pivot_table(
-        index="Category",
-        columns="Year",
-        values="Amount",
-        aggfunc="sum"
-    ).fillna(0)
+        top_income_pivot = income_grouped[
+            income_grouped["Category"].isin(top_income_categories)
+        ].pivot_table(
+            index="Category",
+            columns="Year",
+            values="Amount",
+            aggfunc="sum"
+        ).fillna(0)
 
-    # Remove index name
-    top_income_pivot.index.name = None
+        # Remove index name
+        top_income_pivot.index.name = None
 
-    # Convert pivot column names to strings
-    top_income_pivot.columns = top_income_pivot.columns.astype(str)
+        # Convert pivot column names to strings
+        top_income_pivot.columns = top_income_pivot.columns.astype(str)
 
-    styled_income = style_top5(add_rank_icons(top_income_pivot))
+        styled_income = style_top5(add_rank_icons(top_income_pivot))
 
-    # 🔥 Remove decimals even if values became strings
-    styled_income = styled_income.format(
-        lambda x: f"{float(x):,.0f}"
-        if str(x).replace('.', '', 1).isdigit()
-        else x
-    )
+        # 🔥 Remove decimals even if values became strings
+        styled_income = styled_income.format(
+            lambda x: f"{float(x):,.0f}"
+            if str(x).replace('.', '', 1).isdigit()
+            else x
+        )
 
-    st.dataframe(styled_income, use_container_width=True)
+        st.dataframe(styled_income, use_container_width=True)
 
-    st.divider()
+        st.divider()
 
-    # -----------------------------------------------------
-    # TOP 5 EXPENSE PIVOT
-    # -----------------------------------------------------
-    st.markdown("### 📉 Top 5 Expense Categories (All Years)")
+        # -----------------------------------------------------
+        # TOP 5 EXPENSE PIVOT
+        # -----------------------------------------------------
+        st.markdown("### 📉 Top 5 Expense Categories (All Years)")
 
-    expense_df = df[
-        (df["Type"] == "Expense") &
-        (~df["Category"].str.lower().str.startswith("total for")) &
-        (~df["Category"].str.contains("depreciat", case=False, na=False))
-    ]
+        expense_df = df[
+            (df["Type"] == "Expense") &
+            (~df["Category"].str.lower().str.startswith("total for")) &
+            (~df["Category"].str.contains("depreciat", case=False, na=False))
+        ]
 
-    expense_grouped = expense_df.groupby(["Category", "Year"])["Amount"].sum().reset_index()
+        expense_grouped = expense_df.groupby(["Category", "Year"])["Amount"].sum().reset_index()
 
-    # 🔥 Remove decimals at grouped level
-    expense_grouped["Amount"] = expense_grouped["Amount"].astype(float).round(0).astype(int)
+        # 🔥 Remove decimals at grouped level
+        expense_grouped["Amount"] = expense_grouped["Amount"].astype(float).round(0).astype(int)
 
-    top_expense_categories = (
-        expense_grouped.groupby("Category")["Amount"]
-        .sum()
-        .sort_values(ascending=False)
-        .head(5)
-        .index
-    )
+        top_expense_categories = (
+            expense_grouped.groupby("Category")["Amount"]
+            .sum()
+            .sort_values(ascending=False)
+            .head(5)
+            .index
+        )
 
-    top_expense_pivot = expense_grouped[
-        expense_grouped["Category"].isin(top_expense_categories)
-    ].pivot_table(
-        index="Category",
-        columns="Year",
-        values="Amount",
-        aggfunc="sum"
-    ).fillna(0)
+        top_expense_pivot = expense_grouped[
+            expense_grouped["Category"].isin(top_expense_categories)
+        ].pivot_table(
+            index="Category",
+            columns="Year",
+            values="Amount",
+            aggfunc="sum"
+        ).fillna(0)
 
-    # Remove index name
-    top_expense_pivot.index.name = None
+        # Remove index name
+        top_expense_pivot.index.name = None
 
-    # Convert pivot column names to strings
-    top_expense_pivot.columns = top_expense_pivot.columns.astype(str)
+        # Convert pivot column names to strings
+        top_expense_pivot.columns = top_expense_pivot.columns.astype(str)
 
-    styled_expense = style_top5(add_rank_icons(top_expense_pivot))
+        styled_expense = style_top5(add_rank_icons(top_expense_pivot))
 
-    styled_expense = styled_expense.format(
-        lambda x: f"{float(x):,.0f}"
-        if str(x).replace('.', '', 1).isdigit()
-        else x
-    )
+        styled_expense = styled_expense.format(
+            lambda x: f"{float(x):,.0f}"
+            if str(x).replace('.', '', 1).isdigit()
+            else x
+        )
 
-    st.dataframe(styled_expense, use_container_width=True)
+        st.dataframe(styled_expense, use_container_width=True)
 
     # -----------------------------------------------------
     # TAB 2 — CLEAN YOY SUMMARY
