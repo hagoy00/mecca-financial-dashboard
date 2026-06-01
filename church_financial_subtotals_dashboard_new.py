@@ -569,7 +569,7 @@ def main():
 
         st.divider()
 
-        # TOP 5 INCOME PIVOT
+                # TOP 5 INCOME PIVOT
         st.markdown("### 💰 Top 5 Income Categories (All Years)")
 
         income_df = df[
@@ -596,8 +596,11 @@ def main():
             aggfunc="sum"
         ).fillna(0)
 
-        # Apply styling + remove decimals safely
+        # 🔥 Force numeric columns back to numeric
+        top_income_pivot = top_income_pivot.apply(pd.to_numeric, errors="ignore")
+
         styled_income = style_top5(add_rank_icons(top_income_pivot))
+
         numeric_cols = top_income_pivot.select_dtypes(include="number").columns
         styled_income = styled_income.format({col: "{:,.0f}" for col in numeric_cols})
 
@@ -605,7 +608,7 @@ def main():
 
         st.divider()
 
-        # TOP 5 EXPENSE PIVOT
+                # TOP 5 EXPENSE PIVOT
         st.markdown("### 📉 Top 5 Expense Categories (All Years)")
 
         expense_df = df[
@@ -633,8 +636,11 @@ def main():
             aggfunc="sum"
         ).fillna(0)
 
-        # Apply styling + remove decimals safely
+        # 🔥 Force numeric columns back to numeric
+        top_expense_pivot = top_expense_pivot.apply(pd.to_numeric, errors="ignore")
+
         styled_expense = style_top5(add_rank_icons(top_expense_pivot))
+
         numeric_cols = top_expense_pivot.select_dtypes(include="number").columns
         styled_expense = styled_expense.format({col: "{:,.0f}" for col in numeric_cols})
 
