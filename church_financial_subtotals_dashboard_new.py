@@ -456,8 +456,7 @@ def main():
     #-----------------------------------------------
 
     with tab1:
-
-    st.subheader("📘 Unified Subtotal Summary (Pivot View)")
+        st.subheader("📘 Unified Subtotal Summary (Pivot View)")
 
     # ---------- SUMMARY ----------
     summary_rows = []
