@@ -511,8 +511,8 @@ def main():
         "Forecasting",
         "Board PDF"
     ])
-
-        # -----------------------------------------------------
+    
+    # -----------------------------------------------------
     # TAB 1 — FIXED SUMMARY + FIXED TOP 5 INCOME/EXPENSE
     # -----------------------------------------------------
     with tab1:
@@ -551,18 +551,27 @@ def main():
         summary_pivot = summary_df.pivot(index="Category", columns="Year", values="Amount").fillna(0)
         summary_pivot.index.name = None
 
-        summary_styled = summary_pivot.style.hide(axis="index").set_table_styles([
-            {"selector": "table", "props": [("table-layout", "fixed"), ("width", "100%")]},
-            {"selector": "th.col_heading", "props": [("text-align", "left"), ("width", "280px")]},
-            {"selector": "td", "props": [("text-align", "left"), ("width", "200px"), ("padding-left", "10px")]}
-        ])
+        # Convert to HTML with fixed column width
+        summary_html = summary_pivot.to_html(classes="wide-table", border=0)
 
-        st.dataframe(summary_styled, use_container_width=True)
+        st.markdown("""
+            <style>
+                .wide-table th, .wide-table td {
+                    text-align: left !important;
+                    padding: 8px 12px !important;
+                    width: 260px !important;
+                    max-width: 260px !important;
+                    white-space: nowrap !important;
+                }
+            </style>
+        """, unsafe_allow_html=True)
+
+        st.markdown(summary_html, unsafe_allow_html=True)
 
         st.divider()
 
         # -----------------------------------------------------
-        # 2. TOP 5 INCOME — FIXED + WIDE COLUMNS
+        # 2. TOP 5 INCOME — FIXED WIDTH
         # -----------------------------------------------------
         st.markdown("### 💰 Top 5 Income Categories (All Years)")
 
@@ -586,18 +595,13 @@ def main():
         income_yearly = pd.DataFrame(income_yearly).astype(int)
         income_yearly.index.name = None
 
-        styled_income = income_yearly.style.hide(axis="index").set_table_styles([
-            {"selector": "table", "props": [("table-layout", "fixed"), ("width", "100%")]},
-            {"selector": "th.col_heading", "props": [("text-align", "left"), ("width", "280px")]},
-            {"selector": "td", "props": [("text-align", "left"), ("width", "200px"), ("padding-left", "10px")]}
-        ])
-
-        st.dataframe(styled_income, use_container_width=True)
+        income_html = income_yearly.to_html(classes="wide-table", border=0)
+        st.markdown(income_html, unsafe_allow_html=True)
 
         st.divider()
 
         # -----------------------------------------------------
-        # 3. TOP 5 EXPENSE — FIXED + WIDE COLUMNS
+        # 3. TOP 5 EXPENSE — FIXED WIDTH
         # -----------------------------------------------------
         st.markdown("### 📉 Top 5 Expense Categories (All Years)")
 
@@ -622,14 +626,10 @@ def main():
         expense_yearly = pd.DataFrame(expense_yearly).astype(int)
         expense_yearly.index.name = None
 
-        styled_expense = expense_yearly.style.hide(axis="index").set_table_styles([
-            {"selector": "table", "props": [("table-layout", "fixed"), ("width", "100%")]},
-            {"selector": "th.col_heading", "props": [("text-align", "left"), ("width", "280px")]},
-            {"selector": "td", "props": [("text-align", "left"), ("width", "200px"), ("padding-left", "10px")]}
-        ])
+        expense_html = expense_yearly.to_html(classes="wide-table", border=0)
+        st.markdown(expense_html, unsafe_allow_html=True)
 
-        st.dataframe(styled_expense, use_container_width=True)
-
+    
     
     # -----------------------------------------------------
     # TAB 2 — CLEAN YOY SUMMARY
