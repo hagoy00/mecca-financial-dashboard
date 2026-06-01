@@ -560,6 +560,20 @@ def main():
 
         st.divider()
 
+        # ---------------------------------------------------------
+        # FORCE CLEAN AMOUNT COLUMN (THIS FIXES EVERYTHING)
+        # ---------------------------------------------------------
+        df["Amount"] = (
+            df["Amount"]
+            .astype(str)
+            .str.replace(",", "", regex=False)
+            .str.replace(" ", "", regex=False)
+            .str.replace("\u00A0", "", regex=False)  # non-breaking space
+        )
+
+        df["Amount"] = pd.to_numeric(df["Amount"], errors="coerce").fillna(0).astype(int)
+
+
         # -----------------------------------------------------
         # 2. TOP 5 INCOME — FULLY FIXED
         # -----------------------------------------------------
