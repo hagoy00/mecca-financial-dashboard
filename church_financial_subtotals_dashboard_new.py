@@ -509,10 +509,24 @@ def main():
             values="Amount"
         ).fillna(0)
 
-        summary_pivot = summary_pivot.applymap(lambda x: f"{int(x):,}")
-        summary_html = summary_pivot.to_html(classes="wide-table", border=0)
+        # --- Ensure pivot is always a DataFrame ---
+if isinstance(summary_pivot, pd.Series):
+    summary_pivot = summary_pivot.to_frame()
 
-        st.markdown(f"<div class='scroll-box'>{summary_html}</div>", unsafe_allow_html=True)
+# --- Safe formatting (handles NaN, floats, ints) ---
+def fmt(x):
+    try:
+        return f"{int(x):,}"
+    except:
+        return x
+
+summary_pivot = summary_pivot.applymap(fmt)
+
+# --- Convert to HTML ---
+summary_html = summary_pivot.to_html(classes="wide-table", border=0)
+
+st.markdown(f"<div class='scroll-box'>{summary_html}</div>", unsafe_allow_html=True)
+
 
         st.divider()
 
