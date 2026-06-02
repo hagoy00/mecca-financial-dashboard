@@ -427,6 +427,7 @@ def style_top5(df):
 
     return styler
 
+
 #-----------------------------------------------
 # Main 
 #-----------------------------------------------
@@ -450,10 +451,9 @@ def main():
         "Forecasting",
         "Board PDF"
     ])
-    
-    
+
     #-----------------------------------------------
-    # Tab 1 summary
+    # Tab 1 summary  (THIS MUST BE INSIDE main())
     #-----------------------------------------------
     with tab1:
 
@@ -564,7 +564,7 @@ def main():
 
         expense_yearly = expense_df[expense_df["Category"].isin(top_expense)].pivot_table(
             index="Category", columns="Year", values="Amount", aggfunc="sum", fill_value=0
-        )    
+        )
 
         expense_yearly = expense_yearly.applymap(lambda x: f"{int(x):,}")
         expense_html = expense_yearly.to_html(classes="wide-table", border=0)
