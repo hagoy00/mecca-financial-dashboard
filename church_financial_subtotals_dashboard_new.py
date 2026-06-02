@@ -22,7 +22,7 @@ def format_pivot(styler):
         .set_properties(**{"text-align": "left"})
     )
 
-'from reportlab.lib.pagesizes import letter
+from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib import colors
