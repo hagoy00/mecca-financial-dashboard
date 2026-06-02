@@ -501,14 +501,19 @@ def main():
             summary_rows.append(["Payroll", year, payroll])
             summary_rows.append(["Utilities", year, utilities])
 
+        # ⭐ ALWAYS BUILD THE PIVOT FROM summary_df — NEVER from summary_pivot
         summary_df = pd.DataFrame(summary_rows, columns=["Category", "Year", "Amount"])
 
-        # ⭐ THIS IS THE CORRECT PIVOT
-        summary_pivot = summary_df.pivot(index="Category", columns="Year", values="Amount").fillna(0)
+        summary_pivot = summary_df.pivot(
+            index="Category",
+            columns="Year",
+            values="Amount"
+        ).fillna(0)
 
-        # ⭐ FORMAT NUMBERS (NO DECIMALS, COMMAS, LEFT ALIGN)
+        # ⭐ FORMAT NUMBERS (NO DECIMALS, COMMAS)
         summary_pivot = summary_pivot.applymap(lambda x: f"{int(x):,}")
 
+        # ⭐ CONVERT TO HTML
         summary_html = summary_pivot.to_html(classes="wide-table", border=0, justify="left")
 
         st.markdown(f"<div class='scroll-box'>{summary_html}</div>", unsafe_allow_html=True)
