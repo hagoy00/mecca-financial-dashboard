@@ -450,15 +450,15 @@ def main():
         "Forecasting",
         "Board PDF"
     ])
-    
-    #-----------------------------------------------
+
+        #-----------------------------------------------
     # Tab 1 summary
     #-----------------------------------------------
     with tab1:
 
         st.subheader("📘 Unified Subtotal Summary (Pivot View)")
 
-        # ---------- CSS FOR ALL TABLES ----------
+        # ---------- CSS ----------
         st.markdown("""
             <style>
                 .scroll-box { 
@@ -501,7 +501,6 @@ def main():
             summary_rows.append(["Payroll", year, payroll])
             summary_rows.append(["Utilities", year, utilities])
 
-        # ⭐ ALWAYS BUILD THE PIVOT FROM summary_df — NEVER from summary_pivot
         summary_df = pd.DataFrame(summary_rows, columns=["Category", "Year", "Amount"])
 
         summary_pivot = summary_df.pivot(
@@ -510,13 +509,12 @@ def main():
             values="Amount"
         ).fillna(0)
 
-        # ⭐ FORMAT NUMBERS (NO DECIMALS, COMMAS)
         summary_pivot = summary_pivot.applymap(lambda x: f"{int(x):,}")
-
-        # ⭐ CONVERT TO HTML
-        summary_html = summary_pivot.to_html(classes="wide-table", border=0, justify="left")
+        summary_html = summary_pivot.to_html(classes="wide-table", border=0)
 
         st.markdown(f"<div class='scroll-box'>{summary_html}</div>", unsafe_allow_html=True)
+
+        st.divider()
 
         # ---------- TOP 5 INCOME ----------
         st.markdown("### 💰 Top 5 Income Categories")
@@ -532,9 +530,8 @@ def main():
             index="Category", columns="Year", values="Amount", aggfunc="sum", fill_value=0
         )
 
-        # ⭐ FORMAT NUMBERS
         income_yearly = income_yearly.applymap(lambda x: f"{int(x):,}")
-        income_html = income_yearly.to_html(classes="wide-table", border=0, justify="left")
+        income_html = income_yearly.to_html(classes="wide-table", border=0)
 
         st.markdown(f"<div class='scroll-box'>{income_html}</div>", unsafe_allow_html=True)
 
@@ -555,37 +552,38 @@ def main():
             index="Category", columns="Year", values="Amount", aggfunc="sum", fill_value=0
         )
 
-        # ⭐ FORMAT NUMBERS
         expense_yearly = expense_yearly.applymap(lambda x: f"{int(x):,}")
-        expense_html = expense_yearly.to_html(classes="wide-table", border=0, justify="left")
+        expense_html = expense_yearly.to_html(classes="wide-table", border=0)
 
         st.markdown(f"<div class='scroll-box'>{expense_html}</div>", unsafe_allow_html=True)
-    
-    # -----------------------------------------------------
+
+            # -----------------------------------------------------
     # TAB 2 — CLEAN YOY SUMMARY
     # -----------------------------------------------------
     with tab2:
+
         st.subheader("📘 Year‑Over‑Year (YOY) Summary")
 
         TARGET_ORDER = [
-        "Total Revenue",
-        "Total Expenses",
-        "Net Income",
-        "Payroll",
-        "Utilities"
+            "Total Revenue",
+            "Total Expenses",
+            "Net Income",
+            "Payroll",
+            "Utilities"
         ]
 
         yoy_rows = []
 
         for cat in TARGET_ORDER:
+
             cat_data = subtotals[subtotals["Category"] == cat].sort_values("Year")
             years_cat = cat_data["Year"].tolist()
             amounts = cat_data["Amount"].tolist()
 
             for i in range(len(years_cat)):
+
                 year = years_cat[i]
                 amount = amounts[i]
-
                 prev_year = year - 1
 
                 if prev_year not in years_cat:
@@ -594,7 +592,6 @@ def main():
                 else:
                     prev_index = years_cat.index(prev_year)
                     prev = amounts[prev_index]
-
                     yoy_change = amount - prev
                     yoy_pct = (yoy_change / prev * 100) if prev != 0 else 0
 
@@ -612,7 +609,7 @@ def main():
         ).fillna(0)
 
         st.dataframe(yoy_pivot.style.format("{:,.0f}"), use_container_width=True)
-
+    
     # -----------------------------------------------------
     # TAB 3 — TOP INCOME & EXPENSES (FORECASTING)
     # -----------------------------------------------------
