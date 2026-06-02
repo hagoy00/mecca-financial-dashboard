@@ -333,7 +333,7 @@ def get_top_income(df, n=5):
     d = df.copy()
     d = d[d["Type"] == "Income"]
     d = d[~d["Category"].str.startswith("Total for ")]
-    grouped = d.groupby(["Year", "Category"])["Amount"].sum() #.reset_index()
+    grouped = d.groupby(["Year", "Category"])["Amount"].sum().reset_index()
 
     grouped["Rank"] = grouped.groupby("Year")["Amount"].rank(method="first", ascending=False)
     return grouped[grouped["Rank"] <= n].drop(columns="Rank")
@@ -349,7 +349,7 @@ def get_top_expense(df, n=5):
 
     #d = d[d["Type"] == "Expense"]
     #d = d[~d["Category"].str.startswith("Total for ")]
-    grouped = d.groupby(["Year", "Category"])["Amount"].sum() #.reset_index()
+    grouped = d.groupby(["Year", "Category"])["Amount"].sum().reset_index()
 
     grouped["Rank"] = grouped.groupby("Year")["Amount"].rank(method="first", ascending=False)
     return grouped[grouped["Rank"] <= n].drop(columns="Rank")
