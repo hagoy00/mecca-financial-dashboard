@@ -665,7 +665,6 @@ def main():
         
         # Use st.table to preserve styling
         st.table(styled_expense)
-
         
     # -----------------------------------------------------
     # TAB 2 — CLEAN YOY SUMMARY
