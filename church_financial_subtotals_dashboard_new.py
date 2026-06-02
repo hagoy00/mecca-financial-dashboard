@@ -68,13 +68,13 @@ html, body, div, span, p, label, h1, h2, h3, h4, h5, h6 {
     font-size: 27px !important;
 }
 .stMarkdown, .stText, .stDataFrame, .stTable, .stMetric, .stNumberInput, .stSlider {
-    font-size: 27px !important;
+    font-size: 26px !important;
 }
 .dataframe tbody tr td {
-    font-size: 27px !important;
+    font-size: 26px !important;
 }
 .dataframe thead tr th {
-    font-size: 27px !important;
+    font-size: 26px !important;
     font-weight: bold !important;
 }
 </style>
@@ -510,16 +510,6 @@ def main():
         "Forecasting",
         "Board PDF"
     ])
-    # -----------------------------------------------------
-    # GLOBAL FORMATTER (use for all pivots)
-    # -----------------------------------------------------
-    def format_pivot(styler):
-        return (
-            styler.format(
-                lambda x: f"{int(x):,}" if isinstance(x, (int, float)) else x
-            )
-            .set_properties(**{"text-align": "left"})
-        )
 
     # -----------------------------------------------------
     # TAB 1 — UNIFIED SUBTOTAL SUMMARY (NEW)
@@ -536,12 +526,14 @@ def main():
                 "Amount"
             ].sum()
 
+            total_income = revenue
+
             total_expenses = group.loc[
                 group["Category"].str.lower() == "total for expenses",
                 "Amount"
             ].sum()
 
-            net_income = revenue - total_expenses
+            net_income = total_income - total_expenses
 
             payroll = df[
                 (df["Year"] == year) &
@@ -560,6 +552,8 @@ def main():
             summary_rows.append(["Utilities", year, utilities])
 
         summary_df = pd.DataFrame(summary_rows, columns=["Category", "Year", "Amount"])
+
+        # Remove decimals
         summary_df["Amount"] = summary_df["Amount"].astype(float).round(0).astype(int)
 
         summary_pivot = summary_df.pivot_table(
@@ -571,11 +565,102 @@ def main():
 
         summary_pivot.index.name = None
 
-        styled_summary = style_top5(add_summary_icons(summary_pivot))
-        st.table(format_pivot(styled_summary))
+        st.markdown("### 📘 Main Financial Summary")
+        st.dataframe(style_top5(add_summary_icons(summary_pivot)), use_container_width=True)
 
         st.divider()
-        
+
+        # -----------------------------------------------------
+        # TOP 5 INCOME PIVOT
+        # -----------------------------------------------------
+        st.markdown("### 💰 Top 5 Income Categories (All Years)")
+
+        income_df = df[
+            (df["Type"] == "Income") &
+            (~df["Category"].str.lower().str.startswith("total for"))
+        ]
+
+        income_grouped = income_df.groupby(["Category", "Year"])["Amount"].sum().reset_index()
+
+        income_grouped["Amount"] = income_grouped["Amount"].astype(float).round(0).astype(int)
+
+        top_income_categories = (
+            income_grouped.groupby("Category")["Amount"]
+            .sum()
+            .sort_values(ascending=False)
+            .head(5)
+            .index
+        )
+
+        top_income_pivot = income_grouped[
+            income_grouped["Category"].isin(top_income_categories)
+        ].pivot_table(
+            index="Category",
+            columns="Year",
+            values="Amount",
+            aggfunc="sum"
+        ).fillna(0)
+
+        top_income_pivot.index.name = None
+        top_income_pivot.columns = top_income_pivot.columns.astype(str)
+
+        styled_income = style_top5(add_rank_icons(top_income_pivot))
+
+        styled_income = styled_income.format(
+            lambda x: f"{float(x):,.0f}"
+            if str(x).replace('.', '', 1).isdigit()
+            else x
+        )
+
+        st.dataframe(styled_income, use_container_width=True)
+
+        st.divider()
+
+        # -----------------------------------------------------
+        # TOP 5 EXPENSE PIVOT
+        # -----------------------------------------------------
+        st.markdown("### 📉 Top 5 Expense Categories (All Years)")
+
+        expense_df = df[
+            (df["Type"] == "Expense") &
+            (~df["Category"].str.lower().str.startswith("total for")) &
+            (~df["Category"].str.contains("depreciat", case=False, na=False))
+        ]
+
+        expense_grouped = expense_df.groupby(["Category", "Year"])["Amount"].sum().reset_index()
+
+        expense_grouped["Amount"] = expense_grouped["Amount"].astype(float).round(0).astype(int)
+
+        top_expense_categories = (
+            expense_grouped.groupby("Category")["Amount"]
+            .sum()
+            .sort_values(ascending=False)
+            .head(5)
+            .index
+        )
+
+        top_expense_pivot = expense_grouped[
+            expense_grouped["Category"].isin(top_expense_categories)
+        ].pivot_table(
+            index="Category",
+            columns="Year",
+            values="Amount",
+            aggfunc="sum"
+        ).fillna(0)
+
+        top_expense_pivot.index.name = None
+        top_expense_pivot.columns = top_expense_pivot.columns.astype(str)
+
+        styled_expense = style_top5(add_rank_icons(top_expense_pivot))
+
+        styled_expense = styled_expense.format(
+            lambda x: f"{float(x):,.0f}"
+            if str(x).replace('.', '', 1).isdigit()
+            else x
+        )
+
+        st.dataframe(styled_expense, use_container_width=True)
+
     # -----------------------------------------------------
     # TAB 2 — CLEAN YOY SUMMARY
     # -----------------------------------------------------
@@ -632,118 +717,32 @@ def main():
         st.dataframe(yoy_pivot.style.format("{:,.0f}"), use_container_width=True)
 
     # -----------------------------------------------------
-    # TAB 3 — TOP INCOME & EXPENSES
+    # TAB 3 — TOP INCOME & EXPENSES (FORECASTING)
     # -----------------------------------------------------
     with tab_top:
         st.subheader("Top Income & Top Expenses")
-    
-        # -----------------------------------------------------
-        # TOP 5 INCOME PIVOT
-        # -----------------------------------------------------
-        st.markdown("### 💰 Top 5 Income Categories (All Years)")
-    
-        income_df = df[
-            (df["Type"] == "Income") &
-            (~df["Category"].str.lower().str.startswith("total for"))
-        ]
-    
-        income_grouped = income_df.groupby(["Category", "Year"])["Amount"].sum().reset_index()
-        income_grouped["Amount"] = income_grouped["Amount"].astype(float).round(0).astype(int)
-    
-        top_income_categories = (
-            income_grouped.groupby("Category")["Amount"]
-            .sum()
-            .sort_values(ascending=False)
-            .head(5)
-            .index
-        )
-    
-        if len(top_income_categories) == 0:
-            st.warning("No income categories found for Top 5.")
-        else:
-            top_income_pivot = income_grouped[
-                income_grouped["Category"].isin(top_income_categories)
-            ].pivot_table(
-                index="Category",
-                columns="Year",
-                values="Amount",
-                aggfunc="sum"
-            ).fillna(0)
-    
-            top_income_pivot = top_income_pivot.astype(int)
-    
-            styled_income = style_top5(add_rank_icons(top_income_pivot))
-            st.table(format_pivot(styled_income))
-    
-        st.divider()
-    
-        # -----------------------------------------------------
-        # TOP 5 EXPENSE PIVOT
-        # -----------------------------------------------------
-        st.markdown("### 📉 Top 5 Expense Categories (All Years)")
-    
-        expense_df = df[
-            (df["Type"] == "Expense") &
-            (~df["Category"].str.lower().str.startswith("total for")) &
-            (~df["Category"].str.contains("depreciat", case=False, na=False))
-        ]
-    
-        expense_grouped = expense_df.groupby(["Category", "Year"])["Amount"].sum().reset_index()
-        expense_grouped["Amount"] = expense_grouped["Amount"].astype(float).round(0).astype(int)
-    
-        top_expense_categories = (
-            expense_grouped.groupby("Category")["Amount"]
-            .sum()
-            .sort_values(ascending=False)
-            .head(5)
-            .index
-        )
-    
-        if len(top_expense_categories) == 0:
-            st.warning("No expense categories found for Top 5.")
-        else:
-            top_expense_pivot = expense_grouped[
-                expense_grouped["Category"].isin(top_expense_categories)
-            ].pivot_table(
-                index="Category",
-                columns="Year",
-                values="Amount",
-                aggfunc="sum"
-            ).fillna(0)
-    
-            top_expense_pivot = top_expense_pivot.astype(int)
-    
-            styled_expense = style_top5(add_rank_icons(top_expense_pivot))
-            st.table(format_pivot(styled_expense))
-    
-        st.divider()
-    
-        # -----------------------------------------------------
-        # FORECASTING SECTION (RAW DATA)
-        # -----------------------------------------------------
-        st.markdown("### 📈 Forecasting (Raw Data)")
-    
+
         top_income = get_top_income(df)
         top_expense = get_top_expense(df)
-    
+
         year_sel = st.selectbox("Select Year", years)
-    
+
         inc_year = top_income[top_income["Year"] == year_sel].sort_values("Amount", ascending=False).head(5)
         exp_year = top_expense[top_expense["Year"] == year_sel].sort_values("Amount", ascending=False).head(5)
-    
+
         col1, col2 = st.columns(2)
-    
+
         # -----------------------------
         # LEFT COLUMN — INCOME FORECAST
         # -----------------------------
         with col1:
-            st.markdown("### Top Income Categories (Raw)")
+            st.markdown("### Top Income Categories")
             st.dataframe(inc_year, use_container_width=True)
-    
+
             if not inc_year.empty:
                 selected_inc = st.selectbox("Forecast Income Category", inc_year["Category"])
                 inc_forecast = forecast_category(df, selected_inc)
-    
+
                 if not inc_forecast.empty:
                     chart = (
                         alt.Chart(inc_forecast)
@@ -764,20 +763,20 @@ def main():
                         titleFontSize=20,
                         tickCount=12
                     )
-    
+
                     st.altair_chart(chart, use_container_width=True)
-    
+
         # -----------------------------
         # RIGHT COLUMN — EXPENSE FORECAST
         # -----------------------------
         with col2:
-            st.markdown("### Top Expense Categories (Raw)")
+            st.markdown("### Top Expense Categories")
             st.dataframe(exp_year, use_container_width=True)
-    
+
             if not exp_year.empty:
                 selected_exp = st.selectbox("Forecast Expense Category", exp_year["Category"])
                 exp_forecast = forecast_category(df, selected_exp)
-    
+
                 if not exp_forecast.empty:
                     chart = (
                         alt.Chart(exp_forecast)
@@ -798,9 +797,9 @@ def main():
                         titleFontSize=20,
                         tickCount=12
                     )
-    
+
                     st.altair_chart(chart, use_container_width=True)
-    
+
     # -----------------------------------------------------
     # TAB 4 — SURPLUS / DEFICIT
     # -----------------------------------------------------
