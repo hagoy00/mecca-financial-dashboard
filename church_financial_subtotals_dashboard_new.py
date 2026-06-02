@@ -5,7 +5,24 @@ import altair as alt
 from io import BytesIO
 import os
 
-from reportlab.lib.pagesizes import letter
+def format_pivot(styler):
+    """
+    Global formatter for all pivot tables:
+    - Commas
+    - No decimals
+    - Left alignment
+    - Safe handling of icons and text
+    """
+    return (
+        styler.format(
+            lambda x: f"{int(float(x)):,}"
+            if str(x).replace(",", "").replace(".", "").isdigit()
+            else x
+        )
+        .set_properties(**{"text-align": "left"})
+    )
+
+'from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib import colors
@@ -566,12 +583,8 @@ def main():
         # Apply icons + formatting
         styled_summary = style_top5(add_summary_icons(summary_pivot))
     
-        styled_summary = styled_summary.format(lambda x: f"{int(x):,}")
-        styled_summary = styled_summary.set_properties(**{"text-align": "left"})
-    
-        # IMPORTANT: use st.table for correct formatting
-        st.table(styled_summary)
-    
+        st.table(format_pivot(styled_summary))
+
         st.divider()
     
         # -----------------------------------------------------
@@ -608,11 +621,8 @@ def main():
         top_income_pivot.columns = top_income_pivot.columns.astype(str)
     
         styled_income = style_top5(add_rank_icons(top_income_pivot))
-        styled_income = styled_income.format(lambda x: f"{int(x):,}")
-        styled_income = styled_income.set_properties(**{"text-align": "left"})
-    
-        st.table(styled_income)
-    
+        st.table(format_pivot(styled_income))
+
         st.divider()
     
         # -----------------------------------------------------
@@ -650,10 +660,7 @@ def main():
         top_expense_pivot.columns = top_expense_pivot.columns.astype(str)
     
         styled_expense = style_top5(add_rank_icons(top_expense_pivot))
-        styled_expense = styled_expense.format(lambda x: f"{int(x):,}")
-        styled_expense = styled_expense.set_properties(**{"text-align": "left"})
-    
-        st.table(styled_expense)
+        st.table(format_pivot(styled_expense))
         
     # -----------------------------------------------------
     # TAB 2 — CLEAN YOY SUMMARY
