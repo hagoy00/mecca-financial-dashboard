@@ -214,10 +214,9 @@ def load_data():
 def extract_subtotals(df):
     df = df.copy()
 
-    # 1. Extract existing subtotal rows
+    # 1. Extract existing subtotal rows (EXCLUDE Net Income)
     mask = (
         df["Category"].str.startswith("Total for ")
-        | (df["Category"] == "Net Income")
         | (df["Category"] == "Net Operating Income")
     )
     subtotals = df[mask].reset_index(drop=True)
