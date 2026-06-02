@@ -509,28 +509,29 @@ def main():
             values="Amount"
         ).fillna(0)
 
+
         # --- Ensure pivot is always a DataFrame ---
-if isinstance(summary_pivot, pd.Series):
-    summary_pivot = summary_pivot.to_frame()
+        if isinstance(summary_pivot, pd.Series):
+            summary_pivot = summary_pivot.to_frame()
 
-# --- Safe formatting (handles NaN, floats, ints) ---
-def fmt(x):
-    try:
-        return f"{int(x):,}"
-    except:
-        return x
+        # --- Safe formatting (handles NaN, floats, ints) ---
+        def fmt(x):
+            try:
+                return f"{int(x):,}"
+                except:
+                    return x
 
-summary_pivot = summary_pivot.applymap(fmt)
+        summary_pivot = summary_pivot.applymap(fmt)
 
-# --- Convert to HTML ---
-summary_html = summary_pivot.to_html(classes="wide-table", border=0)
+        # --- Convert to HTML ---
+        summary_html = summary_pivot.to_html(classes="wide-table", border=0)
 
-st.markdown(f"<div class='scroll-box'>{summary_html}</div>", unsafe_allow_html=True)
-
+        st.markdown(f"<div class='scroll-box'>{summary_html}</div>", unsafe_allow_html=True)
 
         st.divider()
-
+        
         # ---------- TOP 5 INCOME ----------
+
         st.markdown("### 💰 Top 5 Income Categories")
 
         income_df = df[
@@ -552,6 +553,7 @@ st.markdown(f"<div class='scroll-box'>{summary_html}</div>", unsafe_allow_html=T
         st.divider()
 
         # ---------- TOP 5 EXPENSE ----------
+
         st.markdown("### 📉 Top 5 Expense Categories")
 
         expense_df = df[
