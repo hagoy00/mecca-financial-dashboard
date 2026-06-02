@@ -536,25 +536,29 @@ def main():
 
         # ---------- TOP 5 INCOME ----------
         st.markdown("### 💰 Top 5 Income Categories")
-
+        
         income_df = df[
             (df["Type"] == "Income") &
             (~df["Category"].str.lower().str.startswith("total for"))
         ]
-
+        
         top_income = income_df.groupby("Category")["Amount"].sum().nlargest(5).index
-
+        
         income_yearly = income_df[income_df["Category"].isin(top_income)].pivot_table(
             index="Category", columns="Year", values="Amount", aggfunc="sum", fill_value=0
         )
-
+        
         income_yearly = income_yearly.applymap(lambda x: f"{int(x):,}")
         income_html = income_yearly.to_html(classes="wide-table", border=0, justify="left")
-
+        
         st.markdown(f"<div class='scroll-box'>{income_html}</div>", unsafe_allow_html=True)
-
+        
         st.divider()
 
+        
+        
+        
+        
         # ---------- TOP 5 EXPENSE ----------
         st.markdown("### 📉 Top 5 Expense Categories")
 
