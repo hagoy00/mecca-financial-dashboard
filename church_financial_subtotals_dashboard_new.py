@@ -5,13 +5,6 @@ import altair as alt
 from io import BytesIO
 import os
 
-def format_pivot(styler):
-    return (
-        styler.format(
-            lambda x: f"{int(x):,}" if isinstance(x, (int, float)) else x
-        )
-        .set_properties(**{"text-align": "left"})
-    )
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet
@@ -517,80 +510,85 @@ def main():
         "Forecasting",
         "Board PDF"
     ])
+    # -----------------------------------------------------
+    # GLOBAL FORMATTER (use for all pivots)
+    # -----------------------------------------------------
+    def format_pivot(styler):
+        return (
+            styler.format(
+                lambda x: f"{int(x):,}" if isinstance(x, (int, float)) else x
+            )
+            .set_properties(**{"text-align": "left"})
+        )
 
     # -----------------------------------------------------
     # TAB 1 — UNIFIED SUBTOTAL SUMMARY (NEW)
     # -----------------------------------------------------
     with tab1:
         st.subheader("📘 Unified Subtotal Summary (Pivot View)")
-    
+
         summary_rows = []
-    
+
         for year, group in subtotals.groupby("Year"):
-    
+
             revenue = group.loc[
                 group["Category"].str.lower() == "total for income",
                 "Amount"
             ].sum()
-    
+
             total_expenses = group.loc[
                 group["Category"].str.lower() == "total for expenses",
                 "Amount"
             ].sum()
-    
+
             net_income = revenue - total_expenses
-    
+
             payroll = df[
                 (df["Year"] == year) &
                 (df["Category"].isin(["Salaries & Wages", "Payroll Tax Expense"]))
             ]["Amount"].sum()
-    
+
             utilities = df[
                 (df["Year"] == year) &
                 (df["Category"].str.contains("Utilit", case=False, na=False))
             ]["Amount"].sum()
-    
+
             summary_rows.append(["Total Revenue", year, revenue])
             summary_rows.append(["Total Expenses", year, total_expenses])
             summary_rows.append(["Net Income", year, net_income])
             summary_rows.append(["Payroll", year, payroll])
             summary_rows.append(["Utilities", year, utilities])
-    
+
         summary_df = pd.DataFrame(summary_rows, columns=["Category", "Year", "Amount"])
-    
-        # Remove decimals
         summary_df["Amount"] = summary_df["Amount"].astype(float).round(0).astype(int)
-    
+
         summary_pivot = summary_df.pivot_table(
             index="Category",
             columns="Year",
             values="Amount",
             aggfunc="sum"
         ).fillna(0)
-    
+
         summary_pivot.index.name = None
-    
-        # Apply icons + formatting
+
         styled_summary = style_top5(add_summary_icons(summary_pivot))
-    
         st.table(format_pivot(styled_summary))
 
         st.divider()
-        top_income_pivot = top_income_pivot.astype(int)
 
         # -----------------------------------------------------
         # TOP 5 INCOME PIVOT
         # -----------------------------------------------------
         st.markdown("### 💰 Top 5 Income Categories (All Years)")
-    
+
         income_df = df[
             (df["Type"] == "Income") &
             (~df["Category"].str.lower().str.startswith("total for"))
         ]
-    
+
         income_grouped = income_df.groupby(["Category", "Year"])["Amount"].sum().reset_index()
         income_grouped["Amount"] = income_grouped["Amount"].astype(float).round(0).astype(int)
-    
+
         top_income_categories = (
             income_grouped.groupby("Category")["Amount"]
             .sum()
@@ -598,39 +596,40 @@ def main():
             .head(5)
             .index
         )
-    
-        top_income_pivot = income_grouped[
-            income_grouped["Category"].isin(top_income_categories)
-        ].pivot_table(
-            index="Category",
-            columns="Year",
-            values="Amount",
-            aggfunc="sum"
-        ).fillna(0)
-    
-        top_income_pivot.index.name = None
-        top_income_pivot.columns = top_income_pivot.columns.astype(str)
-    
-        styled_income = style_top5(add_rank_icons(top_income_pivot))
-        st.table(format_pivot(styled_income))
+
+        if len(top_income_categories) == 0:
+            st.warning("No income categories found for Top 5.")
+        else:
+            top_income_pivot = income_grouped[
+                income_grouped["Category"].isin(top_income_categories)
+            ].pivot_table(
+                index="Category",
+                columns="Year",
+                values="Amount",
+                aggfunc="sum"
+            ).fillna(0)
+
+            top_income_pivot = top_income_pivot.astype(int)
+
+            styled_income = style_top5(add_rank_icons(top_income_pivot))
+            st.table(format_pivot(styled_income))
 
         st.divider()
-        top_expense_pivot = top_expense_pivot.astype(int)
 
         # -----------------------------------------------------
         # TOP 5 EXPENSE PIVOT
         # -----------------------------------------------------
         st.markdown("### 📉 Top 5 Expense Categories (All Years)")
-    
+
         expense_df = df[
             (df["Type"] == "Expense") &
             (~df["Category"].str.lower().str.startswith("total for")) &
             (~df["Category"].str.contains("depreciat", case=False, na=False))
         ]
-    
+
         expense_grouped = expense_df.groupby(["Category", "Year"])["Amount"].sum().reset_index()
         expense_grouped["Amount"] = expense_grouped["Amount"].astype(float).round(0).astype(int)
-    
+
         top_expense_categories = (
             expense_grouped.groupby("Category")["Amount"]
             .sum()
@@ -638,21 +637,24 @@ def main():
             .head(5)
             .index
         )
-    
-        top_expense_pivot = expense_grouped[
-            expense_grouped["Category"].isin(top_expense_categories)
-        ].pivot_table(
-            index="Category",
-            columns="Year",
-            values="Amount",
-            aggfunc="sum"
-        ).fillna(0)
-    
-        top_expense_pivot.index.name = None
-        top_expense_pivot.columns = top_expense_pivot.columns.astype(str)
-    
-        styled_expense = style_top5(add_rank_icons(top_expense_pivot))
-        st.table(format_pivot(styled_expense))
+
+        if len(top_expense_categories) == 0:
+            st.warning("No expense categories found for Top 5.")
+        else:
+            top_expense_pivot = expense_grouped[
+                expense_grouped["Category"].isin(top_expense_categories)
+            ].pivot_table(
+                index="Category",
+                columns="Year",
+                values="Amount",
+                aggfunc="sum"
+            ).fillna(0)
+
+            top_expense_pivot = top_expense_pivot.astype(int)
+
+            styled_expense = style_top5(add_rank_icons(top_expense_pivot))
+            st.table(format_pivot(styled_expense))
+
         
     # -----------------------------------------------------
     # TAB 2 — CLEAN YOY SUMMARY
