@@ -450,14 +450,31 @@ def main():
         "Forecasting",
         "Board PDF"
     ])
-
+    
     #-----------------------------------------------
     # Tab 1 summary
     #-----------------------------------------------
-
     with tab1:
 
         st.subheader("📘 Unified Subtotal Summary (Pivot View)")
+
+        # ---------- CSS FOR ALL TABLES ----------
+        st.markdown("""
+            <style>
+                .scroll-box { 
+                    overflow-x: auto; 
+                    padding-bottom: 10px; 
+                }
+                .wide-table th, .wide-table td {
+                    text-align: left !important;
+                    padding: 8px 12px !important;
+                    width: 260px !important;
+                    max-width: 260px !important;
+                    white-space: nowrap !important;
+                    font-weight: bold !important;
+                }
+            </style>
+        """, unsafe_allow_html=True)
 
         # ---------- SUMMARY ----------
         summary_rows = []
@@ -487,42 +504,11 @@ def main():
         summary_df = pd.DataFrame(summary_rows, columns=["Category", "Year", "Amount"])
         summary_pivot = summary_df.pivot(index="Category", columns="Year", values="Amount").fillna(0)
 
-        st.markdown("""
-            <style>
-                .scroll-box { 
-                    overflow-x: auto; 
-                    padding-bottom: 10px; 
-                }
-                .wide-table th, .wide-table td {
-                    text-align: left !important;
-                    padding: 8px 12px !important;
-                    width: 260px !important;
-                    max-width: 260px !important;
-                    white-space: nowrap !important;
-                }
-            </style>
-        """, unsafe_allow_html=True)
+        # ⭐ FORMAT NUMBERS (NO DECIMALS, COMMAS, LEFT ALIGN)
+        summary_pivot = summary_pivot.applymap(lambda x: f"{int(x):,}")
+        summary_html = summary_pivot.to_html(classes="wide-table", border=0, justify="left")
 
-
-
-        
-        st.markdown("""
-            <style>
-                .scroll-box { overflow-x: auto; padding-bottom: 10px; }
-                .wide-table th, .wide-table td {
-                    text-align: left !important;
-                    padding: 8px 12px !important;
-                    width: 260px !important;
-                    max-width: 260px !important;
-                    white-space: nowrap !important;
-                }
-            </style>
-        """, unsafe_allow_html=True)
-
-        st.markdown(
-            f"<div class='scroll-box'>{summary_pivot.to_html(classes='wide-table', border=0)}</div>",
-            unsafe_allow_html=True
-        )
+        st.markdown(f"<div class='scroll-box'>{summary_html}</div>", unsafe_allow_html=True)
 
         st.divider()
 
@@ -540,10 +526,11 @@ def main():
             index="Category", columns="Year", values="Amount", aggfunc="sum", fill_value=0
         )
 
-        st.markdown(
-            f"<div class='scroll-box'>{income_yearly.to_html(classes='wide-table', border=0)}</div>",
-            unsafe_allow_html=True
-        )
+        # ⭐ FORMAT NUMBERS
+        income_yearly = income_yearly.applymap(lambda x: f"{int(x):,}")
+        income_html = income_yearly.to_html(classes="wide-table", border=0, justify="left")
+
+        st.markdown(f"<div class='scroll-box'>{income_html}</div>", unsafe_allow_html=True)
 
         st.divider()
 
@@ -562,11 +549,11 @@ def main():
             index="Category", columns="Year", values="Amount", aggfunc="sum", fill_value=0
         )
 
-        st.markdown(
-            f"<div class='scroll-box'>{expense_yearly.to_html(classes='wide-table', border=0)}</div>",
-            unsafe_allow_html=True
-        )
+        # ⭐ FORMAT NUMBERS
+        expense_yearly = expense_yearly.applymap(lambda x: f"{int(x):,}")
+        expense_html = expense_yearly.to_html(classes="wide-table", border=0, justify="left")
 
+        st.markdown(f"<div class='scroll-box'>{expense_html}</div>", unsafe_allow_html=True)
     
     # -----------------------------------------------------
     # TAB 2 — CLEAN YOY SUMMARY
