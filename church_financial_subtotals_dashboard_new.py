@@ -450,130 +450,128 @@ def main():
         "Forecasting",
         "Board PDF"
     ])
-
-        #-----------------------------------------------
-    # Tab 1 summary
+    
+    
     #-----------------------------------------------
-    with tab1:
+# Tab 1 summary
+#-----------------------------------------------
+with tab1:
 
-        st.subheader("📘 Unified Subtotal Summary (Pivot View)")
+    st.subheader("📘 Unified Subtotal Summary (Pivot View)")
 
-        # ---------- CSS ----------
-        st.markdown("""
-            <style>
-                .scroll-box { 
-                    overflow-x: auto; 
-                    padding-bottom: 10px; 
-                }
-                .wide-table th, .wide-table td {
-                    text-align: left !important;
-                    padding: 8px 12px !important;
-                    width: 260px !important;
-                    max-width: 260px !important;
-                    white-space: nowrap !important;
-                    font-weight: bold !important;
-                }
-            </style>
-        """, unsafe_allow_html=True)
+    # ---------- CSS ----------
+    st.markdown("""
+        <style>
+            .scroll-box { 
+                overflow-x: auto; 
+                padding-bottom: 10px; 
+            }
+            .wide-table th, .wide-table td {
+                text-align: left !important;
+                padding: 8px 12px !important;
+                width: 260px !important;
+                max-width: 260px !important;
+                white-space: nowrap !important;
+                font-weight: bold !important;
+            }
+        </style>
+    """, unsafe_allow_html=True)
 
-        # ---------- SUMMARY ----------
-        summary_rows = []
+    # ---------- SUMMARY ----------
+    summary_rows = []
 
-        for year, group in subtotals.groupby("Year"):
+    for year, group in subtotals.groupby("Year"):
 
-            revenue = group.loc[group["Category"].str.lower() == "total for income", "Amount"].sum()
-            expenses = group.loc[group["Category"].str.lower() == "total for expenses", "Amount"].sum()
-            net = revenue - expenses
+        revenue = group.loc[group["Category"].str.lower() == "total for income", "Amount"].sum()
+        expenses = group.loc[group["Category"].str.lower() == "total for expenses", "Amount"].sum()
+        net = revenue - expenses
 
-            payroll = df[
-                (df["Year"] == year) &
-                (df["Category"].isin(["Salaries & Wages", "Payroll Tax Expense"]))
-            ]["Amount"].sum()
+        payroll = df[
+            (df["Year"] == year) &
+            (df["Category"].isin(["Salaries & Wages", "Payroll Tax Expense"]))
+        ]["Amount"].sum()
 
-            utilities = df[
-                (df["Year"] == year) &
-                (df["Category"].str.contains("Utilit", case=False, na=False))
-            ]["Amount"].sum()
+        utilities = df[
+            (df["Year"] == year) &
+            (df["Category"].str.contains("Utilit", case=False, na=False))
+        ]["Amount"].sum()
 
-            summary_rows.append(["Total Revenue", year, revenue])
-            summary_rows.append(["Total Expenses", year, expenses])
-            summary_rows.append(["Net Income", year, net])
-            summary_rows.append(["Payroll", year, payroll])
-            summary_rows.append(["Utilities", year, utilities])
+        summary_rows.append(["Total Revenue", year, revenue])
+        summary_rows.append(["Total Expenses", year, expenses])
+        summary_rows.append(["Net Income", year, net])
+        summary_rows.append(["Payroll", year, payroll])
+        summary_rows.append(["Utilities", year, utilities])
 
-        summary_df = pd.DataFrame(summary_rows, columns=["Category", "Year", "Amount"])
+    summary_df = pd.DataFrame(summary_rows, columns=["Category", "Year", "Amount"])
 
-        summary_pivot = summary_df.pivot(
-            index="Category",
-            columns="Year",
-            values="Amount"
-        ).fillna(0)
+    summary_pivot = summary_df.pivot(
+        index="Category",
+        columns="Year",
+        values="Amount"
+    ).fillna(0)
 
+    # --- Ensure pivot is always a DataFrame ---
+    if isinstance(summary_pivot, pd.Series):
+        summary_pivot = summary_pivot.to_frame()
 
-        # --- Ensure pivot is always a DataFrame ---
-        if isinstance(summary_pivot, pd.Series):
-            summary_pivot = summary_pivot.to_frame()
+    # --- Safe formatting (handles NaN, floats, ints) ---
+    def fmt(x):
+        try:
+            return f"{int(x):,}"
+        except:
+            return x
 
-        # --- Safe formatting (handles NaN, floats, ints) ---
-        def fmt(x):
-            try:
-                return f"{int(x):,}"
-                except:
-                    return x
+    summary_pivot = summary_pivot.applymap(fmt)
 
-        summary_pivot = summary_pivot.applymap(fmt)
+    # --- Convert to HTML ---
+    summary_html = summary_pivot.to_html(classes="wide-table", border=0)
 
-        # --- Convert to HTML ---
-        summary_html = summary_pivot.to_html(classes="wide-table", border=0)
+    st.markdown(f"<div class='scroll-box'>{summary_html}</div>", unsafe_allow_html=True)
 
-        st.markdown(f"<div class='scroll-box'>{summary_html}</div>", unsafe_allow_html=True)
+    st.divider()
 
-        st.divider()
-        
-        # ---------- TOP 5 INCOME ----------
+    # ---------- TOP 5 INCOME ----------
+    st.markdown("### 💰 Top 5 Income Categories")
 
-        st.markdown("### 💰 Top 5 Income Categories")
+    income_df = df[
+        (df["Type"] == "Income") &
+        (~df["Category"].str.lower().str.startswith("total for"))
+    ]
 
-        income_df = df[
-            (df["Type"] == "Income") &
-            (~df["Category"].str.lower().str.startswith("total for"))
-        ]
+    top_income = income_df.groupby("Category")["Amount"].sum().nlargest(5).index
 
-        top_income = income_df.groupby("Category")["Amount"].sum().nlargest(5).index
+    income_yearly = income_df[income_df["Category"].isin(top_income)].pivot_table(
+        index="Category", columns="Year", values="Amount", aggfunc="sum", fill_value=0
+    )
 
-        income_yearly = income_df[income_df["Category"].isin(top_income)].pivot_table(
-            index="Category", columns="Year", values="Amount", aggfunc="sum", fill_value=0
-        )
+    income_yearly = income_yearly.applymap(lambda x: f"{int(x):,}")
+    income_html = income_yearly.to_html(classes="wide-table", border=0)
 
-        income_yearly = income_yearly.applymap(lambda x: f"{int(x):,}")
-        income_html = income_yearly.to_html(classes="wide-table", border=0)
+    st.markdown(f"<div class='scroll-box'>{income_html}</div>", unsafe_allow_html=True)
 
-        st.markdown(f"<div class='scroll-box'>{income_html}</div>", unsafe_allow_html=True)
+    st.divider()
 
-        st.divider()
+    # ---------- TOP 5 EXPENSE ----------
+    st.markdown("### 📉 Top 5 Expense Categories")
 
-        # ---------- TOP 5 EXPENSE ----------
+    expense_df = df[
+        (df["Type"] == "Expense") &
+        (~df["Category"].str.lower().str.startswith("total for")) &
+        (~df["Category"].str.contains("depreciat", case=False, na=False))
+    ]
 
-        st.markdown("### 📉 Top 5 Expense Categories")
+    top_expense = expense_df.groupby("Category")["Amount"].sum().nlargest(5).index
 
-        expense_df = df[
-            (df["Type"] == "Expense") &
-            (~df["Category"].str.lower().str.startswith("total for")) &
-            (~df["Category"].str.contains("depreciat", case=False, na=False))
-        ]
+    expense_yearly = expense_df[expense_df["Category"].isin(top_expense)].pivot_table(
+        index="Category", columns="Year", values="Amount", aggfunc="sum", fill_value=0
+    )
 
-        top_expense = expense_df.groupby("Category")["Amount"].sum().nlargest(5).index
+    expense_yearly = expense_yearly.applymap(lambda x: f"{int(x):,}")
+    expense_html = expense_yearly.to_html(classes="wide-table", border=0)
 
-        expense_yearly = expense_df[expense_df["Category"].isin(top_expense)].pivot_table(
-            index="Category", columns="Year", values="Amount", aggfunc="sum", fill_value=0
-        )
-
-        expense_yearly = expense_yearly.applymap(lambda x: f"{int(x):,}")
-        expense_html = expense_yearly.to_html(classes="wide-table", border=0)
-
-        st.markdown(f"<div class='scroll-box'>{expense_html}</div>", unsafe_allow_html=True)
-
-        # -----------------------------------------------------
+    st.markdown(f"<div class='scroll-box'>{expense_html}</div>", unsafe_allow_html=True)
+    
+    # -----------------------------------------------------
     # TAB 2 — CLEAN YOY SUMMARY
     # -----------------------------------------------------
     with tab2:
