@@ -451,7 +451,7 @@ def main():
         "Board PDF"
     ])
 
-        #-----------------------------------------------
+    #-----------------------------------------------
     # Tab 1 summary
     #-----------------------------------------------
     with tab1:
@@ -554,13 +554,13 @@ def main():
 
         expense_yearly = expense_yearly.applymap(lambda x: f"{int(x):,}")
         expense_html = expense_yearly.to_html(classes="wide-table", border=0)
-
         st.markdown(f"<div class='scroll-box'>{expense_html}</div>", unsafe_allow_html=True)
 
-            # -----------------------------------------------------
+    # -----------------------------------------------------
     # TAB 2 — CLEAN YOY SUMMARY
     # -----------------------------------------------------
     with tab2:
+
 
         st.subheader("📘 Year‑Over‑Year (YOY) Summary")
 
