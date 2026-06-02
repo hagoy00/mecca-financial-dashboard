@@ -569,8 +569,8 @@ def main():
         st.dataframe(style_top5(add_summary_icons(summary_pivot)), use_container_width=True)
 
         st.divider()
-
-               # -----------------------------------------------------
+        
+        # -----------------------------------------------------
         # TOP 5 INCOME PIVOT
         # -----------------------------------------------------
         st.markdown("### 💰 Top 5 Income Categories (All Years)")
@@ -609,12 +609,13 @@ def main():
         styled_income = style_top5(add_rank_icons(top_income_pivot))
         
         # Format numbers with commas, no decimals
-        styled_income = styled_income.format(lambda x: f"{int(x):,}" if str(x).isdigit() else x)
+        styled_income = styled_income.format(lambda x: f"{int(x):,}" if str(x).replace(',', '').isdigit() else x)
         
         # Force left alignment
         styled_income = styled_income.set_properties(**{"text-align": "left"})
         
-        st.dataframe(styled_income, use_container_width=True)
+        # IMPORTANT: st.table preserves styling, st.dataframe does NOT
+        st.table(styled_income)
         
         st.divider()
         
@@ -657,13 +658,15 @@ def main():
         styled_expense = style_top5(add_rank_icons(top_expense_pivot))
         
         # Format numbers with commas, no decimals
-        styled_expense = styled_expense.format(lambda x: f"{int(x):,}" if str(x).isdigit() else x)
+        styled_expense = styled_expense.format(lambda x: f"{int(x):,}" if str(x).replace(',', '').isdigit() else x)
         
         # Force left alignment
         styled_expense = styled_expense.set_properties(**{"text-align": "left"})
         
-        st.dataframe(styled_expense, use_container_width=True)
+        # Use st.table to preserve styling
+        st.table(styled_expense)
 
+        
     # -----------------------------------------------------
     # TAB 2 — CLEAN YOY SUMMARY
     # -----------------------------------------------------
