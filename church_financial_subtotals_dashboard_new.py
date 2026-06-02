@@ -570,20 +570,21 @@ def main():
 
         st.divider()
 
-        # -----------------------------------------------------
+               # -----------------------------------------------------
         # TOP 5 INCOME PIVOT
         # -----------------------------------------------------
         st.markdown("### 💰 Top 5 Income Categories (All Years)")
-
+        
         income_df = df[
             (df["Type"] == "Income") &
             (~df["Category"].str.lower().str.startswith("total for"))
         ]
-
+        
         income_grouped = income_df.groupby(["Category", "Year"])["Amount"].sum().reset_index()
-
+        
+        # Force integers (no decimals)
         income_grouped["Amount"] = income_grouped["Amount"].astype(float).round(0).astype(int)
-
+        
         top_income_categories = (
             income_grouped.groupby("Category")["Amount"]
             .sum()
@@ -591,7 +592,7 @@ def main():
             .head(5)
             .index
         )
-
+        
         top_income_pivot = income_grouped[
             income_grouped["Category"].isin(top_income_categories)
         ].pivot_table(
@@ -600,37 +601,39 @@ def main():
             values="Amount",
             aggfunc="sum"
         ).fillna(0)
-
+        
         top_income_pivot.index.name = None
         top_income_pivot.columns = top_income_pivot.columns.astype(str)
-
+        
+        # Apply rank icons + style
         styled_income = style_top5(add_rank_icons(top_income_pivot))
-
-        styled_income = styled_income.format(
-            lambda x: f"{float(x):,.0f}"
-            if str(x).replace('.', '', 1).isdigit()
-            else x
-        )
-
+        
+        # Format numbers with commas, no decimals
+        styled_income = styled_income.format(lambda x: f"{int(x):,}" if str(x).isdigit() else x)
+        
+        # Force left alignment
+        styled_income = styled_income.set_properties(**{"text-align": "left"})
+        
         st.dataframe(styled_income, use_container_width=True)
-
+        
         st.divider()
-
+        
         # -----------------------------------------------------
         # TOP 5 EXPENSE PIVOT
         # -----------------------------------------------------
         st.markdown("### 📉 Top 5 Expense Categories (All Years)")
-
+        
         expense_df = df[
             (df["Type"] == "Expense") &
             (~df["Category"].str.lower().str.startswith("total for")) &
             (~df["Category"].str.contains("depreciat", case=False, na=False))
         ]
-
+        
         expense_grouped = expense_df.groupby(["Category", "Year"])["Amount"].sum().reset_index()
-
+        
+        # Force integers (no decimals)
         expense_grouped["Amount"] = expense_grouped["Amount"].astype(float).round(0).astype(int)
-
+        
         top_expense_categories = (
             expense_grouped.groupby("Category")["Amount"]
             .sum()
@@ -638,7 +641,7 @@ def main():
             .head(5)
             .index
         )
-
+        
         top_expense_pivot = expense_grouped[
             expense_grouped["Category"].isin(top_expense_categories)
         ].pivot_table(
@@ -647,18 +650,18 @@ def main():
             values="Amount",
             aggfunc="sum"
         ).fillna(0)
-
+        
         top_expense_pivot.index.name = None
         top_expense_pivot.columns = top_expense_pivot.columns.astype(str)
-
+        
         styled_expense = style_top5(add_rank_icons(top_expense_pivot))
-
-        styled_expense = styled_expense.format(
-            lambda x: f"{float(x):,.0f}"
-            if str(x).replace('.', '', 1).isdigit()
-            else x
-        )
-
+        
+        # Format numbers with commas, no decimals
+        styled_expense = styled_expense.format(lambda x: f"{int(x):,}" if str(x).isdigit() else x)
+        
+        # Force left alignment
+        styled_expense = styled_expense.set_properties(**{"text-align": "left"})
+        
         st.dataframe(styled_expense, use_container_width=True)
 
     # -----------------------------------------------------
