@@ -504,6 +504,7 @@ def main():
 
         summary_df = pd.DataFrame(summary_rows, columns=["Category", "Year", "Amount"])
 
+        # ---------- SUMMARY PIVOT ----------
         summary_pivot = summary_df.pivot(
             index="Category",
             columns="Year",
@@ -523,8 +524,12 @@ def main():
 
         summary_pivot = summary_pivot.applymap(fmt)
 
-        # --- Convert to HTML ---
-        summary_html = summary_pivot.to_html(classes="wide-table", border=0)
+        # --- Convert to HTML with left alignment ---
+        summary_html = summary_pivot.to_html(
+            classes="wide-table",
+            border=0,
+            justify="left"
+        )
 
         st.markdown(f"<div class='scroll-box'>{summary_html}</div>", unsafe_allow_html=True)
 
@@ -545,7 +550,7 @@ def main():
         )
 
         income_yearly = income_yearly.applymap(lambda x: f"{int(x):,}")
-        income_html = income_yearly.to_html(classes="wide-table", border=0)
+        income_html = income_yearly.to_html(classes="wide-table", border=0, justify="left")
 
         st.markdown(f"<div class='scroll-box'>{income_html}</div>", unsafe_allow_html=True)
 
@@ -567,10 +572,10 @@ def main():
         )
 
         expense_yearly = expense_yearly.applymap(lambda x: f"{int(x):,}")
-        expense_html = expense_yearly.to_html(classes="wide-table", border=0)
+        expense_html = expense_yearly.to_html(classes="wide-table", border=0, justify="left")
 
         st.markdown(f"<div class='scroll-box'>{expense_html}</div>", unsafe_allow_html=True)
-    
+
     # -----------------------------------------------------
     # TAB 2 — CLEAN YOY SUMMARY
     # -----------------------------------------------------
