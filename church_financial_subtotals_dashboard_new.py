@@ -456,66 +456,99 @@ def main():
     #-----------------------------------------------
 
     with tab1:
+
         st.subheader("📘 Unified Subtotal Summary (Pivot View)")
 
-    # ---------- SUMMARY ----------
-    summary_rows = []
-    for year, group in subtotals.groupby("Year"):
-        revenue = group.loc[group["Category"].str.lower() == "total for income", "Amount"].sum()
-        expenses = group.loc[group["Category"].str.lower() == "total for expenses", "Amount"].sum()
-        net = revenue - expenses
+        # ---------- SUMMARY ----------
+        summary_rows = []
 
-        summary_rows.append(["Total Revenue", year, revenue])
-        summary_rows.append(["Total Expenses", year, expenses])
-        summary_rows.append(["Net Income", year, net])
+        for year, group in subtotals.groupby("Year"):
 
-    summary_df = pd.DataFrame(summary_rows, columns=["Category", "Year", "Amount"])
-    summary_pivot = summary_df.pivot(index="Category", columns="Year", values="Amount").fillna(0)
+            revenue = group.loc[group["Category"].str.lower() == "total for income", "Amount"].sum()
+            expenses = group.loc[group["Category"].str.lower() == "total for expenses", "Amount"].sum()
+            net = revenue - expenses
 
-    st.markdown("""
-        <style>
-            .scroll-box { overflow-x: auto; padding-bottom: 10px; }
-            .wide-table th, .wide-table td {
-                text-align: left !important;
-                padding: 8px 12px !important;
-                width: 260px !important;
-                max-width: 260px !important;
-                white-space: nowrap !important;
-            }
-        </style>
-    """, unsafe_allow_html=True)
+            payroll = df[
+                (df["Year"] == year) &
+                (df["Category"].isin(["Salaries & Wages", "Payroll Tax Expense"]))
+            ]["Amount"].sum()
 
-    st.markdown(f"<div class='scroll-box'>{summary_pivot.to_html(classes='wide-table', border=0)}</div>", unsafe_allow_html=True)
+            utilities = df[
+                (df["Year"] == year) &
+                (df["Category"].str.contains("Utilit", case=False, na=False))
+            ]["Amount"].sum()
 
-    st.divider()
+            summary_rows.append(["Total Revenue", year, revenue])
+            summary_rows.append(["Total Expenses", year, expenses])
+            summary_rows.append(["Net Income", year, net])
+            summary_rows.append(["Payroll", year, payroll])
+            summary_rows.append(["Utilities", year, utilities])
 
-    # ---------- TOP 5 INCOME ----------
-    st.markdown("### 💰 Top 5 Income Categories")
+        summary_df = pd.DataFrame(summary_rows, columns=["Category", "Year", "Amount"])
+        summary_pivot = summary_df.pivot(index="Category", columns="Year", values="Amount").fillna(0)
 
-    income_df = df[(df["Type"] == "Income") & (~df["Category"].str.lower().str.startswith("total for"))]
-    top_income = income_df.groupby("Category")["Amount"].sum().nlargest(5).index
-    income_yearly = income_df[income_df["Category"].isin(top_income)].pivot_table(
-        index="Category", columns="Year", values="Amount", aggfunc="sum", fill_value=0
-    )
+        st.markdown("""
+            <style>
+                .scroll-box { overflow-x: auto; padding-bottom: 10px; }
+                .wide-table th, .wide-table td {
+                    text-align: left !important;
+                    padding: 8px 12px !important;
+                    width: 260px !important;
+                    max-width: 260px !important;
+                    white-space: nowrap !important;
+                }
+            </style>
+        """, unsafe_allow_html=True)
 
-    st.markdown(f"<div class='scroll-box'>{income_yearly.to_html(classes='wide-table', border=0)}</div>", unsafe_allow_html=True)
+        st.markdown(
+            f"<div class='scroll-box'>{summary_pivot.to_html(classes='wide-table', border=0)}</div>",
+            unsafe_allow_html=True
+        )
 
-    st.divider()
+        st.divider()
 
-    # ---------- TOP 5 EXPENSE ----------
-    st.markdown("### 📉 Top 5 Expense Categories")
+        # ---------- TOP 5 INCOME ----------
+        st.markdown("### 💰 Top 5 Income Categories")
 
-    expense_df = df[(df["Type"] == "Expense") &
-                    (~df["Category"].str.lower().str.startswith("total for")) &
-                    (~df["Category"].str.contains('depreciat', case=False, na=False))]
+        income_df = df[
+            (df["Type"] == "Income") &
+            (~df["Category"].str.lower().str.startswith("total for"))
+        ]
 
-    top_expense = expense_df.groupby("Category")["Amount"].sum().nlargest(5).index
-    expense_yearly = expense_df[expense_df["Category"].isin(top_expense)].pivot_table(
-        index="Category", columns="Year", values="Amount", aggfunc="sum", fill_value=0
-    )
+        top_income = income_df.groupby("Category")["Amount"].sum().nlargest(5).index
 
-    st.markdown(f"<div class='scroll-box'>{expense_yearly.to_html(classes='wide-table', border=0)}</div>", unsafe_allow_html=True)
+        income_yearly = income_df[income_df["Category"].isin(top_income)].pivot_table(
+            index="Category", columns="Year", values="Amount", aggfunc="sum", fill_value=0
+        )
 
+        st.markdown(
+            f"<div class='scroll-box'>{income_yearly.to_html(classes='wide-table', border=0)}</div>",
+            unsafe_allow_html=True
+        )
+
+        st.divider()
+
+        # ---------- TOP 5 EXPENSE ----------
+        st.markdown("### 📉 Top 5 Expense Categories")
+
+        expense_df = df[
+            (df["Type"] == "Expense") &
+            (~df["Category"].str.lower().str.startswith("total for")) &
+            (~df["Category"].str.contains("depreciat", case=False, na=False))
+        ]
+
+        top_expense = expense_df.groupby("Category")["Amount"].sum().nlargest(5).index
+
+        expense_yearly = expense_df[expense_df["Category"].isin(top_expense)].pivot_table(
+            index="Category", columns="Year", values="Amount", aggfunc="sum", fill_value=0
+        )
+
+        st.markdown(
+            f"<div class='scroll-box'>{expense_yearly.to_html(classes='wide-table', border=0)}</div>",
+            unsafe_allow_html=True
+        )
+
+    
     # -----------------------------------------------------
     # TAB 2 — CLEAN YOY SUMMARY
     # -----------------------------------------------------
