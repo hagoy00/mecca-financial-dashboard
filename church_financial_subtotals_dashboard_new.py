@@ -23,7 +23,7 @@ st.markdown("""
     z-index: 999999;
     background-color: white;
     padding: 14px 0 18px 0;
-    font-size: 35px !important;   /* MAKE IT BIG */
+    font-size: 37px !important;   /* MAKE IT BIG */
     font-weight: 900 !important;
     color: #1E90FF !important;
     text-align: center;
@@ -72,7 +72,6 @@ html, body, div, span, p, label, h1, h2, h3, h4, h5, h6 {
 }
 .dataframe tbody tr td {
     font-size: 26px !important;
-    font-weight: bold !important;
 }
 .dataframe thead tr th {
     font-size: 26px !important;
@@ -91,7 +90,7 @@ st.markdown("""
     z-index: 10;
     background-color: white;
     padding: 14px 0 18px 0;
-    font-size: 46px !important;
+    font-size: 48px !important;
     font-weight: 900 !important;
     color: #1E90FF !important;
     text-align: center;
@@ -426,6 +425,67 @@ def style_top5(df):
 
     return styler
 
+def add_rank_icons(df):
+    df = df.copy()
+    n = len(df)
+
+    # Always generate icons matching the number of rows
+    icons = []
+    for i in range(n):
+        if i < 3:
+            icons.append("▲")
+        else:
+            icons.append("▼")
+
+    df.insert(0, "Rank", icons)
+    return df
+
+def add_summary_icons(df):
+    df = df.copy()
+    n = len(df)
+
+    icons = []
+    for i in range(n):
+        if i < 3:
+            icons.append("▲")
+        else:
+            icons.append("▼")
+
+    df.insert(0, "Trend", icons)
+    return df
+
+
+def add_yoy_icons(df):
+    df = df.copy()
+    icons = []
+
+    # YoY Change column must exist
+    for change in df["YoY Change"]:
+        if pd.isna(change):
+            icons.append("•")
+        elif change > 0:
+            icons.append("▲")
+        elif change < 0:
+            icons.append("▼")
+        else:
+            icons.append("•")
+
+    df.insert(0, "Trend", icons)
+    return df
+
+
+def add_forecast_icons(df):
+    df = df.copy()
+    mean_val = df["Amount"].mean()
+
+    icons = []
+    for amt in df["Amount"]:
+        if amt > mean_val:
+            icons.append("▲")
+        else:
+            icons.append("▼")
+
+    df.insert(0, "Trend", icons)
     
 #-----------------------------------------------
 # Main 
@@ -506,6 +566,7 @@ def main():
         summary_pivot.index.name = None
 
         st.markdown("### 📘 Main Financial Summary")
+        st.dataframe(style_top5(add_summary_icons(summary_pivot)), use_container_width=True)
 
         st.divider()
 
@@ -542,6 +603,8 @@ def main():
 
         top_income_pivot.index.name = None
         top_income_pivot.columns = top_income_pivot.columns.astype(str)
+
+        styled_income = style_top5(add_rank_icons(top_income_pivot))
 
         styled_income = styled_income.format(
             lambda x: f"{float(x):,.0f}"
@@ -587,6 +650,8 @@ def main():
 
         top_expense_pivot.index.name = None
         top_expense_pivot.columns = top_expense_pivot.columns.astype(str)
+
+        styled_expense = style_top5(add_rank_icons(top_expense_pivot))
 
         styled_expense = styled_expense.format(
             lambda x: f"{float(x):,.0f}"
@@ -639,6 +704,8 @@ def main():
         yoy_clean = pd.DataFrame(yoy_rows, columns=[
             "Category", "Year", "Amount", "YoY Change", "YoY %"
         ])
+
+        yoy_clean = add_yoy_icons(yoy_clean)
 
         yoy_pivot = yoy_clean.pivot_table(
             index="Category",
