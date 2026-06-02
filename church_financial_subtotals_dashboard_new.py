@@ -512,6 +512,9 @@ def main():
             values="Amount"
         ).fillna(0)
         
+        st.write("DEBUG type(summary_pivot):", type(summary_pivot))
+        st.write("DEBUG summary_pivot raw:", summary_pivot)
+        
         # ⭐⭐⭐ BULLETPROOF FIX — FORCE DATAFRAME FOR ANY TYPE ⭐⭐⭐
         if not isinstance(summary_pivot, pd.DataFrame):
             summary_pivot = pd.DataFrame(summary_pivot)
