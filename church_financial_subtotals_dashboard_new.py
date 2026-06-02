@@ -511,18 +511,18 @@ def main():
             columns="Year",
             values="Amount"
         ).fillna(0)
-
-        # ⭐⭐⭐ BULLETPROOF FIX — FORCE DATAFRAME ⭐⭐⭐
-        if isinstance(summary_pivot, pd.Series):
-            summary_pivot = summary_pivot.to_frame()
-
+        
+        # ⭐⭐⭐ BULLETPROOF FIX — FORCE DATAFRAME FOR ANY TYPE ⭐⭐⭐
+        if not isinstance(summary_pivot, pd.DataFrame):
+            summary_pivot = pd.DataFrame(summary_pivot)
+        
         # --- Safe formatting ---
         def fmt(x):
             try:
                 return f"{int(x):,}"
             except:
                 return x
-
+        
         summary_pivot = summary_pivot.applymap(fmt)
 
         # --- Convert to HTML ---
