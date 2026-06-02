@@ -72,6 +72,7 @@ html, body, div, span, p, label, h1, h2, h3, h4, h5, h6 {
 }
 .dataframe tbody tr td {
     font-size: 26px !important;
+    font-weight: bold !important;
 }
 .dataframe thead tr th {
     font-size: 26px !important;
