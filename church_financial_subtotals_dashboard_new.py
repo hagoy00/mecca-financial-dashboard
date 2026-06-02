@@ -575,86 +575,6 @@ def main():
         st.table(format_pivot(styled_summary))
 
         st.divider()
-
-        # -----------------------------------------------------
-        # TOP 5 INCOME PIVOT
-        # -----------------------------------------------------
-        st.markdown("### 💰 Top 5 Income Categories (All Years)")
-
-        income_df = df[
-            (df["Type"] == "Income") &
-            (~df["Category"].str.lower().str.startswith("total for"))
-        ]
-
-        income_grouped = income_df.groupby(["Category", "Year"])["Amount"].sum().reset_index()
-        income_grouped["Amount"] = income_grouped["Amount"].astype(float).round(0).astype(int)
-
-        top_income_categories = (
-            income_grouped.groupby("Category")["Amount"]
-            .sum()
-            .sort_values(ascending=False)
-            .head(5)
-            .index
-        )
-
-        if len(top_income_categories) == 0:
-            st.warning("No income categories found for Top 5.")
-        else:
-            top_income_pivot = income_grouped[
-                income_grouped["Category"].isin(top_income_categories)
-            ].pivot_table(
-                index="Category",
-                columns="Year",
-                values="Amount",
-                aggfunc="sum"
-            ).fillna(0)
-
-            top_income_pivot = top_income_pivot.astype(int)
-
-            styled_income = style_top5(add_rank_icons(top_income_pivot))
-            st.table(format_pivot(styled_income))
-
-        st.divider()
-
-        # -----------------------------------------------------
-        # TOP 5 EXPENSE PIVOT
-        # -----------------------------------------------------
-        st.markdown("### 📉 Top 5 Expense Categories (All Years)")
-
-        expense_df = df[
-            (df["Type"] == "Expense") &
-            (~df["Category"].str.lower().str.startswith("total for")) &
-            (~df["Category"].str.contains("depreciat", case=False, na=False))
-        ]
-
-        expense_grouped = expense_df.groupby(["Category", "Year"])["Amount"].sum().reset_index()
-        expense_grouped["Amount"] = expense_grouped["Amount"].astype(float).round(0).astype(int)
-
-        top_expense_categories = (
-            expense_grouped.groupby("Category")["Amount"]
-            .sum()
-            .sort_values(ascending=False)
-            .head(5)
-            .index
-        )
-
-        if len(top_expense_categories) == 0:
-            st.warning("No expense categories found for Top 5.")
-        else:
-            top_expense_pivot = expense_grouped[
-                expense_grouped["Category"].isin(top_expense_categories)
-            ].pivot_table(
-                index="Category",
-                columns="Year",
-                values="Amount",
-                aggfunc="sum"
-            ).fillna(0)
-
-            top_expense_pivot = top_expense_pivot.astype(int)
-
-            styled_expense = style_top5(add_rank_icons(top_expense_pivot))
-            st.table(format_pivot(styled_expense))
-
         
     # -----------------------------------------------------
     # TAB 2 — CLEAN YOY SUMMARY
@@ -716,6 +636,84 @@ def main():
     # -----------------------------------------------------
     with tab_top:
         st.subheader("Top Income & Top Expenses")
+        # -----------------------------------------------------
+        # TOP 5 INCOME PIVOT
+        # -----------------------------------------------------
+        st.markdown("### 💰 Top 5 Income Categories (All Years)")
+        
+        income_df = df[
+            (df["Type"] == "Income") &
+            (~df["Category"].str.lower().str.startswith("total for"))
+        ]
+        
+        income_grouped = income_df.groupby(["Category", "Year"])["Amount"].sum().reset_index()
+        income_grouped["Amount"] = income_grouped["Amount"].astype(float).round(0).astype(int)
+        
+        top_income_categories = (
+            income_grouped.groupby("Category")["Amount"]
+            .sum()
+            .sort_values(ascending=False)
+            .head(5)
+            .index
+        )
+        
+        if len(top_income_categories) == 0:
+            st.warning("No income categories found for Top 5.")
+        else:
+            top_income_pivot = income_grouped[
+                income_grouped["Category"].isin(top_income_categories)
+            ].pivot_table(
+                index="Category",
+                columns="Year",
+                values="Amount",
+                aggfunc="sum"
+            ).fillna(0)
+        
+            top_income_pivot = top_income_pivot.astype(int)
+        
+            styled_income = style_top5(add_rank_icons(top_income_pivot))
+            st.table(format_pivot(styled_income))
+        
+        st.divider()
+        
+        # -----------------------------------------------------
+        # TOP 5 EXPENSE PIVOT
+        # -----------------------------------------------------
+        st.markdown("### 📉 Top 5 Expense Categories (All Years)")
+        
+        expense_df = df[
+            (df["Type"] == "Expense") &
+            (~df["Category"].str.lower().str.startswith("total for")) &
+            (~df["Category"].str.contains("depreciat", case=False, na=False))
+        ]
+        
+        expense_grouped = expense_df.groupby(["Category", "Year"])["Amount"].sum().reset_index()
+        expense_grouped["Amount"] = expense_grouped["Amount"].astype(float).round(0).astype(int)
+        
+        top_expense_categories = (
+            expense_grouped.groupby("Category")["Amount"]
+            .sum()
+            .sort_values(ascending=False)
+            .head(5)
+            .index
+        )
+        
+        if len(top_expense_categories) == 0:
+            st.warning("No expense categories found for Top 5.")
+        else:
+            top_expense_pivot = expense_grouped[
+                expense_grouped["Category"].isin(top_expense_categories)
+            ].pivot_table(
+                index="Category",
+                columns="Year",
+                values="Amount",
+                aggfunc="sum"
+            ).fillna(0)
+        
+            top_expense_pivot = top_expense_pivot.astype(int)
+        
+            styled_expense = style_top5(add_rank_icons(top_expense_pivot))
+            st.table(format_pivot(styled_expense))
 
         top_income = get_top_income(df)
         top_expense = get_top_expense(df)
