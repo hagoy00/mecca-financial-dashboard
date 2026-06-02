@@ -502,15 +502,16 @@ def main():
             summary_rows.append(["Utilities", year, utilities])
 
         summary_df = pd.DataFrame(summary_rows, columns=["Category", "Year", "Amount"])
+
+        # ⭐ THIS IS THE CORRECT PIVOT
         summary_pivot = summary_df.pivot(index="Category", columns="Year", values="Amount").fillna(0)
 
         # ⭐ FORMAT NUMBERS (NO DECIMALS, COMMAS, LEFT ALIGN)
         summary_pivot = summary_pivot.applymap(lambda x: f"{int(x):,}")
+
         summary_html = summary_pivot.to_html(classes="wide-table", border=0, justify="left")
 
         st.markdown(f"<div class='scroll-box'>{summary_html}</div>", unsafe_allow_html=True)
-
-        st.divider()
 
         # ---------- TOP 5 INCOME ----------
         st.markdown("### 💰 Top 5 Income Categories")
