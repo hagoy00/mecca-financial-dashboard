@@ -489,6 +489,25 @@ def main():
 
         st.markdown("""
             <style>
+                .scroll-box { 
+                    overflow-x: auto; 
+                    padding-bottom: 10px; 
+                }
+                .wide-table th, .wide-table td {
+                    text-align: left !important;
+                    padding: 8px 12px !important;
+                    width: 260px !important;
+                    max-width: 260px !important;
+                    white-space: nowrap !important;
+                }
+            </style>
+        """, unsafe_allow_html=True)
+
+
+
+        
+        st.markdown("""
+            <style>
                 .scroll-box { overflow-x: auto; padding-bottom: 10px; }
                 .wide-table th, .wide-table td {
                     text-align: left !important;
