@@ -500,11 +500,10 @@ def main():
             summary_rows.append(["Payroll", year, payroll])
             summary_rows.append(["Utilities", year, utilities])
 
-        #summary_df = pd.DataFrame(summary_rows, columns=["Category", "Year", "Amount"])
-
+        # Build DataFrame
         summary_df = pd.DataFrame(summary_rows, columns=["Category", "Year", "Amount"])
 
-        # FIX DUPLICATES — THIS IS THE REAL SOLUTION
+        # ⭐⭐⭐ CRITICAL FIX — REMOVE DUPLICATE CATEGORY/YEAR ROWS ⭐⭐⭐
         summary_df = summary_df.groupby(["Category", "Year"], as_index=False)["Amount"].sum()
 
         # ---------- SUMMARY PIVOT ----------
@@ -513,10 +512,6 @@ def main():
             columns="Year",
             values="Amount"
         ).fillna(0)
-
-        # --- FORCE DataFrame ALWAYS ---
-        if isinstance(summary_pivot, pd.Series):
-            summary_pivot = summary_pivot.to_frame()
 
         # --- Safe formatting ---
         def fmt(x):
