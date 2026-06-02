@@ -506,7 +506,6 @@ def main():
         summary_pivot.index.name = None
 
         st.markdown("### 📘 Main Financial Summary")
-        st.dataframe(style_top5(add_summary_icons(summary_pivot)), use_container_width=True)
 
         st.divider()
 
