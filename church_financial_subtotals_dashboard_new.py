@@ -439,7 +439,7 @@ def main():
     selected_years = st.multiselect("Select Years", years, default=years)
 
     # -----------------------------------------
-    # Tabs (must NOT be indented deeper)
+    # Tabs
     # -----------------------------------------
     tab1, tab2, tab_top, tab3, tab4, tab_pdf = st.tabs([
         "Subtotal Summary",
@@ -500,10 +500,9 @@ def main():
             summary_rows.append(["Payroll", year, payroll])
             summary_rows.append(["Utilities", year, utilities])
 
-        # Build DataFrame
         summary_df = pd.DataFrame(summary_rows, columns=["Category", "Year", "Amount"])
 
-        # ⭐⭐⭐ CRITICAL FIX — REMOVE DUPLICATE CATEGORY/YEAR ROWS ⭐⭐⭐
+        # ⭐ FIX DUPLICATES (prevents pivot collapse)
         summary_df = summary_df.groupby(["Category", "Year"], as_index=False)["Amount"].sum()
 
         # ---------- SUMMARY PIVOT ----------
@@ -513,21 +512,7 @@ def main():
             values="Amount"
         ).fillna(0)
 
-        # --- Safe formatting ---
-        def fmt(x):
-            try:
-                return f"{int(x):,}"
-            except:
-                return x
-
-        # ---------- SUMMARY PIVOT ----------
-        summary_pivot = summary_df.pivot(
-            index="Category",
-            columns="Year",
-            values="Amount"
-        ).fillna(0)
-
-        # ✅ GUARANTEE DataFrame (fixes AttributeError: Series has no applymap)
+        # ⭐⭐⭐ BULLETPROOF FIX — FORCE DATAFRAME ⭐⭐⭐
         if isinstance(summary_pivot, pd.Series):
             summary_pivot = summary_pivot.to_frame()
 
@@ -537,8 +522,6 @@ def main():
                 return f"{int(x):,}"
             except:
                 return x
-
-        summary_pivot = summary_pivot.applymap(fmt)
 
         summary_pivot = summary_pivot.applymap(fmt)
 
@@ -593,6 +576,7 @@ def main():
         expense_html = expense_yearly.to_html(classes="wide-table", border=0, justify="left")
 
         st.markdown(f"<div class='scroll-box'>{expense_html}</div>", unsafe_allow_html=True)
+
     
     # -----------------------------------------------------
     # TAB 2 — CLEAN YOY SUMMARY
