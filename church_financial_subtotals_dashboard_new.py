@@ -520,6 +520,26 @@ def main():
             except:
                 return x
 
+        # ---------- SUMMARY PIVOT ----------
+        summary_pivot = summary_df.pivot(
+            index="Category",
+            columns="Year",
+            values="Amount"
+        ).fillna(0)
+
+        # ✅ GUARANTEE DataFrame (fixes AttributeError: Series has no applymap)
+        if isinstance(summary_pivot, pd.Series):
+            summary_pivot = summary_pivot.to_frame()
+
+        # --- Safe formatting ---
+        def fmt(x):
+            try:
+                return f"{int(x):,}"
+            except:
+                return x
+
+        summary_pivot = summary_pivot.applymap(fmt)
+
         summary_pivot = summary_pivot.applymap(fmt)
 
         # --- Convert to HTML ---
