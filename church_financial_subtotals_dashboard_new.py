@@ -6,22 +6,12 @@ from io import BytesIO
 import os
 
 def format_pivot(styler):
-    """
-    Global formatter for all pivot tables:
-    - Commas
-    - No decimals
-    - Left alignment
-    - Safe handling of icons and text
-    """
     return (
         styler.format(
-            lambda x: f"{int(float(x)):,}"
-            if str(x).replace(",", "").replace(".", "").isdigit()
-            else x
+            lambda x: f"{int(x):,}" if isinstance(x, (int, float)) else x
         )
         .set_properties(**{"text-align": "left"})
     )
-
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet
@@ -586,7 +576,8 @@ def main():
         st.table(format_pivot(styled_summary))
 
         st.divider()
-    
+        top_income_pivot = top_income_pivot.astype(int)
+
         # -----------------------------------------------------
         # TOP 5 INCOME PIVOT
         # -----------------------------------------------------
@@ -624,7 +615,8 @@ def main():
         st.table(format_pivot(styled_income))
 
         st.divider()
-    
+        top_expense_pivot = top_expense_pivot.astype(int)
+
         # -----------------------------------------------------
         # TOP 5 EXPENSE PIVOT
         # -----------------------------------------------------
