@@ -543,8 +543,6 @@ def main():
         top_income_pivot.index.name = None
         top_income_pivot.columns = top_income_pivot.columns.astype(str)
 
-        styled_income = style_top5(add_rank_icons(top_income_pivot))
-
         styled_income = styled_income.format(
             lambda x: f"{float(x):,.0f}"
             if str(x).replace('.', '', 1).isdigit()
@@ -589,8 +587,6 @@ def main():
 
         top_expense_pivot.index.name = None
         top_expense_pivot.columns = top_expense_pivot.columns.astype(str)
-
-        styled_expense = style_top5(add_rank_icons(top_expense_pivot))
 
         styled_expense = styled_expense.format(
             lambda x: f"{float(x):,.0f}"
@@ -643,8 +639,6 @@ def main():
         yoy_clean = pd.DataFrame(yoy_rows, columns=[
             "Category", "Year", "Amount", "YoY Change", "YoY %"
         ])
-
-        yoy_clean = add_yoy_icons(yoy_clean)
 
         yoy_pivot = yoy_clean.pivot_table(
             index="Category",
