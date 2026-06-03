@@ -439,67 +439,6 @@ def style_top5(df):
 
     return styler
 
-def add_rank_icons(df):
-    df = df.copy()
-    n = len(df)
-
-    # Always generate icons matching the number of rows
-    icons = []
-    for i in range(n):
-        if i < 3:
-            icons.append("▲")
-        else:
-            icons.append("▼")
-
-    df.insert(0, "Rank", icons)
-    return df
-
-def add_summary_icons(df):
-    df = df.copy()
-    n = len(df)
-
-    icons = []
-    for i in range(n):
-        if i < 3:
-            icons.append("▲")
-        else:
-            icons.append("▼")
-
-    df.insert(0, "Trend", icons)
-    return df
-
-
-def add_yoy_icons(df):
-    df = df.copy()
-    icons = []
-
-    # YoY Change column must exist
-    for change in df["YoY Change"]:
-        if pd.isna(change):
-            icons.append("•")
-        elif change > 0:
-            icons.append("▲")
-        elif change < 0:
-            icons.append("▼")
-        else:
-            icons.append("•")
-
-    df.insert(0, "Trend", icons)
-    return df
-
-
-def add_forecast_icons(df):
-    df = df.copy()
-    mean_val = df["Amount"].mean()
-
-    icons = []
-    for amt in df["Amount"]:
-        if amt > mean_val:
-            icons.append("▲")
-        else:
-            icons.append("▼")
-
-    df.insert(0, "Trend", icons)
     
 #-----------------------------------------------
 # Main 
