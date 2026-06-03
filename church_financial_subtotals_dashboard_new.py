@@ -481,7 +481,7 @@ def main():
     ]) 
     
     # -----------------------------------------------------
-    # TAB 1 — UNIFIED SUBTOTAL SUMMARY (FINAL FIXED VERSION)
+    # TAB 1 — UNIFIED SUBTOTAL SUMMARY (FINAL STABLE VERSION)
     # -----------------------------------------------------
     with tab1:
         st.subheader("📘 Unified Subtotal Summary (Pivot View)")
@@ -495,14 +495,12 @@ def main():
                 "Amount"
             ].sum()
     
-            total_income = revenue  # used for Net Income
-    
             total_expenses = group.loc[
                 group["Category"].str.lower() == "total for expenses",
                 "Amount"
             ].sum()
     
-            net_income = total_income - total_expenses
+            net_income = revenue - total_expenses
     
             payroll = df[
                 (df["Year"] == year) &
@@ -514,7 +512,6 @@ def main():
                 (df["Category"].str.contains("Utilit", case=False, na=False))
             ]["Amount"].sum()
     
-            # FINAL LIST (Total Income removed)
             summary_rows.append(["Total Revenue", year, revenue])
             summary_rows.append(["Total Expenses", year, total_expenses])
             summary_rows.append(["Net Income", year, net_income])
@@ -523,7 +520,7 @@ def main():
     
         summary_df = pd.DataFrame(summary_rows, columns=["Category", "Year", "Amount"])
     
-        # SAFE formatting (prevents crash)
+        # SAFE formatting
         if not summary_df.empty:
             summary_df["Amount"] = (
                 summary_df["Amount"]
@@ -578,12 +575,20 @@ def main():
             aggfunc="sum"
         ).fillna(0)
     
-        # Fix Series → DataFrame issue
+        # GUARANTEE DataFrame
         if isinstance(top_income_pivot, pd.Series):
             top_income_pivot = top_income_pivot.to_frame()
     
-        # Format with commas
-        top_income_pivot = top_income_pivot.applymap(lambda x: f"{int(x):,}")
+        # SAFE formatting — no applymap()
+        for col in top_income_pivot.columns:
+            top_income_pivot[col] = (
+                top_income_pivot[col]
+                .fillna(0)
+                .astype(float)
+                .round(0)
+                .astype(int)
+                .apply(lambda x: f"{x:,}")
+            )
     
         st.dataframe(top_income_pivot, use_container_width=True)
     
@@ -620,15 +625,22 @@ def main():
             aggfunc="sum"
         ).fillna(0)
     
-        # Fix Series → DataFrame issue
+        # GUARANTEE DataFrame
         if isinstance(top_expense_pivot, pd.Series):
             top_expense_pivot = top_expense_pivot.to_frame()
     
-        # Format with commas
-        top_expense_pivot = top_expense_pivot.applymap(lambda x: f"{int(x):,}")
-    
+        # SAFE formatting — no applymap()
+        for col in top_expense_pivot.columns:
+            top_expense_pivot[col] = (
+                top_expense_pivot[col]
+                .fillna(0)
+                .astype(float)
+                .round(0)
+                .astype(int)
+                .apply(lambda x: f"{x:,}")
+            )
         st.dataframe(top_expense_pivot, use_container_width=True)
-
+    
     # -----------------------------------------------------
     # TAB 2 — CLEAN YOY SUMMARY
     # -----------------------------------------------------
