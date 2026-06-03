@@ -730,42 +730,43 @@ def main():
 
         st.dataframe(yoy_pivot.style.format("{:,.0f}"), use_container_width=True)
 
+
     # -----------------------------------------------------
     # TAB 3 — TOP INCOME & EXPENSES (FORECASTING)
     # -----------------------------------------------------
     with tab_top:
         st.subheader("Top Income & Top Expenses")
-
+    
         top_income = get_top_income(df)
         top_expense = get_top_expense(df)
-        
+    
         top_income = format_numbers(top_income, exclude_cols=["Category", "Year"])
         top_expense = format_numbers(top_expense, exclude_cols=["Category", "Year"])
-        
+    
         st.markdown("### 💰 Top 5 Income Categories")
         st.dataframe(top_income, use_container_width=True)
-        
+    
         st.markdown("### 📉 Top 5 Expense Categories")
         st.dataframe(top_expense, use_container_width=True)
-        
+    
         year_sel = st.selectbox("Select Year", years)
-
-        inc_year = top_income[top_income["Year"] == year_sel].sort_values("Amount", ascending=False).head(5)
-        exp_year = top_expense[top_expense["Year"] == year_sel].sort_values("Amount", ascending=False).head(5)
-
+    
+        inc_year = top_income[top_income["Year"] == year_sel].head(5)
+        exp_year = top_expense[top_expense["Year"] == year_sel].head(5)
+    
         col1, col2 = st.columns(2)
-
+    
         # -----------------------------
         # LEFT COLUMN — INCOME FORECAST
         # -----------------------------
         with col1:
             st.markdown("### Top Income Categories")
-            st.dataframe(inc_year, use_container_width=True)
-
+            # ❌ REMOVED st.dataframe(inc_year)
+    
             if not inc_year.empty:
                 selected_inc = st.selectbox("Forecast Income Category", inc_year["Category"])
                 inc_forecast = forecast_category(df, selected_inc)
-
+    
                 if not inc_forecast.empty:
                     chart = (
                         alt.Chart(inc_forecast)
@@ -786,20 +787,20 @@ def main():
                         titleFontSize=20,
                         tickCount=12
                     )
-
+    
                     st.altair_chart(chart, use_container_width=True)
-
+    
         # -----------------------------
         # RIGHT COLUMN — EXPENSE FORECAST
         # -----------------------------
         with col2:
             st.markdown("### Top Expense Categories")
-            st.dataframe(exp_year, use_container_width=True)
-
+            # ❌ REMOVED st.dataframe(exp_year)
+    
             if not exp_year.empty:
                 selected_exp = st.selectbox("Forecast Expense Category", exp_year["Category"])
                 exp_forecast = forecast_category(df, selected_exp)
-
+    
                 if not exp_forecast.empty:
                     chart = (
                         alt.Chart(exp_forecast)
@@ -820,9 +821,10 @@ def main():
                         titleFontSize=20,
                         tickCount=12
                     )
-
+    
                     st.altair_chart(chart, use_container_width=True)
-
+    
+   
     # -----------------------------------------------------
     # TAB 4 — SURPLUS / DEFICIT
     # -----------------------------------------------------
