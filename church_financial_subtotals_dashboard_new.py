@@ -514,14 +514,14 @@ def main():
                 (df["Year"] == year) &
                 (df["Category"].str.contains("Utilit", case=False, na=False))
             ]["Amount"].sum()
-    
             summary_rows.append(["Total Revenue", year, revenue])
-            summary_rows.append(["Total Income", year, total_income])
             summary_rows.append(["Total Expenses", year, total_expenses])
             summary_rows.append(["Net Income", year, net_income])
             summary_rows.append(["Payroll", year, payroll])
             summary_rows.append(["Utilities", year, utilities])
-    
+        summary_df["Amount"] = summary_df["Amount"].astype(float).round(0).astype(int)
+        summary_df["Amount"] = summary_df["Amount"].apply(lambda x: f"{x:,.0f}")
+
         summary_df = pd.DataFrame(summary_rows, columns=["Category", "Year", "Amount"])
         summary_pivot = summary_df.pivot_table(
             index="Category",
