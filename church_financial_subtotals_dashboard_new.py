@@ -578,7 +578,9 @@ def main():
             values="Amount",
             aggfunc="sum"
         ).fillna(0)
-    
+        # Format with commas
+        top_income_pivot = top_income_pivot.applymap(lambda x: f"{int(x):,}")
+
         st.dataframe(top_income_pivot, use_container_width=True)
     
         st.divider()
@@ -613,7 +615,9 @@ def main():
             values="Amount",
             aggfunc="sum"
         ).fillna(0)
-    
+        # Format with commas
+        top_expense_pivot = top_expense_pivot.applymap(lambda x: f"{int(x):,}")
+
         st.dataframe(top_expense_pivot, use_container_width=True)
 
     # -----------------------------------------------------
@@ -729,7 +733,7 @@ def main():
                         "Amount:Q",
                         title="Amount",
                         axis=alt.Axis(
-                            tickCount=6,
+                            tickCount=5,
                             labelOverlap=False
                         ),
                         scale=alt.Scale(
@@ -765,7 +769,7 @@ def main():
                         "Amount:Q",
                         title="Amount",
                         axis=alt.Axis(
-                            tickCount=6,
+                            tickCount=5,
                             labelOverlap=False
                         ),
                         scale=alt.Scale(
