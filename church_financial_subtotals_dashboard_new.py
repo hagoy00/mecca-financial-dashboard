@@ -735,7 +735,7 @@ def main():
     # TAB 3 — TOP INCOME & EXPENSES (FORECASTING)
     # -----------------------------------------------------
     
-        with tab_top:
+    with tab_top:
         st.subheader("Top Income & Top Expenses")
     
         # RAW numeric data (all years)
