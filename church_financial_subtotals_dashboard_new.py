@@ -735,40 +735,50 @@ def main():
     # TAB 3 — TOP INCOME & EXPENSES (FORECASTING)
     # -----------------------------------------------------
     
-    with tab_top:
+        with tab_top:
         st.subheader("Top Income & Top Expenses")
     
-        # RAW numeric data
+        # RAW numeric data (all years)
         raw_top_income = get_top_income(df)
         raw_top_expense = get_top_expense(df)
     
-        # FORMATTED display versions
-        top_income_display = format_numbers(raw_top_income, exclude_cols=["Category", "Year"])
-        top_expense_display = format_numbers(raw_top_expense, exclude_cols=["Category", "Year"])
-    
-        st.markdown("### 💰 Top 5 Income Categories")
-        st.dataframe(top_income_display, use_container_width=True)
-    
-        st.markdown("### 📉 Top 5 Expense Categories")
-        st.dataframe(top_expense_display, use_container_width=True)
-    
+        # Year selector
         year_sel = st.selectbox("Select Year", years)
     
-        # Use RAW numeric data for filtering
-        inc_year = raw_top_income[raw_top_income["Year"] == year_sel].sort_values("Amount", ascending=False).head(5)
-        exp_year = raw_top_expense[raw_top_expense["Year"] == year_sel].sort_values("Amount", ascending=False).head(5)
+        # Filter for selected year (Top 5 only)
+        inc_year = (
+            raw_top_income[raw_top_income["Year"] == year_sel]
+            .sort_values("Amount", ascending=False)
+            .head(5)
+        )
     
+        exp_year = (
+            raw_top_expense[raw_top_expense["Year"] == year_sel]
+            .sort_values("Amount", ascending=False)
+            .head(5)
+        )
+    
+        # Format AFTER filtering
+        inc_year_display = format_numbers(inc_year, exclude_cols=["Category", "Year"])
+        exp_year_display = format_numbers(exp_year, exclude_cols=["Category", "Year"])
+    
+        # Display
+        st.markdown(f"### 💰 Top 5 Income Categories — {year_sel}")
+        st.dataframe(inc_year_display, use_container_width=True)
+    
+        st.markdown(f"### 📉 Top 5 Expense Categories — {year_sel}")
+        st.dataframe(exp_year_display, use_container_width=True)
+    
+        # Forecasting section
         col1, col2 = st.columns(2)
     
         with col1:
-            st.markdown("### Top Income Categories")
-    
+            st.markdown("### Income Forecast")
             if not inc_year.empty:
                 selected_inc = st.selectbox("Forecast Income Category", inc_year["Category"])
                 inc_forecast = forecast_category(df, selected_inc)
-    
                 if not inc_forecast.empty:
-                    chart = (
+                    st.altair_chart(
                         alt.Chart(inc_forecast)
                         .mark_line(point=True)
                         .encode(
@@ -776,19 +786,17 @@ def main():
                             y=alt.Y("Amount:Q"),
                             color="Type:N",
                             tooltip=["Year", "Amount", "Type"]
-                        )
+                        ),
+                        use_container_width=True
                     )
-                    st.altair_chart(chart, use_container_width=True)
     
         with col2:
-            st.markdown("### Top Expense Categories")
-    
+            st.markdown("### Expense Forecast")
             if not exp_year.empty:
                 selected_exp = st.selectbox("Forecast Expense Category", exp_year["Category"])
                 exp_forecast = forecast_category(df, selected_exp)
-    
                 if not exp_forecast.empty:
-                    chart = (
+                    st.altair_chart(
                         alt.Chart(exp_forecast)
                         .mark_line(point=True)
                         .encode(
@@ -796,9 +804,9 @@ def main():
                             y=alt.Y("Amount:Q"),
                             color="Type:N",
                             tooltip=["Year", "Amount", "Type"]
-                        )
+                        ),
+                        use_container_width=True
                     )
-                    st.altair_chart(chart, use_container_width=True)    
     
     # -----------------------------------------------------
     # TAB 4 — SURPLUS / DEFICIT
