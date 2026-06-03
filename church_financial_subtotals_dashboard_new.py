@@ -313,6 +313,7 @@ def compute_surplus_deficit(subtotals):
 
     return merged
 
+
 # ---------------------------------------------------------
 # FORECASTING
 # ---------------------------------------------------------
@@ -329,18 +330,17 @@ def forecast_category(df, category):
     if df_cat.empty:
         return pd.DataFrame()
 
-    # Prepare regression
-    X = df_cat["Year"].values.reshape(-1, 1)
+    # Prepare regression using numpy (no sklearn needed)
+    X = df_cat["Year"].values
     y = df_cat["Amount"].values
 
-    model = LinearRegression()
-    model.fit(X, y)
+    # Fit linear regression: y = m*x + b
+    m, b = np.polyfit(X, y, 1)
 
     # Forecast next 5 years
-    last_year = df_cat["Year"].max()
+    last_year = X.max()
     future_years = np.arange(last_year + 1, last_year + 6)
-
-    future_amounts = model.predict(future_years.reshape(-1, 1))
+    future_amounts = m * future_years + b
 
     # Build forecast dataframe
     forecast_df = pd.DataFrame({
