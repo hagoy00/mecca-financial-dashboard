@@ -127,6 +127,20 @@ def classify_row_kind(cat):
         return "Header"
     return "Detail"
 
+
+def format_numbers(df, exclude_cols=None):
+    """
+    Format numeric columns with commas and no decimals.
+    exclude_cols: list of column names to leave untouched (e.g., ['Year'])
+    """
+    df = df.copy()
+    exclude_cols = exclude_cols or []
+
+    for col in df.columns:
+        if col not in exclude_cols and pd.api.types.is_numeric_dtype(df[col]):
+            df[col] = df[col].apply(lambda x: f"{x:,.0f}")
+    return df
+
 # ---------------------------------------------------------
 # ASSIGN Income / Expense / Subtotal
 # ---------------------------------------------------------
