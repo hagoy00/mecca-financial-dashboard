@@ -734,34 +734,34 @@ def main():
     # -----------------------------------------------------
     # TAB 3 — TOP INCOME & EXPENSES (FORECASTING)
     # -----------------------------------------------------
+    
     with tab_top:
         st.subheader("Top Income & Top Expenses")
     
-        top_income = get_top_income(df)
-        top_expense = get_top_expense(df)
+        # RAW numeric data
+        raw_top_income = get_top_income(df)
+        raw_top_expense = get_top_expense(df)
     
-        top_income = format_numbers(top_income, exclude_cols=["Category", "Year"])
-        top_expense = format_numbers(top_expense, exclude_cols=["Category", "Year"])
+        # FORMATTED display versions
+        top_income_display = format_numbers(raw_top_income, exclude_cols=["Category", "Year"])
+        top_expense_display = format_numbers(raw_top_expense, exclude_cols=["Category", "Year"])
     
         st.markdown("### 💰 Top 5 Income Categories")
-        st.dataframe(top_income, use_container_width=True)
+        st.dataframe(top_income_display, use_container_width=True)
     
         st.markdown("### 📉 Top 5 Expense Categories")
-        st.dataframe(top_expense, use_container_width=True)
+        st.dataframe(top_expense_display, use_container_width=True)
     
         year_sel = st.selectbox("Select Year", years)
     
-        inc_year = top_income[top_income["Year"] == year_sel].head(5)
-        exp_year = top_expense[top_expense["Year"] == year_sel].head(5)
+        # Use RAW numeric data for filtering
+        inc_year = raw_top_income[raw_top_income["Year"] == year_sel].sort_values("Amount", ascending=False).head(5)
+        exp_year = raw_top_expense[raw_top_expense["Year"] == year_sel].sort_values("Amount", ascending=False).head(5)
     
         col1, col2 = st.columns(2)
     
-        # -----------------------------
-        # LEFT COLUMN — INCOME FORECAST
-        # -----------------------------
         with col1:
             st.markdown("### Top Income Categories")
-            # ❌ REMOVED st.dataframe(inc_year)
     
             if not inc_year.empty:
                 selected_inc = st.selectbox("Forecast Income Category", inc_year["Category"])
@@ -777,25 +777,11 @@ def main():
                             color="Type:N",
                             tooltip=["Year", "Amount", "Type"]
                         )
-                        .properties(
-                            title=f"Forecast — {selected_inc}",
-                            width=400,
-                            height=300
-                        )
-                    ).configure_axis(
-                        labelFontSize=18,
-                        titleFontSize=20,
-                        tickCount=12
                     )
-    
                     st.altair_chart(chart, use_container_width=True)
     
-        # -----------------------------
-        # RIGHT COLUMN — EXPENSE FORECAST
-        # -----------------------------
         with col2:
             st.markdown("### Top Expense Categories")
-            # ❌ REMOVED st.dataframe(exp_year)
     
             if not exp_year.empty:
                 selected_exp = st.selectbox("Forecast Expense Category", exp_year["Category"])
@@ -811,20 +797,9 @@ def main():
                             color="Type:N",
                             tooltip=["Year", "Amount", "Type"]
                         )
-                        .properties(
-                            title=f"Forecast — {selected_exp}",
-                            width=400,
-                            height=300
-                        )
-                    ).configure_axis(
-                        labelFontSize=18,
-                        titleFontSize=20,
-                        tickCount=12
                     )
+                    st.altair_chart(chart, use_container_width=True)    
     
-                    st.altair_chart(chart, use_container_width=True)
-    
-   
     # -----------------------------------------------------
     # TAB 4 — SURPLUS / DEFICIT
     # -----------------------------------------------------
