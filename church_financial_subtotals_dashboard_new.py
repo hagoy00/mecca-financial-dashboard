@@ -706,13 +706,11 @@ def main():
     
         st.markdown(f"### 📉 Top 5 Expense Categories — {year_sel}")
         st.dataframe(exp_year_display, use_container_width=True)
-        
-            col1, col2 = st.columns(2)
     
-    # -----------------------------
-    # LEFT COLUMN — INCOME FORECAST
-    # -----------------------------
-    with col1:
+        # -----------------------------------------------------
+        # FORECAST CHARTS (STACKED VERTICALLY)
+        # -----------------------------------------------------
+    
         st.markdown("### Income Forecast")
     
         if not inc_year.empty:
@@ -724,23 +722,19 @@ def main():
                     alt.Chart(inc_forecast)
                     .mark_line(point=True)
                     .encode(
-                        x=alt.X("Year:O"),
-                        y=alt.Y("Amount:Q"),
+                        x=alt.X("Year:O", title="Year"),
+                        y=alt.Y("Amount:Q", title="Amount"),
                         color="Type:N",
                         tooltip=["Year", "Amount", "Type"]
                     )
                     .properties(
                         title=f"Forecast — {selected_inc}",
                         width=600,
-                        height=250
+                        height=350
                     )
                 )
                 st.altair_chart(chart, use_container_width=True)
     
-    # -----------------------------
-    # RIGHT COLUMN — EXPENSE FORECAST
-    # -----------------------------
-    with col2:
         st.markdown("### Expense Forecast")
     
         if not exp_year.empty:
@@ -752,15 +746,15 @@ def main():
                     alt.Chart(exp_forecast)
                     .mark_line(point=True)
                     .encode(
-                        x=alt.X("Year:O"),
-                        y=alt.Y("Amount:Q"),
+                        x=alt.X("Year:O", title="Year"),
+                        y=alt.Y("Amount:Q", title="Amount"),
                         color="Type:N",
                         tooltip=["Year", "Amount", "Type"]
                     )
                     .properties(
                         title=f"Forecast — {selected_exp}",
                         width=600,
-                        height=250
+                        height=350
                     )
                 )
                 st.altair_chart(chart, use_container_width=True)
