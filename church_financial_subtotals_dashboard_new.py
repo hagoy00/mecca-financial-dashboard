@@ -478,11 +478,10 @@ def main():
         "Surplus / Deficit",
         "Forecasting",
         "Board PDF"
-    ])
-    
+    ]) 
     
     # -----------------------------------------------------
-    # TAB 1 — UNIFIED SUBTOTAL SUMMARY (FIXED)
+    # TAB 1 — UNIFIED SUBTOTAL SUMMARY (FINAL FIXED VERSION)
     # -----------------------------------------------------
     with tab1:
         st.subheader("📘 Unified Subtotal Summary (Pivot View)")
@@ -532,7 +531,7 @@ def main():
                 .astype(float)
                 .round(0)
                 .astype(int)
-                .apply(lambda x: f"{x:,.0f}")
+                .apply(lambda x: f"{x:,}")
             )
     
         summary_pivot = summary_df.pivot_table(
@@ -578,9 +577,14 @@ def main():
             values="Amount",
             aggfunc="sum"
         ).fillna(0)
+    
+        # Fix Series → DataFrame issue
+        if isinstance(top_income_pivot, pd.Series):
+            top_income_pivot = top_income_pivot.to_frame()
+    
         # Format with commas
         top_income_pivot = top_income_pivot.applymap(lambda x: f"{int(x):,}")
-
+    
         st.dataframe(top_income_pivot, use_container_width=True)
     
         st.divider()
@@ -615,9 +619,14 @@ def main():
             values="Amount",
             aggfunc="sum"
         ).fillna(0)
+    
+        # Fix Series → DataFrame issue
+        if isinstance(top_expense_pivot, pd.Series):
+            top_expense_pivot = top_expense_pivot.to_frame()
+    
         # Format with commas
         top_expense_pivot = top_expense_pivot.applymap(lambda x: f"{int(x):,}")
-
+    
         st.dataframe(top_expense_pivot, use_container_width=True)
 
     # -----------------------------------------------------
