@@ -312,32 +312,47 @@ def compute_surplus_deficit(subtotals):
 
     return merged
 
-
 # ---------------------------------------------------------
 # FORECASTING
 # ---------------------------------------------------------
-def forecast_category(df, category, end_year=2032):
-    data = df[df["Category"] == category].groupby("Year")["Amount"].sum().reset_index()
-    if len(data) < 2:
+def forecast_category(df, category):
+    # Filter category and aggregate by year
+    df_cat = (
+        df[df["Category"] == category]
+        .groupby("Year")["Amount"]
+        .sum()
+        .reset_index()
+        .sort_values("Year")
+    )
+
+    if df_cat.empty:
         return pd.DataFrame()
 
-    x = data["Year"].values
-    y = data["Amount"].values
+    # Prepare regression
+    X = df_cat["Year"].values.reshape(-1, 1)
+    y = df_cat["Amount"].values
 
-    m, b = np.polyfit(x, y, 1)
+    model = LinearRegression()
+    model.fit(X, y)
 
-    last_year = x.max()
-    future_years = np.arange(last_year + 1, end_year + 1)
-    future_amounts = m * future_years + b
+    # Forecast next 5 years
+    last_year = df_cat["Year"].max()
+    future_years = np.arange(last_year + 1, last_year + 6)
 
-    hist = data.copy()
-    hist["Type"] = "Actual"
+    future_amounts = model.predict(future_years.reshape(-1, 1))
 
-    fut = pd.DataFrame({"Year": future_years, "Amount": future_amounts})
-    fut["Type"] = "Forecast"
+    # Build forecast dataframe
+    forecast_df = pd.DataFrame({
+        "Year": future_years,
+        "Amount": future_amounts,
+        "Type": "Forecast"
+    })
 
-    return pd.concat([hist, fut], ignore_index=True)
+    # Label actuals
+    df_cat["Type"] = "Actual"
 
+    # Combine actual + forecast
+    return pd.concat([df_cat, forecast_df], ignore_index=True)
 
 # ---------------------------------------------------------
 # TOP INCOME / EXPENSE
@@ -654,11 +669,6 @@ def main():
 
         st.dataframe(yoy_pivot.style.format("{:,.0f}"), use_container_width=True)
 
-
-    # -----------------------------------------------------
-    # TAB 3 — TOP INCOME & EXPENSES (FORECASTING)
-    # -----------------------------------------------------
-    
     # -----------------------------------------------------
     # TAB 3 — TOP INCOME & EXPENSES (FORECASTING)
     # -----------------------------------------------------
