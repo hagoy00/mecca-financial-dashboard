@@ -556,12 +556,6 @@ def main():
 
         #styled_income = style_top5(add_rank_icons(top_income_pivot))
 
-        styled_income = styled_income.format(
-            lambda x: f"{float(x):,.0f}"
-            if str(x).replace('.', '', 1).isdigit()
-            else x
-        )
-
         st.dataframe(styled_income, use_container_width=True)
 
         st.divider()
@@ -602,12 +596,6 @@ def main():
         top_expense_pivot.columns = top_expense_pivot.columns.astype(str)
 
         #styled_expense = style_top5(add_rank_icons(top_expense_pivot))
-
-        styled_expense = styled_expense.format(
-            lambda x: f"{float(x):,.0f}"
-            if str(x).replace('.', '', 1).isdigit()
-            else x
-        )
 
         st.dataframe(styled_expense, use_container_width=True)
 
