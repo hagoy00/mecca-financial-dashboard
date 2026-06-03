@@ -479,11 +479,11 @@ def main():
         "Forecasting",
         "Board PDF"
     ])
-
-    # -----------------------------------------------------
-    # TAB 1 — UNIFIED SUBTOTAL SUMMARY (NEW)
-    # -----------------------------------------------------
     
+    
+    # -----------------------------------------------------
+    # TAB 1 — UNIFIED SUBTOTAL SUMMARY (FIXED)
+    # -----------------------------------------------------
     with tab1:
         st.subheader("📘 Unified Subtotal Summary (Pivot View)")
     
@@ -496,7 +496,7 @@ def main():
                 "Amount"
             ].sum()
     
-            total_income = revenue
+            total_income = revenue  # used for Net Income
     
             total_expenses = group.loc[
                 group["Category"].str.lower() == "total for expenses",
@@ -514,28 +514,44 @@ def main():
                 (df["Year"] == year) &
                 (df["Category"].str.contains("Utilit", case=False, na=False))
             ]["Amount"].sum()
+    
+            # FINAL LIST (Total Income removed)
             summary_rows.append(["Total Revenue", year, revenue])
             summary_rows.append(["Total Expenses", year, total_expenses])
             summary_rows.append(["Net Income", year, net_income])
             summary_rows.append(["Payroll", year, payroll])
             summary_rows.append(["Utilities", year, utilities])
-        summary_df["Amount"] = summary_df["Amount"].astype(float).round(0).astype(int)
-        summary_df["Amount"] = summary_df["Amount"].apply(lambda x: f"{x:,.0f}")
-
+    
         summary_df = pd.DataFrame(summary_rows, columns=["Category", "Year", "Amount"])
+    
+        # SAFE formatting (prevents crash)
+        if not summary_df.empty:
+            summary_df["Amount"] = (
+                summary_df["Amount"]
+                .fillna(0)
+                .astype(float)
+                .round(0)
+                .astype(int)
+                .apply(lambda x: f"{x:,.0f}")
+            )
+    
         summary_pivot = summary_df.pivot_table(
             index="Category",
             columns="Year",
             values="Amount",
-            aggfunc="sum"
-        ).fillna(0)
+            aggfunc="first"
+        ).fillna("0")
+    
+        summary_pivot.index.name = None
     
         st.markdown("### 📘 Main Financial Summary")
         st.dataframe(summary_pivot, use_container_width=True)
     
         st.divider()
     
+        # -----------------------------------------------------
         # TOP 5 INCOME PIVOT
+        # -----------------------------------------------------
         st.markdown("### 💰 Top 5 Income Categories (All Years)")
     
         income_df = df[
@@ -544,6 +560,7 @@ def main():
         ]
     
         income_grouped = income_df.groupby(["Category", "Year"])["Amount"].sum().reset_index()
+        income_grouped["Amount"] = income_grouped["Amount"].astype(int)
     
         top_income_categories = (
             income_grouped.groupby("Category")["Amount"]
@@ -566,7 +583,9 @@ def main():
     
         st.divider()
     
+        # -----------------------------------------------------
         # TOP 5 EXPENSE PIVOT
+        # -----------------------------------------------------
         st.markdown("### 📉 Top 5 Expense Categories (All Years)")
     
         expense_df = df[
@@ -576,6 +595,7 @@ def main():
         ]
     
         expense_grouped = expense_df.groupby(["Category", "Year"])["Amount"].sum().reset_index()
+        expense_grouped["Amount"] = expense_grouped["Amount"].astype(int)
     
         top_expense_categories = (
             expense_grouped.groupby("Category")["Amount"]
