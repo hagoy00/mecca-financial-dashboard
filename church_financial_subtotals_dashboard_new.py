@@ -724,7 +724,19 @@ def main():
                     .mark_line(point=True)
                     .encode(
                         x=alt.X("Year:O", title="Year"),
-                        y=alt.Y("Amount:Q", title="Amount"),
+                        #y=alt.Y("Amount:Q", title="Amount"),
+                        y=alt.Y(
+                        "Amount:Q",
+                        title="Amount",
+                        axis=alt.Axis(
+                            tickCount=6,
+                            labelOverlap=False
+                        ),
+                        scale=alt.Scale(
+                            nice=False
+                        )
+                    ),
+
                         color="Type:N",
                         tooltip=["Year", "Amount", "Type"]
                     )
@@ -748,7 +760,19 @@ def main():
                     .mark_line(point=True)
                     .encode(
                         x=alt.X("Year:O", title="Year"),
-                        y=alt.Y("Amount:Q", title="Amount"),
+                        #y=alt.Y("Amount:Q", title="Amount"),
+                        y=alt.Y(
+                        "Amount:Q",
+                        title="Amount",
+                        axis=alt.Axis(
+                            tickCount=6,
+                            labelOverlap=False
+                        ),
+                        scale=alt.Scale(
+                            nice=False
+                        )
+                    ),
+
                         color="Type:N",
                         tooltip=["Year", "Amount", "Type"]
                     )
