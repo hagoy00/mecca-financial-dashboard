@@ -1,3 +1,15 @@
+top_income = get_top_income(df)
+top_expense = get_top_expense(df)
+
+# Apply formatting (commas + no decimals)
+top_income = format_numbers(top_income, exclude_cols=["Category", "Year"])
+top_expense = format_numbers(top_expense, exclude_cols=["Category", "Year"])
+
+st.markdown("### 💰 Top 5 Income Categories")
+st.dataframe(top_income, use_container_width=True)
+
+st.markdown("### 📉 Top 5 Expense Categories")
+st.dataframe(top_expense, use_container_width=True)
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -738,14 +750,16 @@ def main():
 
         top_income = get_top_income(df)
         top_expense = get_top_expense(df)
-
+            
         # Apply formatting (commas + no decimals)
         top_income = format_numbers(top_income, exclude_cols=["Category", "Year"])
         top_expense = format_numbers(top_expense, exclude_cols=["Category", "Year"])
-
+        
+        st.markdown("### 💰 Top 5 Income Categories")
         st.dataframe(top_income, use_container_width=True)
+        
+        st.markdown("### 📉 Top 5 Expense Categories")
         st.dataframe(top_expense, use_container_width=True)
-      
         year_sel = st.selectbox("Select Year", years)
 
         inc_year = top_income[top_income["Year"] == year_sel].sort_values("Amount", ascending=False).head(5)
