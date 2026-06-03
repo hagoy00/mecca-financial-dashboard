@@ -556,7 +556,7 @@ def main():
 
         #styled_income = style_top5(add_rank_icons(top_income_pivot))
 
-        st.dataframe(styled_income, use_container_width=True)
+        #st.dataframe(styled_income, use_container_width=True)
 
         st.divider()
 
@@ -597,7 +597,7 @@ def main():
 
         #styled_expense = style_top5(add_rank_icons(top_expense_pivot))
 
-        st.dataframe(styled_expense, use_container_width=True)
+        #st.dataframe(styled_expense, use_container_width=True)
 
     # -----------------------------------------------------
     # TAB 2 — CLEAN YOY SUMMARY
