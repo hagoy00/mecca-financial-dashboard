@@ -838,13 +838,16 @@ def main():
             "Year", "Total Income", "Total Expenses", "Surplus/Deficit", "YoY Change"
         ])
     
-        # GUARANTEED SAFE FILTER
+        # 🔥 GUARANTEED SAFE FILTER — sd_filtered will ALWAYS exist
         try:
-            sd_filtered = sd_df[sd_df["Year"].isin(selected_years)]
+            if selected_years:
+                sd_filtered = sd_df[sd_df["Year"].isin(selected_years)]
+            else:
+                sd_filtered = sd_df.copy()
         except Exception:
             sd_filtered = sd_df.copy()
     
-        # GUARANTEED index removal
+        # 🔥 GUARANTEED index removal — cannot fail
         sd_filtered = sd_filtered.reset_index(drop=True)
     
         st.dataframe(
@@ -856,7 +859,7 @@ def main():
             }),
             use_container_width=True
         )
-
+        
     # -----------------------------------------------------
     # TAB 5 — FORECASTING
     # -----------------------------------------------------
