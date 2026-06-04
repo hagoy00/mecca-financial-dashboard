@@ -23,7 +23,7 @@ st.markdown("""
     width: 100%;
     z-index: 999999;
     background-color: white;
-    padding: 15px 0 18px 0;
+    padding: 20px 0 26px 0;
     font-size: 38px !important;   /* MAKE IT BIG */
     font-weight: 900 !important;
     color: #1E90FF !important;
