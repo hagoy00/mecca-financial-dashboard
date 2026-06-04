@@ -838,13 +838,13 @@ def main():
             "Year", "Total Income", "Total Expenses", "Surplus/Deficit", "YoY Change"
         ])
     
-        # SAFE FILTER — prevents UnboundLocalError
-        if "selected_years" in locals() and selected_years:
+        # GUARANTEED SAFE FILTER
+        try:
             sd_filtered = sd_df[sd_df["Year"].isin(selected_years)]
-        else:
+        except Exception:
             sd_filtered = sd_df.copy()
     
-        # FIX — remove index column before Year
+        # GUARANTEED index removal
         sd_filtered = sd_filtered.reset_index(drop=True)
     
         st.dataframe(
@@ -856,7 +856,7 @@ def main():
             }),
             use_container_width=True
         )
-    
+
     # -----------------------------------------------------
     # TAB 5 — FORECASTING
     # -----------------------------------------------------
