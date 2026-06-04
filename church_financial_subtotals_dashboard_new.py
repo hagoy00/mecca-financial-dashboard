@@ -61,24 +61,55 @@ header[data-testid="stHeader"] {
 """, unsafe_allow_html=True)
 
 # ---------------------------------------------------------
-# GLOBAL FONT OVERRIDE — 26px
+# GLOBAL FONT OVERRIDE — CLEAN + CONTROLLED
 # ---------------------------------------------------------
 st.markdown("""
 <style>
-html, body, div, span, p, label, h1, h2, h3, h4, h5, h6 {
+
+/* -----------------------------------------
+   BASE FONT SIZE FOR NORMAL TEXT
+----------------------------------------- */
+html, body, div, span, p, label {
+    font-size: 20px !important;
+}
+
+/* -----------------------------------------
+   HEADERS (bigger but not huge)
+----------------------------------------- */
+h1, h2, h3, h4, h5, h6 {
+    font-size: 26px !important;
+    font-weight: 700 !important;
+}
+
+/* -----------------------------------------
+   PIVOT TABLES — MAKE THESE BIGGER
+----------------------------------------- */
+.dataframe tbody td {
+    font-size: 28px !important;
+}
+
+.dataframe thead th {
     font-size: 30px !important;
-}
-.stMarkdown, .stText, .stDataFrame, .stTable, .stMetric, .stNumberInput, .stSlider {
-    font-size: 90px !important;
     font-weight: bold !important;
 }
-.dataframe tbody tr td {
-    font-size: 90px !important;
+
+/* Streamlit table widget */
+.stTable {
+    font-size: 28px !important;
 }
-.dataframe thead tr th {
-    font-size: 90px !important;
-    font-weight: bold !important;
+
+/* Streamlit dataframe widget */
+.stDataFrame {
+    font-size: 28px !important;
 }
+
+/* -----------------------------------------
+   SLIDERS, METRICS, INPUTS — NORMAL SIZE
+----------------------------------------- */
+.stSlider, .stNumberInput, .stMetric {
+    font-size: 20px !important;
+}
+
 </style>
 """, unsafe_allow_html=True)
 # ---------------------------------------------------------
