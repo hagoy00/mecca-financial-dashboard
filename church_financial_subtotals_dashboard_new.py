@@ -69,14 +69,14 @@ html, body, div, span, p, label, h1, h2, h3, h4, h5, h6 {
     font-size: 32px !important;
 }
 .stMarkdown, .stText, .stDataFrame, .stTable, .stMetric, .stNumberInput, .stSlider {
-    font-size: 100px !important;
+    font-size: 120px !important;
     font-weight: bold !important;
 }
 .dataframe tbody tr td {
-    font-size: 100px !important;
+    font-size: 120px !important;
 }
 .dataframe thead tr th {
-    font-size: 100px !important;
+    font-size: 120px !important;
     font-weight: bold !important;
 }
 </style>
