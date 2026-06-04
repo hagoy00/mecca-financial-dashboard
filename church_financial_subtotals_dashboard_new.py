@@ -24,7 +24,7 @@ st.markdown("""
     z-index: 999999;
     background-color: white;
     padding: 16px 0 20px 0;
-    font-size: 40px !important;   /* MAKE IT BIG */
+    font-size: 38px !important;   /* MAKE IT BIG */
     font-weight: 900 !important;
     color: #1E90FF !important;
     text-align: center;
@@ -33,7 +33,7 @@ st.markdown("""
 
 /* Push Streamlit app down so title doesn't overlap */
 body {
-    padding-top: 38px !important;
+    padding-top: 34px !important;
 }
 </style>
 
@@ -69,14 +69,14 @@ html, body, div, span, p, label, h1, h2, h3, h4, h5, h6 {
     font-size: 38px !important;
 }
 .stMarkdown, .stText, .stDataFrame, .stTable, .stMetric, .stNumberInput, .stSlider {
-    font-size: 11px !important;
+    font-size: 136px !important;
     font-weight: bold !important;
 }
 .dataframe tbody tr td {
-    font-size: 11px !important;
+    font-size: 126px !important;
 }
 .dataframe thead tr th {
-    font-size: 11px !important;
+    font-size: 26px !important;
     font-weight: bold !important;
 }
 </style>
@@ -92,7 +92,7 @@ st.markdown("""
     z-index: 10;
     background-color: white;
     padding: 14px 0 18px 0;
-    font-size: 50px !important;
+    font-size: 40px !important;
     font-weight: 900 !important;
     color: #1E90FF !important;
     text-align: center;
