@@ -724,6 +724,7 @@ def main():
     
         # Display Top 5
         st.markdown(f"### 💰 Top 5 Income Categories — {year_sel}")
+        st.write("DEBUG COLUMNS:", sd_filtered.columns.tolist())
         st.dataframe(inc_year_display, use_container_width=True)
     
         st.markdown(f"### 📉 Top 5 Expense Categories — {year_sel}")
