@@ -632,51 +632,69 @@ def main():
                     st.altair_chart(chart, use_container_width=True)
 
     # -----------------------------------------------------
-    # TAB 4 — SURPLUS / DEFICIT
-    # -----------------------------------------------------
-    with tab3:
-        st.subheader("📉 Surplus / Deficit Summary")
+# TAB 4 — SURPLUS / DEFICIT (FINAL FIXED VERSION)
+# -----------------------------------------------------
+with tab3:
+    st.subheader("📊 Surplus / Deficit Summary")
 
-        income_df_sd = subtotals[subtotals["Category"] == "Total Income"].sort_values("Year")
-        expense_df_sd = subtotals[subtotals["Category"] == "Total Expenses"].sort_values("Year")
+    # Build surplus/deficit table
+    sd_rows = []
+    years_sorted = sorted(df["Year"].unique())
 
-        years_income = income_df_sd["Year"].tolist()
-        income_vals = income_df_sd["Amount"].tolist()
-        expense_vals = expense_df_sd["Amount"].tolist()
+    income_vals = []
+    expense_vals = []
 
-        sd_rows = []
+    for year in years_sorted:
+        inc = subtotals[
+            (subtotals["Year"] == year) &
+            (subtotals["Category"].str.lower() == "total for income")
+        ]["Amount"].sum()
 
-        for i in range(len(years_income)):
-            year = years_income[i]
-            inc = income_vals[i]
-            exp = expense_vals[i]
-            surplus = inc - exp
+        exp = subtotals[
+            (subtotals["Year"] == year) &
+            (subtotals["Category"].str.lower() == "total for expenses")
+        ]["Amount"].sum()
 
-            if i == 0:
-                yoy_change = 0
-            else:
-                prev_surplus = income_vals[i - 1] - expense_vals[i - 1]
-                yoy_change = surplus - prev_surplus
+        income_vals.append(inc)
+        expense_vals.append(exp)
 
-            sd_rows.append([year, inc, exp, surplus, yoy_change])
+    for i, year in enumerate(years_sorted):
+        inc = income_vals[i]
+        exp = expense_vals[i]
 
-        sd_df = pd.DataFrame(sd_rows, columns=[
-            "Year", "Total Income", "Total Expenses", "Surplus/Deficit", "YoY Change"
-        ])
+        surplus = round(inc - exp, 2)
 
+        if i == 0:
+            yoy_change = 0
+        else:
+            prev_surplus = round(income_vals[i - 1] - expense_vals[i - 1], 2)
+            yoy_change = round(surplus - prev_surplus, 2)
+
+        sd_rows.append([year, inc, exp, surplus, yoy_change])
+
+    sd_df = pd.DataFrame(
+        sd_rows,
+        columns=["Year", "Total Income", "Total Expenses", "Surplus/Deficit", "YoY Change"]
+    )
+
+    # Filter by selected years
+    if selected_years:
         sd_filtered = sd_df[sd_df["Year"].isin(selected_years)]
-        sd_filtered.index = [""] * len(sd_filtered)
+    else:
+        sd_filtered = sd_df.copy()
 
-        st.dataframe(
+    # Remove index completely (so no 0,1,2,3,4)
+    sd_filtered = sd_filtered.reset_index(drop=True)
+
+    # Display clean table with no index
+    st.table(
         sd_filtered.style.format({
             "Total Income": "{:,.2f}",
             "Total Expenses": "{:,.2f}",
             "Surplus/Deficit": "{:,.2f}",
             "YoY Change": "{:,.2f}"
-        }),
-        use_container_width=True
+        })
     )
-
     # -----------------------------------------------------
     # TAB 5 — FORECASTING
     # -----------------------------------------------------
