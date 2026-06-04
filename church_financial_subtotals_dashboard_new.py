@@ -85,22 +85,22 @@ h1, h2, h3, h4, h5, h6 {
    PIVOT TABLES — MAKE THESE BIGGER
 ----------------------------------------- */
 .dataframe tbody td {
-    font-size: 60px !important;
+    font-size: 70px !important;
 }
 
 .dataframe thead th {
-    font-size: 58px !important;
+    font-size: 65px !important;
     font-weight: bold !important;
 }
 
 /* Streamlit table widget */
 .stTable {
-    font-size: 58px !important;
+    font-size: 65px !important;
 }
 
 /* Streamlit dataframe widget */
 .stDataFrame {
-    font-size: 58px !important;
+    font-size: 65px !important;
 }
 
 /* -----------------------------------------
