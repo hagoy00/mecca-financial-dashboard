@@ -23,7 +23,7 @@ st.markdown("""
     width: 100%;
     z-index: 999999;
     background-color: white;
-    padding: 14px 0 18px 0;
+    padding: 18px 0 22px 0;
     font-size: 40px !important;   /* MAKE IT BIG */
     font-weight: 900 !important;
     color: #1E90FF !important;
@@ -66,7 +66,7 @@ header[data-testid="stHeader"] {
 st.markdown("""
 <style>
 html, body, div, span, p, label, h1, h2, h3, h4, h5, h6 {
-    font-size: 50px !important;
+    font-size: 38px !important;
 }
 .stMarkdown, .stText, .stDataFrame, .stTable, .stMetric, .stNumberInput, .stSlider {
     font-size: 11px !important;
