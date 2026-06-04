@@ -668,14 +668,14 @@ def main():
         sd_filtered = sd_df[sd_df["Year"].isin(selected_years)]
 
         st.dataframe(
-            sd_filtered.style.format({
-                "Total Income": "{:,.2f}",
-                "Total Expenses": "{:,.2f}",
-                "Surplus/Deficit": "{:,.2f}",
-                "YoY Change": "{:,.2f}"
-            }),
-            use_container_width=True
-        )
+        sd_filtered.style.format({
+            "Total Income": "{:,.0f}",
+            "Total Expenses": "{:,.0f}",
+            "Surplus/Deficit": "{:,.0f}",
+            "YoY Change": "{:,.0f}"
+        }),
+        use_container_width=True
+    )
 
     # -----------------------------------------------------
     # TAB 5 — FORECASTING
