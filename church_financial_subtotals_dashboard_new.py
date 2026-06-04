@@ -536,7 +536,7 @@ def main():
         summary_pivot.index.name = None
     
         st.markdown("### 📘 Main Financial Summary")
-        sd_filtered = sd_filtered.reset_index(drop=True)
+        #sd_filtered = sd_filtered.reset_index(drop=True)
         st.dataframe(summary_pivot, use_container_width=True)
     
         st.divider()
