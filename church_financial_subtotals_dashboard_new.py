@@ -847,8 +847,11 @@ def main():
         # MUST BE INSIDE TAB BLOCK
         sd_filtered = sd_filtered.reset_index(drop=True)
     
+        ssd_filtered = sd_filtered.reset_index(drop=True)
+
+        # 👉 PASTE THIS RIGHT AFTER THE LINE ABOVE
         st.dataframe(
-            sd_filtered.style.format({
+            sd_filtered.style.hide(axis="index").format({
                 "Total Income": "{:,.0f}",
                 "Total Expenses": "{:,.0f}",
                 "Surplus/Deficit": "{:,.0f}",
@@ -856,6 +859,7 @@ def main():
             }),
             use_container_width=True
         )
+
     # -----------------------------------------------------
     # TAB 5 — FORECASTING
     # -----------------------------------------------------
