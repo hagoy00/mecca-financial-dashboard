@@ -70,14 +70,14 @@ st.markdown("""
    BASE FONT SIZE FOR NORMAL TEXT
 ----------------------------------------- */
 html, body, div, span, p, label {
-    font-size: 40px !important;
+    font-size: 34px !important;
 }
 
 /* -----------------------------------------
    HEADERS (bigger but not huge)
 ----------------------------------------- */
 h1, h2, h3, h4, h5, h6 {
-    font-size: 36px !important;
+    font-size: 34px !important;
     font-weight: 700 !important;
 }
 
@@ -89,18 +89,18 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .dataframe thead th {
-    font-size: 60px !important;
+    font-size: 54px !important;
     font-weight: bold !important;
 }
 
 /* Streamlit table widget */
 .stTable {
-    font-size: 58px !important;
+    font-size: 54px !important;
 }
 
 /* Streamlit dataframe widget */
 .stDataFrame {
-    font-size: 28px !important;
+    font-size: 34px !important;
 }
 
 /* -----------------------------------------
