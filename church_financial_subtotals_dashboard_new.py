@@ -838,17 +838,19 @@ def main():
             "Year", "Total Income", "Total Expenses", "Surplus/Deficit", "YoY Change"
         ])
     
-        # 🔥 GUARANTEED SAFE FILTER — sd_filtered will ALWAYS exist
+        # 🔥 SAFE FILTER — sd_filtered ALWAYS exists
         try:
-            if selected_years:
+            if "selected_years" in locals() and selected_years:
                 sd_filtered = sd_df[sd_df["Year"].isin(selected_years)]
             else:
                 sd_filtered = sd_df.copy()
-        except Exception:
-            sd_filtered = sd_df.copy()
     
-        # 🔥 GUARANTEED index removal — cannot fail
-        sd_filtered = sd_filtered.reset_index(drop=True)
+            # 🔥 Reset index ONLY after sd_filtered exists
+            sd_filtered = sd_filtered.reset_index(drop=True)
+    
+        except Exception:
+            # 🔥 Absolute fallback — cannot fail
+            sd_filtered = sd_df.copy().reset_index(drop=True)
     
         st.dataframe(
             sd_filtered.style.format({
