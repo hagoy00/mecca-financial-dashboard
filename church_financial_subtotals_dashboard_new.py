@@ -89,18 +89,18 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .dataframe thead th {
-    font-size: 65px !important;
+    font-size: 90px !important;
     font-weight: bold !important;
 }
 
 /* Streamlit table widget */
 .stTable {
-    font-size: 65px !important;
+    font-size: 90px !important;
 }
 
 /* Streamlit dataframe widget */
 .stDataFrame {
-    font-size: 65px !important;
+    font-size: 90px !important;
 }
 
 /* -----------------------------------------
