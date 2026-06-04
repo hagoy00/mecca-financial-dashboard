@@ -871,10 +871,10 @@ def main():
         # Display clean table
         st.dataframe(
             sd_filtered.style.format({
-                "Total Income": "{:,.2f}",
-                "Total Expenses": "{:,.2f}",
-                "Surplus/Deficit": "{:,.2f}",
-                "YoY Change": "{:,.2f}"
+                "Total Income": "{:,.0f}",
+                "Total Expenses": "{:,.0f}",
+                "Surplus/Deficit": "{:,.0f}",
+                "YoY Change": "{:,.0f}"
             }),
             use_container_width=True
         )
