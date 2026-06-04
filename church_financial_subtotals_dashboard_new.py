@@ -854,14 +854,14 @@ def main():
     
         # Display without index
         st.dataframe(
-            sd_filtered.style.hide(axis="index").format({
-                "Total Income": "{:,.0f}",
-                "Total Expenses": "{:,.0f}",
-                "Surplus/Deficit": "{:,.0f}",
-                "YoY Change": "{:,.0f}"
-            }),
-            use_container_width=True
-        )
+        sd_filtered.style.hide(axis="index").format({
+            "Total Income": "{:,.0f}",
+            "Total Expenses": "{:,.0f}",
+            "Surplus/Deficit": "{:,.0f}",
+            "YoY Change": "{:,.0f}"
+        }),
+        use_container_width=True
+    )
 
 
     # -----------------------------------------------------
