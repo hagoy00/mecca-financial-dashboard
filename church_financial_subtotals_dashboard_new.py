@@ -226,15 +226,15 @@ def load_data():
 def extract_subtotals(df):
     df = df.copy()
 
-    # 1. Extract existing subtotal rows
+    # 1. Extract subtotal rows INCLUDING Excel Net Income
     mask = (
         df["Category"].str.startswith("Total for ")
-        | (df["Category"] == "Net Income")
+        | (df["Category"] == "Net Income")   # ← keep Excel Net Income
         | (df["Category"] == "Net Operating Income")
     )
     subtotals = df[mask].reset_index(drop=True)
 
-    # 2. AUTO TOTALS
+    # 2. AUTO TOTALS (Income, Expenses, Revenue)
     income_rows = subtotals[subtotals["Category"] == "Total for Income"]
     total_income = income_rows.groupby("Year")["Amount"].sum().reset_index()
     total_income["Category"] = "Total Income"
@@ -246,36 +246,30 @@ def extract_subtotals(df):
     revenue_df = total_income.copy()
     revenue_df["Category"] = "Total Revenue"
 
-    net_income = pd.merge(
-        total_income,
-        total_expenses,
-        on="Year",
-        suffixes=("_Income", "_Expenses")
-    )
-    net_income["Amount"] = net_income["Amount_Income"] - net_income["Amount_Expenses"]
-    net_income = net_income[["Year", "Amount"]]
-    net_income["Category"] = "Net Income"
+    # ❌ REMOVE Python Net Income calculation completely
+    # (We keep Excel Net Income exactly as-is)
 
     auto_totals = pd.concat(
-        [total_income, total_expenses, revenue_df, net_income],
+        [total_income, total_expenses, revenue_df],
         ignore_index=True
     )
 
-    # 3. ADD PAYROLL SUBTOTAL
+    # 3. Payroll subtotal
     payroll_rows = df[df["Category"].isin(["Salaries & Wages", "Payroll Tax Expense"])]
     payroll_sum = payroll_rows.groupby("Year")["Amount"].sum().reset_index()
     payroll_sum["Category"] = "Payroll"
 
-    # 4. ADD UTILITIES SUBTOTAL
+    # 4. Utilities subtotal
     util_rows = df[df["Category"].str.contains("Utilit", case=False, na=False)]
     util_sum = util_rows.groupby("Year")["Amount"].sum().reset_index()
     util_sum["Category"] = "Utilities"
 
-    # 5. RETURN FULL SUBTOTAL SET
+    # 5. Return everything (Excel Net Income preserved)
     return pd.concat(
         [subtotals, auto_totals, payroll_sum, util_sum],
         ignore_index=True
     )
+
 
 # ---------------------------------------------------------
 # YOY CALC (generic)
