@@ -24,7 +24,7 @@ st.markdown("""
     z-index: 999999;
     background-color: white;
     padding: 15px 0 18px 0;
-    font-size: 34px !important;   /* MAKE IT BIG */
+    font-size: 36px !important;   /* MAKE IT BIG */
     font-weight: 900 !important;
     color: #1E90FF !important;
     text-align: center;
@@ -69,14 +69,14 @@ html, body, div, span, p, label, h1, h2, h3, h4, h5, h6 {
     font-size: 38px !important;
 }
 .stMarkdown, .stText, .stDataFrame, .stTable, .stMetric, .stNumberInput, .stSlider {
-    font-size: 136px !important;
+    font-size: 90px !important;
     font-weight: bold !important;
 }
 .dataframe tbody tr td {
-    font-size: 126px !important;
+    font-size: 90px !important;
 }
 .dataframe thead tr th {
-    font-size: 26px !important;
+    font-size: 90px !important;
     font-weight: bold !important;
 }
 </style>
