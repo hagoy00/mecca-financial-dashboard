@@ -689,10 +689,10 @@ with tab3:
     # Display clean table with no index
     st.table(
         sd_filtered.style.format({
-            "Total Income": "{:,.2f}",
-            "Total Expenses": "{:,.2f}",
-            "Surplus/Deficit": "{:,.2f}",
-            "YoY Change": "{:,.2f}"
+            "Total Income": "{:,.0f}",
+            "Total Expenses": "{:,.0f}",
+            "Surplus/Deficit": "{:,.0f}",
+            "YoY Change": "{:,.0f}"
         })
     )
     # -----------------------------------------------------
