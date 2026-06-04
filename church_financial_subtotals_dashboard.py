@@ -583,7 +583,6 @@ def main():
 
         st.dataframe(yoy_pivot.style.format("{:,.2f}"), use_container_width=True)
 
-    
     # -----------------------------------------------------
     # TAB 3 — TOP INCOME & EXPENSES (FORECASTING)
     # -----------------------------------------------------
@@ -666,13 +665,14 @@ def main():
         ])
 
         sd_filtered = sd_df[sd_df["Year"].isin(selected_years)]
+        sd_filtered.index = [""] * len(sd_filtered)
 
         st.dataframe(
         sd_filtered.style.format({
-            "Total Income": "{:,.0f}",
-            "Total Expenses": "{:,.0f}",
-            "Surplus/Deficit": "{:,.0f}",
-            "YoY Change": "{:,.0f}"
+            "Total Income": "{:,.2f}",
+            "Total Expenses": "{:,.2f}",
+            "Surplus/Deficit": "{:,.2f}",
+            "YoY Change": "{:,.2f}"
         }),
         use_container_width=True
     )
