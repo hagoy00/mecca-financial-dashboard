@@ -70,7 +70,7 @@ st.markdown("""
    BASE FONT SIZE FOR NORMAL TEXT
 ----------------------------------------- */
 html, body, div, span, p, label {
-    font-size: 38px !important;
+    font-size: 35px !important;
 }
 
 /* -----------------------------------------
