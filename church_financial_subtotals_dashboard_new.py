@@ -805,13 +805,13 @@ def main():
                     )
                 )
                 st.altair_chart(chart, use_container_width=True)
-        
     # -----------------------------------------------------
     # TAB 4 — SURPLUS / DEFICIT
     # -----------------------------------------------------
     with tab3:
         st.subheader("📉 Surplus / Deficit Summary")
     
+        # Build income/expense tables
         income_df_sd = subtotals[subtotals["Category"] == "Total Income"].sort_values("Year")
         expense_df_sd = subtotals[subtotals["Category"] == "Total Expenses"].sort_values("Year")
     
@@ -835,22 +835,25 @@ def main():
     
             sd_rows.append([year, inc, exp, surplus, yoy_change])
     
+        # Build dataframe
         sd_df = pd.DataFrame(sd_rows, columns=[
             "Year", "Total Income", "Total Expenses", "Surplus/Deficit", "YoY Change"
         ])
     
-        # SAFE FILTER — selected_years may not exist
+        # Safe filter — selected_years may not exist
         if "selected_years" in locals() and selected_years:
             sd_filtered = sd_df[sd_df["Year"].isin(selected_years)]
         else:
             sd_filtered = sd_df.copy()
     
-        # MUST BE INSIDE TAB BLOCK
+        # Reset index
         sd_filtered = sd_filtered.reset_index(drop=True)
     
-        ssd_filtered = sd_filtered.reset_index(drop=True)
-
-        # 👉 PASTE THIS RIGHT AFTER THE LINE ABOVE
+        # 🔥 REMOVE ANY FIRST COLUMN THAT IS NOT 'Year'
+        if sd_filtered.columns[0] != "Year":
+            sd_filtered = sd_filtered.drop(columns=sd_filtered.columns[0])
+    
+        # Display without index
         st.dataframe(
             sd_filtered.style.hide(axis="index").format({
                 "Total Income": "{:,.0f}",
@@ -860,6 +863,7 @@ def main():
             }),
             use_container_width=True
         )
+
 
     # -----------------------------------------------------
     # TAB 5 — FORECASTING
