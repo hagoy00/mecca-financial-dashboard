@@ -838,19 +838,14 @@ def main():
             "Year", "Total Income", "Total Expenses", "Surplus/Deficit", "YoY Change"
         ])
     
-        # 🔥 SAFE FILTER — sd_filtered ALWAYS exists
-        try:
-            if "selected_years" in locals() and selected_years:
-                sd_filtered = sd_df[sd_df["Year"].isin(selected_years)]
-            else:
-                sd_filtered = sd_df.copy()
+        # SAFE FILTER — selected_years may not exist
+        if "selected_years" in locals() and selected_years:
+            sd_filtered = sd_df[sd_df["Year"].isin(selected_years)]
+        else:
+            sd_filtered = sd_df.copy()
     
-            # 🔥 Reset index ONLY after sd_filtered exists
-            sd_filtered = sd_filtered.reset_index(drop=True)
-    
-        except Exception:
-            # 🔥 Absolute fallback — cannot fail
-            sd_filtered = sd_df.copy().reset_index(drop=True)
+        # MUST BE INSIDE TAB BLOCK
+        sd_filtered = sd_filtered.reset_index(drop=True)
     
         st.dataframe(
             sd_filtered.style.format({
@@ -861,7 +856,6 @@ def main():
             }),
             use_container_width=True
         )
-        
     # -----------------------------------------------------
     # TAB 5 — FORECASTING
     # -----------------------------------------------------
