@@ -804,66 +804,81 @@ def main():
                     )
                 )
                 st.altair_chart(chart, use_container_width=True)
+    
     # -----------------------------------------------------
-    # TAB 4 — SURPLUS / DEFICIT
+    # TAB 4 — SURPLUS / DEFICIT (FINAL FIXED VERSION)
     # -----------------------------------------------------
     with tab3:
-        st.subheader("📉 Surplus / Deficit Summary")
+        st.subheader("📊 Surplus / Deficit Summary")
     
-        # Build income/expense tables
-        income_df_sd = subtotals[subtotals["Category"] == "Total Income"].sort_values("Year")
-        expense_df_sd = subtotals[subtotals["Category"] == "Total Expenses"].sort_values("Year")
-    
-        years_income = income_df_sd["Year"].tolist()
-        income_vals = income_df_sd["Amount"].tolist()
-        expense_vals = expense_df_sd["Amount"].tolist()
-    
+        # Build surplus/deficit table
         sd_rows = []
+        years_sorted = sorted(df["Year"].unique())
     
-        for i in range(len(years_income)):
-            year = years_income[i]
+        income_vals = []
+        expense_vals = []
+    
+        # Collect income & expense totals
+        for year in years_sorted:
+            inc = subtotals[
+                (subtotals["Year"] == year) &
+                (subtotals["Category"].str.lower() == "total for income")
+            ]["Amount"].sum()
+    
+            exp = subtotals[
+                (subtotals["Year"] == year) &
+                (subtotals["Category"].str.lower() == "total for expenses")
+            ]["Amount"].sum()
+    
+            income_vals.append(inc)
+            expense_vals.append(exp)
+    
+        # Build rows
+        for i, year in enumerate(years_sorted):
             inc = income_vals[i]
             exp = expense_vals[i]
-            surplus = inc - exp
+    
+            surplus = round(inc - exp, 2)
     
             if i == 0:
                 yoy_change = 0
             else:
-                prev_surplus = income_vals[i - 1] - expense_vals[i - 1]
-                yoy_change = surplus - prev_surplus
+                prev_surplus = round(income_vals[i - 1] - expense_vals[i - 1], 2)
+                yoy_change = round(surplus - prev_surplus, 2)
     
             sd_rows.append([year, inc, exp, surplus, yoy_change])
     
-        # Build dataframe
-        sd_df = pd.DataFrame(sd_rows, columns=[
-            "Year", "Total Income", "Total Expenses", "Surplus/Deficit", "YoY Change"
-        ])
+        # Create DataFrame
+        sd_df = pd.DataFrame(
+            sd_rows,
+            columns=["Year", "Total Income", "Total Expenses", "Surplus/Deficit", "YoY Change"]
+        )
     
-        # Safe filter — selected_years may not exist
-        if "selected_years" in locals() and selected_years:
+        # Filter by selected years
+        if selected_years:
             sd_filtered = sd_df[sd_df["Year"].isin(selected_years)]
         else:
             sd_filtered = sd_df.copy()
     
-        # Reset index
+        # Reset index (clean)
         sd_filtered = sd_filtered.reset_index(drop=True)
     
-        # 🔥 REMOVE ANY FIRST COLUMN THAT IS NOT 'Year'
-        if sd_filtered.columns[0] != "Year":
-            sd_filtered = sd_filtered.drop(columns=sd_filtered.columns[0])
+        # 🔥 REMOVE THE UNWANTED FIRST COLUMN (0,1,2,3,4)
+        # This guarantees the fix even if a hidden column appears.
+        if sd_filtered.columns[0] not in ["Year"]:
+            sd_filtered = sd_filtered.iloc[:, 1:]
     
-        # Display without index
+        # Display clean table
         st.dataframe(
-        sd_filtered.style.hide(axis="index").format({
-            "Total Income": "{:,.0f}",
-            "Total Expenses": "{:,.0f}",
-            "Surplus/Deficit": "{:,.0f}",
-            "YoY Change": "{:,.0f}"
-        }),
-        use_container_width=True
-    )
-
-
+            sd_filtered.style.format({
+                "Total Income": "{:,.2f}",
+                "Total Expenses": "{:,.2f}",
+                "Surplus/Deficit": "{:,.2f}",
+                "YoY Change": "{:,.2f}"
+            }),
+            use_container_width=True
+        )
+        
     # -----------------------------------------------------
     # TAB 5 — FORECASTING
     # -----------------------------------------------------
