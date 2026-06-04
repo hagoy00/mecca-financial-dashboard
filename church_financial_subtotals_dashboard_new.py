@@ -66,17 +66,17 @@ header[data-testid="stHeader"] {
 st.markdown("""
 <style>
 html, body, div, span, p, label, h1, h2, h3, h4, h5, h6 {
-    font-size: 28px !important;
+    font-size: 30px !important;
 }
 .stMarkdown, .stText, .stDataFrame, .stTable, .stMetric, .stNumberInput, .stSlider {
-    font-size: 90px !important;
+    font-size: 100px !important;
     font-weight: bold !important;
 }
 .dataframe tbody tr td {
     font-size: 100px !important;
 }
 .dataframe thead tr th {
-    font-size: 90px !important;
+    font-size: 100px !important;
     font-weight: bold !important;
 }
 </style>
@@ -92,7 +92,7 @@ st.markdown("""
     z-index: 10;
     background-color: white;
     padding: 14px 0 18px 0;
-    font-size: 40px !important;
+    font-size: 100px !important;
     font-weight: 900 !important;
     color: #1E90FF !important;
     text-align: center;
