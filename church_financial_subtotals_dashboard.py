@@ -685,6 +685,7 @@ with tab3:
 
     # Remove index completely (so no 0,1,2,3,4)
     sd_filtered = sd_filtered.reset_index(drop=True)
+    sd_filtered = sd_filtered.iloc[:, 1:]
 
     # Display clean table with no index
     st.table(
