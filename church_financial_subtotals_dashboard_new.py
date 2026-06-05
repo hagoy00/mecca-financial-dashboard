@@ -345,9 +345,13 @@ def compute_surplus_deficit(subtotals):
 # ---------------------------------------------------------
 def forecast_category(df, category):
     # Filter category and aggregate by year
+    df_cat = df[df["Category"] == category]
+
+    # 🔥 Keep ONLY Excel Net Income rows
+    df_cat = df_cat[df_cat["Source"] == "Excel"]
+    
     df_cat = (
-        df[df["Category"] == category]
-        .groupby("Year")["Amount"]
+        df_cat.groupby("Year")["Amount"]
         .sum()
         .reset_index()
         .sort_values("Year")
