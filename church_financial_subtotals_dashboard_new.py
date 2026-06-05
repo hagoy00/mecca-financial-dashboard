@@ -303,17 +303,23 @@ def extract_subtotals(df):
     )
     subtotals = df[mask].reset_index(drop=True)
 
+    # Ensure Source column exists
+    subtotals["Source"] = "Excel"
+
     # 2. AUTO TOTALS
     income_rows = subtotals[subtotals["Category"] == "Total for Income"]
     total_income = income_rows.groupby("Year")["Amount"].sum().reset_index()
     total_income["Category"] = "Total Income"
+    total_income["Source"] = "Excel"
 
     expense_rows = subtotals[subtotals["Category"] == "Total for Expenses"]
     total_expenses = expense_rows.groupby("Year")["Amount"].sum().reset_index()
     total_expenses["Category"] = "Total Expenses"
+    total_expenses["Source"] = "Excel"
 
     revenue_df = total_income.copy()
     revenue_df["Category"] = "Total Revenue"
+    revenue_df["Source"] = "Excel"
 
     net_income = pd.merge(
         total_income,
@@ -324,20 +330,31 @@ def extract_subtotals(df):
     net_income["Amount"] = net_income["Amount_Income"] - net_income["Amount_Expenses"]
     net_income = net_income[["Year", "Amount"]]
     net_income["Category"] = "Net Income"
+    net_income["Source"] = "Excel"
 
-    # 3. ADD PAYROLL SUBTOTAL
+    # 3. PAYROLL SUBTOTAL
     payroll_rows = df[df["Category"].isin(["Salaries & Wages", "Payroll Tax Expense"])]
     payroll_sum = payroll_rows.groupby("Year")["Amount"].sum().reset_index()
     payroll_sum["Category"] = "Payroll"
+    payroll_sum["Source"] = "Excel"
 
-    # 4. ADD UTILITIES SUBTOTAL
+    # 4. UTILITIES SUBTOTAL
     util_rows = df[df["Category"].str.contains("Utilit", case=False, na=False)]
     util_sum = util_rows.groupby("Year")["Amount"].sum().reset_index()
     util_sum["Category"] = "Utilities"
+    util_sum["Source"] = "Excel"
 
     # 5. RETURN FULL SUBTOTAL SET
     return pd.concat(
-        [subtotals, total_income, total_expenses, revenue_df, net_income, payroll_sum, util_sum],
+        [
+            subtotals,
+            total_income,
+            total_expenses,
+            revenue_df,
+            net_income,
+            payroll_sum,
+            util_sum
+        ],
         ignore_index=True
     )
 
