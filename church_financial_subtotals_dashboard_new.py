@@ -24,7 +24,7 @@ st.markdown("""
     z-index: 999999;
     background-color: white;
     padding: 20px 0 26px 0;
-    font-size: 38px !important;   /* MAKE IT BIG */
+    font-size: 34px !important;   /* MAKE IT BIG */
     font-weight: 900 !important;
     color: #1E90FF !important;
     text-align: center;
@@ -33,7 +33,7 @@ st.markdown("""
 
 /* Push Streamlit app down so title doesn't overlap */
 body {
-    padding-top: 34px !important;
+    padding-top: 30px !important;
 }
 </style>
 
@@ -70,7 +70,7 @@ st.markdown("""
    BASE FONT SIZE FOR NORMAL TEXT
 ----------------------------------------- */
 html, body, div, span, p, label {
-    font-size: 35px !important;
+    font-size: 32px !important;
 }
 
 /* -----------------------------------------
