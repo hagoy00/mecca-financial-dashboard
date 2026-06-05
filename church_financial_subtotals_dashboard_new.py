@@ -542,24 +542,25 @@ def main():
                 "Amount"
             ].sum()
     
-            net_income = revenue - total_expenses
-    
-            payroll = df[
-                (df["Year"] == year) &
-                (df["Category"].isin(["Salaries & Wages", "Payroll Tax Expense"]))
-            ]["Amount"].sum()
-    
-            utilities = df[
-                (df["Year"] == year) &
-                (df["Category"].str.contains("Utilit", case=False, na=False))
-            ]["Amount"].sum()
-    
-            summary_rows.append(["Total Revenue", year, revenue])
-            summary_rows.append(["Total Expenses", year, total_expenses])
-            summary_rows.append(["Net Income", year, net_income])
-            summary_rows.append(["Payroll", year, payroll])
-            summary_rows.append(["Utilities", year, utilities])
-    
+        net_income = revenue - total_expenses
+
+        # Use df_raw for detailed category rows
+        payroll = df_raw[
+            (df_raw["Year"] == year) &
+            (df_raw["Category"].isin(["Salaries & Wages", "Payroll Tax Expense"]))
+        ]["Amount"].sum()
+            
+        utilities = df_raw[
+            (df_raw["Year"] == year) &
+            (df_raw["Category"].str.contains("Utilit", case=False, na=False))                
+        ]["Amount"].sum()
+            
+        summary_rows.append(["Total Revenue", year, revenue])
+        summary_rows.append(["Total Expenses", year, total_expenses])
+        summary_rows.append(["Net Income", year, net_income])            
+        summary_rows.append(["Payroll", year, payroll])
+        summary_rows.append(["Utilities", year, utilities])
+            
         summary_df = pd.DataFrame(summary_rows, columns=["Category", "Year", "Amount"])
     
         # SAFE formatting
