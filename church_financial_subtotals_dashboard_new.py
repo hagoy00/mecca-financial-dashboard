@@ -493,6 +493,8 @@ def style_top5(df):
     styler = styler.format("{:,.0f}", subset=numeric_cols)
 
     return styler
+
+
 #-----------------------------------------------
 # Main 
 #-----------------------------------------------
