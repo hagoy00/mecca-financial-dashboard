@@ -294,7 +294,7 @@ def assign_income_expense(df):
     return df
 
 # ---------------------------------------------------------
-# EXTRACT SUBTOTALS + AUTO TOTALS (FINAL WORKING VERSION)
+# EXTRACT SUBTOTALS + AUTO TOTALS (FINAL DEDUPED VERSION)
 # ---------------------------------------------------------
 def extract_subtotals(df):
     if df is None or df.empty:
@@ -361,9 +361,9 @@ def extract_subtotals(df):
     util_sum = make_df(util_rows, "Utilities")
 
     # -----------------------------------------------------
-    # RETURN FULL SUBTOTAL SET (YOUR VERSION)
+    # FIX: REMOVE DUPLICATES (Category + Year)
     # -----------------------------------------------------
-    return pd.concat(
+    combined = pd.concat(
         [
             subtotals[["Category", "Year", "Amount", "Source"]],
             total_income,
@@ -376,6 +376,10 @@ def extract_subtotals(df):
         ignore_index=True
     )
 
+    # Deduplicate by summing duplicates
+    combined = combined.groupby(["Category", "Year"], as_index=False)["Amount"].sum()
+
+    return combined
 # ---------------------------------------------------------
 # YOY CALC (generic)
 # ---------------------------------------------------------
@@ -386,9 +390,6 @@ def compute_yoy(subtotals):
     df["YoY %"] = df.groupby("Category")["Amount"].pct_change() * 100
     return df
 
-# ---------------------------------------------------------
-# SURPLUS / DEFICIT (using auto totals)
-# ---------------------------------------------------------
 def compute_surplus_deficit(subtotals):
     df = subtotals.copy()
 
@@ -410,6 +411,9 @@ def compute_surplus_deficit(subtotals):
                .merge(net_income, on="Year", how="outer")
                .sort_values("Year")
     )
+
+    # FINAL FIX: ensure one row per year
+    merged = merged.groupby("Year", as_index=False).first()
 
     return merged
 
