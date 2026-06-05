@@ -496,19 +496,24 @@ def style_top5(df):
 #-----------------------------------------------
 # Main 
 #-----------------------------------------------
+
 def main():
 
-    df = load_data()
-    df = extract_subtotals(df)     # ← This ensures df has Source column
-    subtotals = df                 # subtotals now inside df
-    yoy_df = compute_yoy(subtotals)
+    # Load full raw data
+    df_raw = load_data()
 
-    years = sorted(df["Year"].unique())
+    # Extract subtotals (this includes Source column)
+    df_subtotals = extract_subtotals(df_raw)
+
+    # Subtotals for YOY, Forecast, Surplus/Deficit
+    subtotals = df_subtotals
+    yoy_df = compute_yoy(df_subtotals)
+
+    # Years for filters (use raw data, not subtotals)
+    years = sorted(df_raw["Year"].unique())
     selected_years = st.multiselect("Select Years", years, default=years)
 
-    # -----------------------------------------
-    # Tabs (must NOT be indented deeper)
-    # -----------------------------------------
+    # Tabs
     tab1, tab2, tab_top, tab3, tab4, tab_pdf = st.tabs([
         "Subtotal Summary",
         "YOY Summary",
@@ -516,7 +521,7 @@ def main():
         "Surplus / Deficit",
         "Forecasting",
         "Board PDF"
-    ]) 
+    ])
     
     # -----------------------------------------------------
     # TAB 1 — UNIFIED SUBTOTAL SUMMARY (FINAL STABLE VERSION)
