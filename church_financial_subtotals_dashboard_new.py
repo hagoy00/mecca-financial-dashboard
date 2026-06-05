@@ -555,37 +555,37 @@ def forecast_totals(df_subtotals, category, end_year=2030):
     df_forecast = pd.DataFrame({"Year": future_years, "Amount": future_amounts, "Type": "Forecast"})
     return pd.concat([df_cat, df_forecast], ignore_index=True)
 
-    # ---------------------------------------------------------
-    # Main
-    # ---------------------------------------------------------
-    def main():
-    st.title("Church Financial Dashboard")
+# ---------------------------------------------------------
+# Main
+# ---------------------------------------------------------
+def main():
+st.title("Church Financial Dashboard")
 
-    # ---------------------------------------------------------
-    # LOAD EXCEL FILE DIRECTLY FROM REPO
-    # ---------------------------------------------------------
-    try:
-        df_raw = pd.read_excel("MECCA_Financial_Data.xlsx")
-    except Exception as e:
-        st.error(f"❌ Could not load MECCA_Financial_Data.xlsx: {e}")
-        st.stop()
+# ---------------------------------------------------------
+# LOAD EXCEL FILE DIRECTLY FROM REPO
+# ---------------------------------------------------------
+try:
+    df_raw = pd.read_excel("MECCA_Financial_Data.xlsx")
+except Exception as e:
+    st.error(f"❌ Could not load MECCA_Financial_Data.xlsx: {e}")
+    st.stop()
 
-    # ---------------------------------------------------------
-    # Extract subtotals
-    # ---------------------------------------------------------
-    df_subtotals = extract_subtotals(df_raw)
+# ---------------------------------------------------------
+# Extract subtotals
+# ---------------------------------------------------------
+df_subtotals = extract_subtotals(df_raw)
 
-    if df_subtotals.empty:
-        st.error("❌ extract_subtotals() returned an empty DataFrame — cannot continue.")
-        st.stop()
+if df_subtotals.empty:
+    st.error("❌ extract_subtotals() returned an empty DataFrame — cannot continue.")
+    st.stop()
 
-    # Subtotals for YOY, Forecast, Surplus/Deficit
-    subtotals = df_subtotals
-    yoy_df = compute_yoy(df_subtotals)
+# Subtotals for YOY, Forecast, Surplus/Deficit
+subtotals = df_subtotals
+yoy_df = compute_yoy(df_subtotals)
 
-    # Years for filters (use raw data)
-    years = sorted(df_raw["Year"].unique())
-    selected_years = st.multiselect("Select Years", years, default=years)
+# Years for filters (use raw data)
+years = sorted(df_raw["Year"].unique())
+selected_years = st.multiselect("Select Years", years, default=years)
 
     #-----------------------------------------------
     # Tabs
