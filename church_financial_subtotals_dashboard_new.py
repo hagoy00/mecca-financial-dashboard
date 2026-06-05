@@ -943,17 +943,10 @@ def main():
                 (df_sd["Year"] <= yr_range[1])
             ].copy()
     
-            # Add YoY %
-            ## --- DEBUG: Show columns before calculating YoY %
-            st.write("DEBUG COLUMNS:", filtered.columns.tolist())
-            
             # Correct YoY % calculation using actual column name
             filtered["YoY %"] = filtered["Net_Income"].pct_change() * 100
             
-            # --- DEBUG: Show the first few rows after calculation
-            st.write("DEBUG FILTERED HEAD:", filtered.head())
-            
-                        # -----------------------------------------------------
+            # -----------------------------------------------------
             # BOARD SUMMARY CARD
             # -----------------------------------------------------
             latest = filtered.iloc[-1]
