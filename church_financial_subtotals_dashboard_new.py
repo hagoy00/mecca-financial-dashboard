@@ -173,31 +173,52 @@ def format_numbers(df, exclude_cols=None):
             df[col] = df[col].apply(lambda x: f"{x:,.0f}")
     return df
 
-
 # ---------------------------------------------------------
 # LOAD DATA
 # ---------------------------------------------------------
 @st.cache_data
 def load_data():
     file_path = get_file_path()
-    xls = pd.ExcelFile(file_path)
+
+    # Load Excel file
+    try:
+        xls = pd.ExcelFile(file_path)
+    except Exception as e:
+        st.error(f"❌ Could not open Excel file: {e}")
+        return pd.DataFrame()
+
     all_years = []
 
     for sheet in xls.sheet_names:
+        # Only process sheets named as years (e.g., "2021")
+        if not sheet.isdigit():
+            continue
+
+        year = int(sheet)
+
         try:
-            year = int(sheet)
+            df = pd.read_excel(file_path, sheet_name=sheet)
         except Exception:
             continue
 
-        df = pd.read_excel(file_path, sheet_name=sheet)
+        # Clean column names
         df.columns = df.columns.str.strip()
 
+        # Must have Category column
         if "Category" not in df.columns:
             continue
 
-        value_col = [c for c in df.columns if c != "Category"][0]
+        # The amount column is the year column (e.g., "2021")
+        value_cols = [c for c in df.columns if c != "Category"]
+        if not value_cols:
+            continue
+
+        value_col = value_cols[0]
+
+        # Rename to Amount
         df = df.rename(columns={value_col: "Amount"})
 
+        # Clean Amount values
         df["Amount"] = (
             df["Amount"]
             .astype(str)
@@ -207,17 +228,28 @@ def load_data():
             .str.replace("(", "-", regex=False)
             .str.replace(")", "", regex=False)
         )
+
         df["Amount"] = df["Amount"].replace("", 0)
         df["Amount"] = df["Amount"].fillna(0)
-        df["Amount"] = pd.to_numeric(df["Amount"], errors="coerce")
+        df["Amount"] = pd.to_numeric(df["Amount"], errors="coerce").fillna(0)
 
+        # Add Year + Kind
         df["Year"] = year
         df["Kind"] = df["Category"].apply(classify_row_kind)
 
+        # Keep only needed columns
         all_years.append(df[["Category", "Year", "Amount", "Kind"]])
 
+    # ⭐ Prevent crash if no sheets were processed
+    if not all_years:
+        return pd.DataFrame()
+
+    # Combine all years
     full_df = pd.concat(all_years, ignore_index=True)
+
+    # Assign Income / Expense / Subtotal
     full_df = assign_income_expense(full_df)
+
     return full_df
 
 # ---------------------------------------------------------
