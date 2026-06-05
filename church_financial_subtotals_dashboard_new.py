@@ -555,34 +555,23 @@ def forecast_totals(df_subtotals, category, end_year=2030):
     df_forecast = pd.DataFrame({"Year": future_years, "Amount": future_amounts, "Type": "Forecast"})
     return pd.concat([df_cat, df_forecast], ignore_index=True)
 
-def main():
-
+    # ---------------------------------------------------------
+    # Main
+    # ---------------------------------------------------------
+    def main():
     st.title("Church Financial Dashboard")
 
     # ---------------------------------------------------------
-    # FILE UPLOAD (FINAL, BULLETPROOF VERSION)
+    # LOAD EXCEL FILE DIRECTLY FROM REPO
     # ---------------------------------------------------------
-    uploaded_file = st.file_uploader("📄 Upload Church Financial Excel File", type=["xlsx"])
-
-    if uploaded_file is None:
-        st.warning("Please upload an Excel file to continue.")
-        st.stop()
-
     try:
-        df_raw = pd.read_excel(uploaded_file)
+        df_raw = pd.read_excel("MECCA_Financial_Data.xlsx")
     except Exception as e:
-        st.error(f"❌ Failed to read Excel file: {e}")
-        st.stop()
-
-    required_cols = {"Category", "Amount", "Year"}
-    missing = required_cols - set(df_raw.columns)
-
-    if missing:
-        st.error(f"❌ Excel file is missing required columns: {missing}")
+        st.error(f"❌ Could not load MECCA_Financial_Data.xlsx: {e}")
         st.stop()
 
     # ---------------------------------------------------------
-    # Extract subtotals (includes Source column)
+    # Extract subtotals
     # ---------------------------------------------------------
     df_subtotals = extract_subtotals(df_raw)
 
