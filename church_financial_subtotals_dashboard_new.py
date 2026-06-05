@@ -679,65 +679,62 @@ def main():
     # -----------------------------------------------------
     with tab2:
         st.subheader("📘 Year‑Over‑Year (YOY) Summary")
-
+    
         TARGET_ORDER = [
-        "Total Revenue",
-        "Total Expenses",
-        "Net Income",
-        "Payroll",
-        "Utilities"
+            "Total Revenue",
+            "Total Expenses",
+            "Net Income",
+            "Payroll",
+            "Utilities"
         ]
-
-
+    
         yoy_rows = []
-
+    
         for cat in TARGET_ORDER:
             cat_data = subtotals[subtotals["Category"] == cat].sort_values("Year")
             years_cat = cat_data["Year"].tolist()
             amounts = cat_data["Amount"].tolist()
-
+    
             for i in range(len(years_cat)):
                 year = years_cat[i]
                 amount = amounts[i]
-
+    
                 prev_year = year - 1
-
+    
                 if prev_year not in years_cat:
                     yoy_change = 0
                     yoy_pct = 0
                 else:
                     prev_index = years_cat.index(prev_year)
                     prev = amounts[prev_index]
-
+    
                     yoy_change = amount - prev
                     yoy_pct = (yoy_change / prev * 100) if prev != 0 else 0
-
+    
                 yoy_rows.append([cat, year, amount, yoy_change, yoy_pct])
-
+    
         yoy_clean = pd.DataFrame(yoy_rows, columns=[
             "Category", "Year", "Amount", "YoY Change", "YoY %"
         ])
-
-        #yoy_clean = add_yoy_icons(yoy_clean)
-
+    
         yoy_pivot = yoy_clean.pivot_table(
             index="Category",
             columns="Year",
             values="YoY Change",
             aggfunc="sum"
         ).fillna(0)
-
+    
         st.dataframe(yoy_pivot.style.format("{:,.0f}"), use_container_width=True)
-
+    
     # -----------------------------------------------------
     # TAB 3 — TOP INCOME & EXPENSES (FORECASTING)
     # -----------------------------------------------------
     with tab_top:
         st.subheader("Top Income & Top Expenses")
     
-        # RAW numeric data (all years)
-        raw_top_income = get_top_income(df)
-        raw_top_expense = get_top_expense(df)
+        # RAW numeric data (all years) — use df_raw, NOT df
+        raw_top_income = get_top_income(df_raw)
+        raw_top_expense = get_top_expense(df_raw)
     
         # Year selector
         year_sel = st.selectbox("Select Year", years)
@@ -774,7 +771,8 @@ def main():
     
         if not inc_year.empty:
             selected_inc = st.selectbox("Forecast Income Category", inc_year["Category"])
-            inc_forecast = forecast_category(df, selected_inc)
+            # use df_raw for category-level forecast
+            inc_forecast = forecast_category(df_raw, selected_inc)
     
             if not inc_forecast.empty:
                 chart = (
@@ -782,19 +780,17 @@ def main():
                     .mark_line(point=True)
                     .encode(
                         x=alt.X("Year:O", title="Year"),
-                        #y=alt.Y("Amount:Q", title="Amount"),
                         y=alt.Y(
-                        "Amount:Q",
-                        title="Amount",
-                        axis=alt.Axis(
-                            tickCount=5,
-                            labelOverlap=False
+                            "Amount:Q",
+                            title="Amount",
+                            axis=alt.Axis(
+                                tickCount=5,
+                                labelOverlap=False
+                            ),
+                            scale=alt.Scale(
+                                nice=False
+                            )
                         ),
-                        scale=alt.Scale(
-                            nice=False
-                        )
-                    ),
-
                         color="Type:N",
                         tooltip=["Year", "Amount", "Type"]
                     )
@@ -810,7 +806,8 @@ def main():
     
         if not exp_year.empty:
             selected_exp = st.selectbox("Forecast Expense Category", exp_year["Category"])
-            exp_forecast = forecast_category(df, selected_exp)
+            # use df_raw for category-level forecast
+            exp_forecast = forecast_category(df_raw, selected_exp)
     
             if not exp_forecast.empty:
                 chart = (
@@ -818,19 +815,17 @@ def main():
                     .mark_line(point=True)
                     .encode(
                         x=alt.X("Year:O", title="Year"),
-                        #y=alt.Y("Amount:Q", title="Amount"),
                         y=alt.Y(
-                        "Amount:Q",
-                        title="Amount",
-                        axis=alt.Axis(
-                            tickCount=5,
-                            labelOverlap=False
+                            "Amount:Q",
+                            title="Amount",
+                            axis=alt.Axis(
+                                tickCount=5,
+                                labelOverlap=False
+                            ),
+                            scale=alt.Scale(
+                                nice=False
+                            )
                         ),
-                        scale=alt.Scale(
-                            nice=False
-                        )
-                    ),
-
                         color="Type:N",
                         tooltip=["Year", "Amount", "Type"]
                     )
@@ -841,7 +836,7 @@ def main():
                     )
                 )
                 st.altair_chart(chart, use_container_width=True)
-    
+
     # -----------------------------------------------------
     # TAB 4 — SURPLUS / DEFICIT (FINAL FIXED VERSION)
     # -----------------------------------------------------
