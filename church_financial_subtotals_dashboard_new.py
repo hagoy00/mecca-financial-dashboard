@@ -252,9 +252,6 @@ def assign_income_expense(df):
 # ---------------------------------------------------------
 # EXTRACT SUBTOTALS + AUTO TOTALS (FINAL BULLETPROOF VERSION)
 # ---------------------------------------------------------
-# ---------------------------------------------------------
-# EXTRACT SUBTOTALS + AUTO TOTALS (FINAL BULLETPROOF VERSION)
-# ---------------------------------------------------------
 def extract_subtotals(df):
     # -----------------------------------------------------
     # GUARD CLAUSES — PREVENT ALL CRASHES
