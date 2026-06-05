@@ -725,7 +725,7 @@ def main():
         ).fillna(0)
     
         st.dataframe(yoy_pivot.style.format("{:,.0f}"), use_container_width=True)
-
+    
     # -----------------------------------------------------
     # TAB 3 — TOP INCOME & EXPENSES (FORECASTING)
     # -----------------------------------------------------
@@ -773,7 +773,6 @@ def main():
     
         if not inc_year.empty:
             selected_inc = st.selectbox("Forecast Income Category", inc_year["Category"])
-            # use df_raw for category-level forecast
             inc_forecast = forecast_category(df_raw, selected_inc)
     
             if not inc_forecast.empty:
@@ -785,10 +784,7 @@ def main():
                         y=alt.Y(
                             "Amount:Q",
                             title="Amount",
-                            axis=alt.Axis(
-                                tickCount=5,
-                                labelOverlap=False
-                            ),
+                            axis=alt.Axis(tickCount=5, labelOverlap=False),
                             scale=alt.Scale(nice=False)
                         ),
                         color="Type:N",
@@ -806,7 +802,6 @@ def main():
     
         if not exp_year.empty:
             selected_exp = st.selectbox("Forecast Expense Category", exp_year["Category"])
-            # use df_raw for category-level forecast
             exp_forecast = forecast_category(df_raw, selected_exp)
     
             if not exp_forecast.empty:
@@ -818,10 +813,7 @@ def main():
                         y=alt.Y(
                             "Amount:Q",
                             title="Amount",
-                            axis=alt.Axis(
-                                tickCount=5,
-                                labelOverlap=False
-                            ),
+                            axis=alt.Axis(tickCount=5, labelOverlap=False),
                             scale=alt.Scale(nice=False)
                         ),
                         color="Type:N",
@@ -835,7 +827,8 @@ def main():
                 )
                 st.altair_chart(chart, use_container_width=True)
 
-
+    
+    
     # -----------------------------------------------------
     # TAB 4 — SURPLUS / DEFICIT (FINAL FIXED VERSION)
     # -----------------------------------------------------
