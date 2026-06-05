@@ -828,87 +828,12 @@ def main():
                 st.altair_chart(chart, use_container_width=True)
 
     
-    
     # -----------------------------------------------------
-    # TAB 4 — SURPLUS / DEFICIT (FINAL FIXED VERSION)
-    # -----------------------------------------------------
-    with tab3:
-        st.subheader("📊 Surplus / Deficit Summary")
-    
-        # Build surplus/deficit table
-        sd_rows = []
-        years_sorted = sorted(df["Year"].unique())
-    
-        income_vals = []
-        expense_vals = []
-    
-        # Collect income & expense totals
-        for year in years_sorted:
-            inc = subtotals[
-                (subtotals["Year"] == year) &
-                (subtotals["Category"].str.lower() == "total for income")
-            ]["Amount"].sum()
-    
-            exp = subtotals[
-                (subtotals["Year"] == year) &
-                (subtotals["Category"].str.lower() == "total for expenses")
-            ]["Amount"].sum()
-    
-            income_vals.append(inc)
-            expense_vals.append(exp)
-    
-        # Build rows
-        for i, year in enumerate(years_sorted):
-            inc = income_vals[i]
-            exp = expense_vals[i]
-    
-            surplus = round(inc - exp, 2)
-    
-            if i == 0:
-                yoy_change = 0
-            else:
-                prev_surplus = round(income_vals[i - 1] - expense_vals[i - 1], 2)
-                yoy_change = round(surplus - prev_surplus, 2)
-    
-            sd_rows.append([year, inc, exp, surplus, yoy_change])
-    
-        # Create DataFrame
-        sd_df = pd.DataFrame(
-            sd_rows,
-            columns=["Year", "Total Income", "Total Expenses", "Surplus/Deficit", "YoY Change"]
-        )
-    
-        # Filter by selected years
-        if selected_years:
-            sd_filtered = sd_df[sd_df["Year"].isin(selected_years)]
-        else:
-            sd_filtered = sd_df.copy()
-    
-        # Reset index (clean)
-        sd_filtered = sd_filtered.reset_index(drop=True)
-    
-        # 🔥 REMOVE THE UNWANTED FIRST COLUMN (0,1,2,3,4)
-        # This guarantees the fix even if a hidden column appears.
-        if sd_filtered.columns[0] not in ["Year"]:
-            sd_filtered = sd_filtered.iloc[:, 1:]
-    
-        # Display clean table
-        st.dataframe(
-            sd_filtered.style.format({
-                "Total Income": "{:,.0f}",
-                "Total Expenses": "{:,.0f}",
-                "Surplus/Deficit": "{:,.0f}",
-                "YoY Change": "{:,.0f}"
-            }),
-            use_container_width=True
-        )
-        
-    # -----------------------------------------------------
-    # TAB 5 — FORECASTING
+    # TAB 5 — FORECASTING (FINAL FIXED VERSION)
     # -----------------------------------------------------
     with tab4:
         st.subheader("📈 Forecasting Through 2030")
-
+    
         FORECAST_TARGETS = [
             "Total Revenue",
             "Total Expenses",
@@ -916,16 +841,22 @@ def main():
             "Payroll",
             "Utilities"
         ]
-
+    
         for category in FORECAST_TARGETS:
             st.markdown(f"### 🔮 {category} Forecast (to 2030)")
-
-            fc = forecast_category(subtotals, category)
-
+    
+            # TOTALS use df_subtotals
+            if category in ["Total Revenue", "Total Expenses", "Net Income"]:
+                fc = forecast_totals(subtotals, category)
+    
+            # CATEGORY-LEVEL uses df_raw
+            else:
+                fc = forecast_category(df_raw, category)
+    
             if fc.empty:
                 st.warning(f"No data available to forecast {category}")
                 continue
-
+    
             chart = (
                 alt.Chart(fc)
                 .mark_line(point=True)
@@ -937,17 +868,20 @@ def main():
                 )
                 .properties(width=800, height=400)
             )
-
+    
             st.altair_chart(chart, use_container_width=True)
-
+    
             st.dataframe(
                 fc.pivot_table(index="Year", columns="Type", values="Amount")
                   .fillna(0)
                   .style.format("{:,.0f}"),
                 use_container_width=True
             )
-
+    
             st.divider()
+    
+    
+    
 
     # -----------------------------------------------------
     # TAB 6 — BOARD PDF
