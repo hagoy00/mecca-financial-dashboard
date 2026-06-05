@@ -725,7 +725,7 @@ def main():
         ).fillna(0)
     
         st.dataframe(yoy_pivot.style.format("{:,.0f}"), use_container_width=True)
-    
+
     # -----------------------------------------------------
     # TAB 3 — TOP INCOME & EXPENSES (FORECASTING)
     # -----------------------------------------------------
@@ -763,6 +763,8 @@ def main():
         st.markdown(f"### 📉 Top 5 Expense Categories — {year_sel}")
         st.dataframe(exp_year_display, use_container_width=True)
     
+        st.divider()
+    
         # -----------------------------------------------------
         # FORECAST CHARTS (STACKED VERTICALLY)
         # -----------------------------------------------------
@@ -787,9 +789,7 @@ def main():
                                 tickCount=5,
                                 labelOverlap=False
                             ),
-                            scale=alt.Scale(
-                                nice=False
-                            )
+                            scale=alt.Scale(nice=False)
                         ),
                         color="Type:N",
                         tooltip=["Year", "Amount", "Type"]
@@ -822,9 +822,7 @@ def main():
                                 tickCount=5,
                                 labelOverlap=False
                             ),
-                            scale=alt.Scale(
-                                nice=False
-                            )
+                            scale=alt.Scale(nice=False)
                         ),
                         color="Type:N",
                         tooltip=["Year", "Amount", "Type"]
@@ -836,6 +834,7 @@ def main():
                     )
                 )
                 st.altair_chart(chart, use_container_width=True)
+
 
     # -----------------------------------------------------
     # TAB 4 — SURPLUS / DEFICIT (FINAL FIXED VERSION)
