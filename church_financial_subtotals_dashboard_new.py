@@ -412,6 +412,10 @@ def compute_surplus_deficit(subtotals):
 
     return merged
 
+    st.write("DEBUG – categories in SUBTOTALS:", df_subtotals["Category"].unique())
+    st.write("DEBUG – Payroll rows:", df_subtotals[df_subtotals["Category"] == "Payroll"])
+    st.write("DEBUG – Utilities rows:", df_subtotals[df_subtotals["Category"] == "Utilities"])
+    
 # ---------------------------------------------------------
 # FORECASTING — CATEGORY LEVEL (NO SOURCE COLUMN)
 # ---------------------------------------------------------
