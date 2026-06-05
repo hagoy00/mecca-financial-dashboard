@@ -322,7 +322,7 @@ def extract_subtotals(df):
     # 2. Auto totals
     total_income = make_df(
         subtotals[subtotals["Category"].str.contains("Total for Income", case=False)],
-        "Total Income"
+        "Total_Income"
     )
 
     total_expenses = make_df(
@@ -398,7 +398,7 @@ def compute_surplus_deficit(subtotals):
     df = subtotals.copy()
 
     # Extract each subtotal category with unique column names
-    total_income = df[df["Category"] == "Total Income"][["Year", "Amount"]]
+    total_income = df[df["Category"] == "Total_Income"][["Year", "Amount"]]
     total_income = total_income.rename(columns={"Amount": "Total_Income"})
 
     total_expenses = df[df["Category"] == "Total Expenses"][["Year", "Amount"]]
@@ -971,7 +971,7 @@ def main():
                     📌 Board Summary — {int(latest['Year'])}
                 </h3>
                 <p style="margin:6px 0 0 0; font-size:16px;">
-                    <b>Total Income:</b> ${latest['Total Income']:,.0f}<br>
+                    <b>Total_Income:</b> ${latest['Total_Income']:,.0f}<br>
                     <b>Total Expenses:</b> ${latest['Total Expenses']:,.0f}<br>
                     <b>Net_Income (Surplus/Deficit):</b> 
                     <span style="color:{surplus_color}; font-weight:700;">
@@ -987,13 +987,13 @@ def main():
             # -----------------------------------------------------
             last3 = filtered.tail(3).copy()
     
-            margin = last3["Net_Income"].iloc[-1] / last3["Total Income"].iloc[-1]
+            margin = last3["Net_Income"].iloc[-1] / last3["Total_Income"].iloc[-1]
             margin_score = max(0, min(1, margin)) * 40
     
             yoy = last3["Net_Income"].pct_change().iloc[-1]
             yoy_score = max(0, min(1, yoy)) * 30
     
-            efficiency = last3["Total Expenses"].iloc[-1] / last3["Total Income"].iloc[-1]
+            efficiency = last3["Total Expenses"].iloc[-1] / last3["Total_Income"].iloc[-1]
             eff_score = (1 - max(0, min(1, efficiency))) * 20
     
             stability = 1 - (last3["Net_Income"].std() / abs(last3["Net_Income"].mean()))
@@ -1034,7 +1034,7 @@ def main():
             # 3-YEAR TREND SUMMARY
             # -----------------------------------------------------
             trend = last3.copy()
-            trend["Income YoY %"] = trend["Total Income"].pct_change() * 100
+            trend["Income YoY %"] = trend["Total_Income"].pct_change() * 100
             trend["Expense YoY %"] = trend["Total Expenses"].pct_change() * 100
             trend["Net YoY %"] = trend["Net_Income"].pct_change() * 100
             
@@ -1045,7 +1045,7 @@ def main():
             
             trend_styled = (
                 trend.style.format({
-                    "Total Income": "{:,.0f}",
+                    "Total_Income": "{:,.0f}",
                     "Total Expenses": "{:,.0f}",
                     "Net_Income": "{:,.0f}",
                     "Income YoY %": "{:,.1f}%",
@@ -1065,7 +1065,7 @@ def main():
             filtered_styled = (
                 filtered.style.format({
                     "Total Revenue": "{:,.0f}",
-                    "Total Income": "{:,.0f}",
+                    "Total_Income": "{:,.0f}",
                     "Total Expenses": "{:,.0f}",
                     "Net_Income": "{:,.0f}",
                     "YoY %": "{:,.1f}%"
