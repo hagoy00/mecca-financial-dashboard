@@ -175,35 +175,6 @@ def format_numbers(df, exclude_cols=None):
 
 
 # ---------------------------------------------------------
-# ASSIGN Income / Expense / Subtotal  (FINAL CLEAN VERSION)
-# ---------------------------------------------------------
-def assign_income_expense(df):
-    df = df.copy()
-    df["Type"] = None
-
-    for year, group in df.groupby("Year"):
-        income_total_idx = group[group["Category"].str.lower() == "total for income"].index
-        expense_total_idx = group[group["Category"].str.lower() == "total for expenses"].index
-
-        if len(income_total_idx) == 0 or len(expense_total_idx) == 0:
-            continue
-
-        income_end = income_total_idx[0]
-        expense_end = expense_total_idx[0]
-
-        # 1. INCOME BLOCK
-        df.loc[group.index.min():income_end - 1, "Type"] = "Income"
-
-        # 2. EXPENSE BLOCK
-        df.loc[income_end + 1:expense_end - 1, "Type"] = "Expense"
-
-        # 3. SUBTOTALS override everything
-        subtotal_idx = group.index[group["Category"].str.lower().str.startswith("total for ")]
-        df.loc[subtotal_idx, "Type"] = "Subtotal"
-
-    return df
-
-# ---------------------------------------------------------
 # LOAD DATA
 # ---------------------------------------------------------
 @st.cache_data
@@ -250,12 +221,42 @@ def load_data():
     return full_df
 
 # ---------------------------------------------------------
+# ASSIGN Income / Expense / Subtotal  (FINAL CLEAN VERSION)
+# ---------------------------------------------------------
+def assign_income_expense(df):
+    df = df.copy()
+    df["Type"] = None
+
+    for year, group in df.groupby("Year"):
+        income_total_idx = group[group["Category"].str.lower() == "total for income"].index
+        expense_total_idx = group[group["Category"].str.lower() == "total for expenses"].index
+
+        if len(income_total_idx) == 0 or len(expense_total_idx) == 0:
+            continue
+
+        income_end = income_total_idx[0]
+        expense_end = expense_total_idx[0]
+
+        # 1. INCOME BLOCK
+        df.loc[group.index.min():income_end - 1, "Type"] = "Income"
+
+        # 2. EXPENSE BLOCK
+        df.loc[income_end + 1:expense_end - 1, "Type"] = "Expense"
+
+        # 3. SUBTOTALS override everything
+        subtotal_idx = group.index[group["Category"].str.lower().str.startswith("total for ")]
+        df.loc[subtotal_idx, "Type"] = "Subtotal"
+
+    return df
+
+
+# ---------------------------------------------------------
 # EXTRACT SUBTOTALS + AUTO TOTALS (FINAL FIXED VERSION)
 # ---------------------------------------------------------
 def extract_subtotals(df):
     df = df.copy()
 
-    # Existing subtotals
+    # 1. Extract existing subtotal rows
     mask = (
         df["Category"].str.startswith("Total for ")
         | (df["Category"] == "Net Income")
@@ -264,12 +265,14 @@ def extract_subtotals(df):
     subtotals = df[mask].reset_index(drop=True)
     subtotals["Source"] = "Excel"
 
-    # Auto totals
-    total_income = df[df["Category"] == "Total for Income"].groupby("Year")["Amount"].sum().reset_index()
+    # 2. AUTO TOTALS
+    income_rows = subtotals[subtotals["Category"] == "Total for Income"]
+    total_income = income_rows.groupby("Year")["Amount"].sum().reset_index()
     total_income["Category"] = "Total Income"
     total_income["Source"] = "Excel"
 
-    total_expenses = df[df["Category"] == "Total for Expenses"].groupby("Year")["Amount"].sum().reset_index()
+    expense_rows = subtotals[subtotals["Category"] == "Total for Expenses"]
+    total_expenses = expense_rows.groupby("Year")["Amount"].sum().reset_index()
     total_expenses["Category"] = "Total Expenses"
     total_expenses["Source"] = "Excel"
 
@@ -283,17 +286,21 @@ def extract_subtotals(df):
     net_income["Category"] = "Net Income"
     net_income["Source"] = "Excel"
 
-    # Payroll
+    # 3. PAYROLL SUBTOTAL
     payroll_sum = df[df["Category"].isin(["Salaries & Wages", "Payroll Tax Expense"])].groupby("Year")["Amount"].sum().reset_index()
     payroll_sum["Category"] = "Payroll"
     payroll_sum["Source"] = "Excel"
 
-    # Utilities
+    # 4. UTILITIES SUBTOTAL
     util_sum = df[df["Category"].str.contains("Utilit", case=False, na=False)].groupby("Year")["Amount"].sum().reset_index()
     util_sum["Category"] = "Utilities"
     util_sum["Source"] = "Excel"
 
-    return pd.concat([subtotals, total_income, total_expenses, revenue_df, net_income, payroll_sum, util_sum], ignore_index=True)
+    # 5. RETURN FULL SUBTOTAL SET
+    return pd.concat(
+        [subtotals, total_income, total_expenses, revenue_df, net_income, payroll_sum, util_sum],
+        ignore_index=True
+    )
 
 # ---------------------------------------------------------
 # YOY CALC (generic)
