@@ -944,17 +944,16 @@ def main():
             ].copy()
     
             # Add YoY %
-            # --- DEBUG: Show columns before calculating YoY %
+            ## --- DEBUG: Show columns before calculating YoY %
             st.write("DEBUG COLUMNS:", filtered.columns.tolist())
             
-            # --- ORIGINAL LINE THAT FAILS (keep it for now until we see columns)
-            filtered["YoY %"] = filtered["Net Income"].pct_change() * 100
+            # Correct YoY % calculation using actual column name
+            filtered["YoY %"] = filtered["Net_Income"].pct_change() * 100
             
             # --- DEBUG: Show the first few rows after calculation
             st.write("DEBUG FILTERED HEAD:", filtered.head())
-
-
-            # -----------------------------------------------------
+            
+                        # -----------------------------------------------------
             # BOARD SUMMARY CARD
             # -----------------------------------------------------
             latest = filtered.iloc[-1]
