@@ -412,10 +412,6 @@ def compute_surplus_deficit(subtotals):
 
     return merged
 
-    st.write("DEBUG – categories in SUBTOTALS:", df_subtotals["Category"].unique())
-    st.write("DEBUG – Payroll rows:", df_subtotals[df_subtotals["Category"] == "Payroll"])
-    st.write("DEBUG – Utilities rows:", df_subtotals[df_subtotals["Category"] == "Utilities"])
-    
 # ---------------------------------------------------------
 # FORECASTING — CATEGORY LEVEL (NO SOURCE COLUMN)
 # ---------------------------------------------------------
@@ -577,12 +573,7 @@ def main():
     if df_raw.empty:
         st.error("❌ No data loaded from Excel. Check sheet names and file path.")
         st.stop()
-
-    st.subheader("DEBUG — RAW DATA (first 50 rows)")
-    st.write(df_raw.head(50))
     
-    st.subheader("DEBUG — RAW CATEGORIES")
-    st.write(df_raw["Category"].unique().tolist())
     # Extract subtotals (includes Source column)
     df_subtotals = extract_subtotals(df_raw)
     
