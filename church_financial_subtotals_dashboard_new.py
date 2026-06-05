@@ -168,7 +168,7 @@ def classify_row_kind(cat):
     c = str(cat).strip().lower()
     if c.startswith("total for "):
         return "Subtotal"
-    if c in ["expenses", "net income", "net operating income"]:
+    if c in ["expenses", "Net_Income", "net operating income"]:
         return "Header"
     return "Detail"
 
@@ -306,7 +306,7 @@ def extract_subtotals(df):
     # 1. Extract existing subtotal rows
     mask = (
         df["Category"].str.startswith("Total for ")
-        | (df["Category"] == "Net Income")
+        | (df["Category"] == "Net_Income")
         | (df["Category"] == "Net Operating Income")
     )
     subtotals = df[mask].copy()
@@ -345,7 +345,7 @@ def extract_subtotals(df):
         - net_income["Amount_Expenses"].fillna(0)
     )
     net_income = net_income[["Year", "Amount"]]
-    net_income["Category"] = "Net Income"
+    net_income["Category"] = "Net_Income"
     net_income["Source"] = "Excel"
 
     # 3. Payroll
@@ -407,7 +407,7 @@ def compute_surplus_deficit(subtotals):
     revenue = df[df["Category"] == "Total Revenue"][["Year", "Amount"]]
     revenue = revenue.rename(columns={"Amount": "Total_Revenue"})
 
-    net_income = df[df["Category"] == "Net Income"][["Year", "Amount"]]
+    net_income = df[df["Category"] == "Net_Income"][["Year", "Amount"]]
     net_income = net_income.rename(columns={"Amount": "Net_Income"})
 
     # Merge safely — no overwriting
@@ -656,7 +656,7 @@ def main():
     
             summary_rows.append(["Total Revenue", year, revenue])
             summary_rows.append(["Total Expenses", year, total_expenses])
-            summary_rows.append(["Net Income", year, net_income])
+            summary_rows.append(["Net_Income", year, net_income])
             summary_rows.append(["Payroll", year, payroll])
             summary_rows.append(["Utilities", year, utilities])
     
@@ -778,7 +778,7 @@ def main():
         TARGET_ORDER = [
             "Total Revenue",
             "Total Expenses",
-            "Net Income",
+            "Net_Income",
             "Payroll",
             "Utilities"
         ]
@@ -957,7 +957,7 @@ def main():
             # BOARD SUMMARY CARD
             # -----------------------------------------------------
             latest = filtered.iloc[-1]
-            surplus_color = "green" if latest["Net Income"] > 0 else "red"
+            surplus_color = "green" if latest["Net_Income"] > 0 else "red"
     
             st.markdown(f"""
             <div style="
@@ -973,9 +973,9 @@ def main():
                 <p style="margin:6px 0 0 0; font-size:16px;">
                     <b>Total Income:</b> ${latest['Total Income']:,.0f}<br>
                     <b>Total Expenses:</b> ${latest['Total Expenses']:,.0f}<br>
-                    <b>Net Income (Surplus/Deficit):</b> 
+                    <b>Net_Income (Surplus/Deficit):</b> 
                     <span style="color:{surplus_color}; font-weight:700;">
-                        ${latest['Net Income']:,.0f}
+                        ${latest['Net_Income']:,.0f}
                     </span><br>
                     <b>YoY Change:</b> {latest['YoY %']:.1f}%
                 </p>
@@ -987,16 +987,16 @@ def main():
             # -----------------------------------------------------
             last3 = filtered.tail(3).copy()
     
-            margin = last3["Net Income"].iloc[-1] / last3["Total Income"].iloc[-1]
+            margin = last3["Net_Income"].iloc[-1] / last3["Total Income"].iloc[-1]
             margin_score = max(0, min(1, margin)) * 40
     
-            yoy = last3["Net Income"].pct_change().iloc[-1]
+            yoy = last3["Net_Income"].pct_change().iloc[-1]
             yoy_score = max(0, min(1, yoy)) * 30
     
             efficiency = last3["Total Expenses"].iloc[-1] / last3["Total Income"].iloc[-1]
             eff_score = (1 - max(0, min(1, efficiency))) * 20
     
-            stability = 1 - (last3["Net Income"].std() / abs(last3["Net Income"].mean()))
+            stability = 1 - (last3["Net_Income"].std() / abs(last3["Net_Income"].mean()))
             stab_score = max(0, min(1, stability)) * 10
     
             health_score = round(margin_score + yoy_score + eff_score + stab_score, 1)
@@ -1022,7 +1022,7 @@ def main():
                     🏛️ Financial Health Score: {health_score}/100
                 </h3>
                 <p style="margin:6px 0 0 0; font-size:16px;">
-                    <b>Net Income Margin:</b> {margin:.1%}<br>
+                    <b>Net_Income Margin:</b> {margin:.1%}<br>
                     <b>YoY Growth:</b> {yoy:.1%}<br>
                     <b>Expense Efficiency:</b> {efficiency:.1%}<br>
                     <b>Stability (3‑yr):</b> {stability:.1%}
@@ -1036,7 +1036,7 @@ def main():
             trend = last3.copy()
             trend["Income YoY %"] = trend["Total Income"].pct_change() * 100
             trend["Expense YoY %"] = trend["Total Expenses"].pct_change() * 100
-            trend["Net YoY %"] = trend["Net Income"].pct_change() * 100
+            trend["Net YoY %"] = trend["Net_Income"].pct_change() * 100
             
             st.markdown("### 📊 3‑Year Trend Summary")
             
@@ -1047,7 +1047,7 @@ def main():
                 trend.style.format({
                     "Total Income": "{:,.0f}",
                     "Total Expenses": "{:,.0f}",
-                    "Net Income": "{:,.0f}",
+                    "Net_Income": "{:,.0f}",
                     "Income YoY %": "{:,.1f}%",
                     "Expense YoY %": "{:,.1f}%",
                     "Net YoY %": "{:,.1f}%"
@@ -1067,10 +1067,10 @@ def main():
                     "Total Revenue": "{:,.0f}",
                     "Total Income": "{:,.0f}",
                     "Total Expenses": "{:,.0f}",
-                    "Net Income": "{:,.0f}",
+                    "Net_Income": "{:,.0f}",
                     "YoY %": "{:,.1f}%"
                 })
-                .apply(color_surplus, subset=["Net Income", "YoY %"])
+                .apply(color_surplus, subset=["Net_Income", "YoY %"])
             )
     
             st.dataframe(filtered_styled, use_container_width=True)
@@ -1078,19 +1078,19 @@ def main():
             # -----------------------------------------------------
             # SURPLUS / DEFICIT CHART
             # -----------------------------------------------------
-            st.markdown("### 📈 Surplus / Deficit Trend (Net Income)")
+            st.markdown("### 📈 Surplus / Deficit Trend (Net_Income)")
             chart = (
                 alt.Chart(filtered)
                 .mark_line(point=True)
                 .encode(
                     x="Year:O",
-                    y="Net Income:Q",
+                    y="Net_Income:Q",
                     color=alt.condition(
                         alt.datum.Net_Income > 0,
                         alt.value("green"),
                         alt.value("red")
                     ),
-                    tooltip=["Year", "Net Income", "YoY %"]
+                    tooltip=["Year", "Net_Income", "YoY %"]
                 )
                 .properties(width=800, height=400)
             )
@@ -1105,7 +1105,7 @@ def main():
         FORECAST_TARGETS = [
             "Total Revenue",
             "Total Expenses",
-            "Net Income",
+            "Net_Income",
             "Payroll",
             "Utilities"
         ]
@@ -1114,7 +1114,7 @@ def main():
             st.markdown(f"### 🔮 {category} Forecast (to 2030)")
     
             # TOTALS use df_subtotals
-            if category in ["Total Revenue", "Total Expenses", "Net Income"]:
+            if category in ["Total Revenue", "Total Expenses", "Net_Income"]:
                 fc = forecast_category(df_subtotals, category)
     
             # CATEGORY-LEVEL ALSO uses df_subtotals (FIXED)
