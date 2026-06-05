@@ -348,51 +348,34 @@ def compute_surplus_deficit(subtotals):
 
     return merged
 
-
 # ---------------------------------------------------------
-# FORECASTING
+# FORECASTING — CATEGORY LEVEL (NO SOURCE COLUMN)
 # ---------------------------------------------------------
-def forecast_category(df, category):
-    # Filter category and aggregate by year
-    df_cat = df[df["Category"] == category]
-
-    # 🔥 Keep ONLY Excel Net Income rows
-    df_cat = df_cat[df_cat["Source"] == "Excel"]
-    
-    df_cat = (
-        df_cat.groupby("Year")["Amount"]
-        .sum()
-        .reset_index()
-        .sort_values("Year")
-    )
+def forecast_category(df_raw, category):
+    df_cat = df_raw[df_raw["Category"] == category].copy()
+    df_cat = df_cat.sort_values("Year")
+    df_cat["Type"] = "Actual"
 
     if df_cat.empty:
         return pd.DataFrame()
 
-    # Prepare regression using numpy (no sklearn needed)
-    X = df_cat["Year"].values
-    y = df_cat["Amount"].values
+    last_year = df_cat["Year"].max()
+    last_amount = df_cat["Amount"].iloc[-1]
 
-    # Fit linear regression: y = m*x + b
-    m, b = np.polyfit(X, y, 1)
+    forecast_years = [last_year + 1, last_year + 2, last_year + 3]
+    forecast_amounts = [
+        last_amount * 1.03,
+        last_amount * 1.06,
+        last_amount * 1.09
+    ]
 
-    # Forecast next 5 years
-    last_year = X.max()
-    future_years = np.arange(last_year + 1, last_year + 6)
-    future_amounts = m * future_years + b
-
-    # Build forecast dataframe
-    forecast_df = pd.DataFrame({
-        "Year": future_years,
-        "Amount": future_amounts,
+    df_forecast = pd.DataFrame({
+        "Year": forecast_years,
+        "Amount": forecast_amounts,
         "Type": "Forecast"
     })
 
-    # Label actuals
-    df_cat["Type"] = "Actual"
-
-    # Combine actual + forecast
-    return pd.concat([df_cat, forecast_df], ignore_index=True)
+    return pd.concat([df_cat, df_forecast], ignore_index=True)
 
 # ---------------------------------------------------------
 # TOP INCOME / EXPENSE
@@ -493,6 +476,36 @@ def style_top5(df):
     styler = styler.format("{:,.0f}", subset=numeric_cols)
 
     return styler
+
+# ---------------------------------------------------------
+# FORECASTING — TOTALS (USES SOURCE COLUMN)
+# ---------------------------------------------------------
+def forecast_totals(df_subtotals, category):
+    df_cat = df_subtotals[df_subtotals["Category"] == category].copy()
+    df_cat = df_cat[df_cat["Source"] == "Excel"]
+    df_cat = df_cat.sort_values("Year")
+    df_cat["Type"] = "Actual"
+
+    if df_cat.empty:
+        return pd.DataFrame()
+
+    last_year = df_cat["Year"].max()
+    last_amount = df_cat["Amount"].iloc[-1]
+
+    forecast_years = [last_year + 1, last_year + 2, last_year + 3]
+    forecast_amounts = [
+        last_amount * 1.03,
+        last_amount * 1.06,
+        last_amount * 1.09
+    ]
+
+    df_forecast = pd.DataFrame({
+        "Year": forecast_years,
+        "Amount": forecast_amounts,
+        "Type": "Forecast"
+    })
+
+    return pd.concat([df_cat, df_forecast], ignore_index=True)
 
 #-----------------------------------------------
 # Main 
