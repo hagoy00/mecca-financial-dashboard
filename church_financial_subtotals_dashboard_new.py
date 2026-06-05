@@ -901,7 +901,6 @@ def main():
     with tab3:
         st.subheader("📉 Surplus / Deficit Summary")
     
-        # Use the correct dataset — NO duplicates
         df_sd = surplus_df.copy()
     
         if df_sd.empty:
@@ -960,27 +959,20 @@ def main():
             # -----------------------------------------------------
             last3 = filtered.tail(3).copy()
     
-            # 1. Net Income Margin
             margin = last3["Net Income"].iloc[-1] / last3["Total Income"].iloc[-1]
             margin_score = max(0, min(1, margin)) * 40
     
-            # 2. YoY Growth
             yoy = last3["Net Income"].pct_change().iloc[-1]
             yoy_score = max(0, min(1, yoy)) * 30
     
-            # 3. Expense Efficiency
             efficiency = last3["Total Expenses"].iloc[-1] / last3["Total Income"].iloc[-1]
             eff_score = (1 - max(0, min(1, efficiency))) * 20
     
-            # 4. Stability
             stability = 1 - (last3["Net Income"].std() / abs(last3["Net Income"].mean()))
             stab_score = max(0, min(1, stability)) * 10
     
-            # Final Score
-            health_score = margin_score + yoy_score + eff_score + stab_score
-            health_score = round(health_score, 1)
+            health_score = round(margin_score + yoy_score + eff_score + stab_score, 1)
     
-            # Color
             if health_score >= 80:
                 score_color = "green"
             elif health_score >= 60:
@@ -1017,9 +1009,9 @@ def main():
             trend["Income YoY %"] = trend["Total Income"].pct_change() * 100
             trend["Expense YoY %"] = trend["Total Expenses"].pct_change() * 100
             trend["Net YoY %"] = trend["Net Income"].pct_change() * 100
-            
+    
             st.markdown("### 📊 3‑Year Trend Summary")
-            
+    
             trend_styled = (
                 trend.style.format({
                     "Total Income": "{:,.0f}",
@@ -1031,7 +1023,7 @@ def main():
                 })
                 .apply(color_surplus, subset=["Net Income", "Net YoY %"])
             )
-            
+    
             st.dataframe(trend_styled, use_container_width=True)
     
             # -----------------------------------------------------
@@ -1039,17 +1031,18 @@ def main():
             # -----------------------------------------------------
             st.markdown("### 📄 Detailed Surplus / Deficit Table")
     
-            st.dataframe(
+            filtered_styled = (
                 filtered.style.format({
                     "Total Revenue": "{:,.0f}",
                     "Total Income": "{:,.0f}",
                     "Total Expenses": "{:,.0f}",
                     "Net Income": "{:,.0f}",
                     "YoY %": "{:,.1f}%"
-                }).apply(color_surplus, subset=["Net Income", "YoY %"])
-
-                use_container_width=True
+                })
+                .apply(color_surplus, subset=["Net Income", "YoY %"])
             )
+    
+            st.dataframe(filtered_styled, use_container_width=True)
     
             # -----------------------------------------------------
             # SURPLUS / DEFICIT CHART
