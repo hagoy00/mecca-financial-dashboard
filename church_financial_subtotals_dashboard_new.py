@@ -390,21 +390,27 @@ def compute_yoy(subtotals):
     df["YoY %"] = df.groupby("Category")["Amount"].pct_change() * 100
     return df
 
+# ---------------------------------------------------------
+# COMPUTE - SURPLUS — CATEGORY 
+# ---------------------------------------------------------
+
 def compute_surplus_deficit(subtotals):
     df = subtotals.copy()
 
+    # Extract each subtotal category with unique column names
     total_income = df[df["Category"] == "Total Income"][["Year", "Amount"]]
-    total_income = total_income.rename(columns={"Amount": "Total Income"})
+    total_income = total_income.rename(columns={"Amount": "Total_Income"})
 
     total_expenses = df[df["Category"] == "Total Expenses"][["Year", "Amount"]]
-    total_expenses = total_expenses.rename(columns={"Amount": "Total Expenses"})
+    total_expenses = total_expenses.rename(columns={"Amount": "Total_Expenses"})
 
     revenue = df[df["Category"] == "Total Revenue"][["Year", "Amount"]]
-    revenue = revenue.rename(columns={"Amount": "Total Revenue"})
+    revenue = revenue.rename(columns={"Amount": "Total_Revenue"})
 
     net_income = df[df["Category"] == "Net Income"][["Year", "Amount"]]
-    net_income = net_income.rename(columns={"Amount": "Net Income"})
+    net_income = net_income.rename(columns={"Amount": "Net_Income"})
 
+    # Merge safely — no overwriting
     merged = (
         revenue.merge(total_income, on="Year", how="outer")
                .merge(total_expenses, on="Year", how="outer")
@@ -412,11 +418,10 @@ def compute_surplus_deficit(subtotals):
                .sort_values("Year")
     )
 
-    # FINAL FIX: ensure one row per year
+    # Final clean-up
     merged = merged.groupby("Year", as_index=False).first()
 
     return merged
-
 # ---------------------------------------------------------
 # FORECASTING — CATEGORY LEVEL (NO SOURCE COLUMN)
 # ---------------------------------------------------------
