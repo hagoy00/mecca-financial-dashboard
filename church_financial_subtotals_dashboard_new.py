@@ -249,7 +249,6 @@ def assign_income_expense(df):
 
     return df
 
-
 # ---------------------------------------------------------
 # EXTRACT SUBTOTALS + AUTO TOTALS (FINAL FIXED VERSION)
 # ---------------------------------------------------------
