@@ -173,9 +173,7 @@ def format_numbers(df, exclude_cols=None):
             df[col] = df[col].apply(lambda x: f"{x:,.0f}")
     return df
 
-# ---------------------------------------------------------
-# ASSIGN Income / Expense / Subtotal
-# ---------------------------------------------------------
+
 # ---------------------------------------------------------
 # ASSIGN Income / Expense / Subtotal  (FINAL CLEAN VERSION)
 # ---------------------------------------------------------
@@ -200,7 +198,10 @@ def assign_income_expense(df):
         df.loc[income_end + 1:expense_end - 1, "Type"] = "Expense"
 
         # 3. SUBTOTALS override everything
-        subtotal_idx = group
+        subtotal_idx = group.index[group["Category"].str.lower().str.startswith("total for ")]
+        df.loc[subtotal_idx, "Type"] = "Subtotal"
+
+    return df
 
 # ---------------------------------------------------------
 # LOAD DATA
