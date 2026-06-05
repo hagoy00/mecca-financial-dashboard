@@ -285,118 +285,87 @@ def assign_income_expense(df):
 # EXTRACT SUBTOTALS + AUTO TOTALS (FINAL BULLETPROOF VERSION)
 # ---------------------------------------------------------
 def extract_subtotals(df):
-    # -----------------------------------------------------
-    # GUARD CLAUSES — PREVENT ALL CRASHES
-    # -----------------------------------------------------
-    if df is None:
-        st.error("❌ extract_subtotals() received df=None")
-        return pd.DataFrame()
-
-    if not isinstance(df, pd.DataFrame):
-        st.error(f"❌ extract_subtotals() expected DataFrame but got {type(df)}")
-        return pd.DataFrame()
-
-    if df.empty:
-        st.error("❌ extract_subtotals() received an EMPTY DataFrame")
+    # Guard clauses
+    if df is None or not isinstance(df, pd.DataFrame) or df.empty:
         return pd.DataFrame()
 
     required_cols = {"Category", "Amount", "Year"}
-    missing = required_cols - set(df.columns)
-    if missing:
-        st.error(f"❌ Missing required columns: {missing}")
+    if not required_cols.issubset(df.columns):
         return pd.DataFrame()
 
-    # Safe to proceed
     df = df.copy()
+    df["Category"] = df["Category"].astype(str).str.strip()
 
-    # Normalize Category
-    df["Category"] = (
-        df["Category"]
-        .astype(str)
-        .str.strip()
-        .str.replace("\u00A0", " ", regex=False)
-    )
-
-    # -----------------------------------------------------
-    # EXTRACT SUBTOTAL ROWS
-    # -----------------------------------------------------
+    # 1. Extract existing subtotal rows
     mask = (
         df["Category"].str.startswith("Total for ")
         | (df["Category"] == "Net Income")
         | (df["Category"] == "Net Operating Income")
     )
-    subtotals = df[mask].reset_index(drop=True)
+    subtotals = df[mask].copy()
     subtotals["Source"] = "Excel"
 
-    # -----------------------------------------------------
-    # TOTAL INCOME
-    # -----------------------------------------------------
-    income_rows = subtotals[subtotals["Category"] == "Total for Income"]
-    total_income = income_rows.groupby("Year")["Amount"].sum().reset_index()
-    total_income["Category"] = "Total Income"
-    total_income["Source"] = "Excel"
+    # 2. Auto totals
+    def make_df(rows, name):
+        out = rows.groupby("Year")["Amount"].sum().reset_index()
+        out["Category"] = name
+        out["Source"] = "Excel"
+        return out
 
-    # -----------------------------------------------------
-    # TOTAL EXPENSES
-    # -----------------------------------------------------
-    expense_rows = subtotals[subtotals["Category"] == "Total for Expenses"]
-    total_expenses = expense_rows.groupby("Year")["Amount"].sum().reset_index()
-    total_expenses["Category"] = "Total Expenses"
-    total_expenses["Source"] = "Excel"
+    total_income = make_df(
+        subtotals[subtotals["Category"].str.contains("Total for Income", case=False)],
+        "Total Income"
+    )
 
-    # -----------------------------------------------------
-    # REVENUE = TOTAL INCOME
-    # -----------------------------------------------------
+    total_expenses = make_df(
+        subtotals[subtotals["Category"].str.contains("Total for Expenses", case=False)],
+        "Total Expenses"
+    )
+
     revenue_df = total_income.copy()
     revenue_df["Category"] = "Total Revenue"
-    revenue_df["Source"] = "Excel"
 
-    # -----------------------------------------------------
-    # NET INCOME = INCOME - EXPENSES
-    # -----------------------------------------------------
-    if not total_income.empty and not total_expenses.empty:
-        net_income = pd.merge(
-            total_income,
-            total_expenses,
-            on="Year",
-            suffixes=("_Income", "_Expenses")
-        )
-        net_income["Amount"] = net_income["Amount_Income"] - net_income["Amount_Expenses"]
-        net_income = net_income[["Year", "Amount"]]
-    else:
-        net_income = pd.DataFrame(columns=["Year", "Amount"])
-
+    # Net Income
+    net_income = pd.merge(
+        total_income,
+        total_expenses,
+        on="Year",
+        how="outer",
+        suffixes=("_Income", "_Expenses")
+    )
+    net_income["Amount"] = (
+        net_income["Amount_Income"].fillna(0)
+        - net_income["Amount_Expenses"].fillna(0)
+    )
+    net_income = net_income[["Year", "Amount"]]
     net_income["Category"] = "Net Income"
     net_income["Source"] = "Excel"
-    
-    # -----------------------------------------------------
-    # PAYROLL (expanded matching)
-    # -----------------------------------------------------
+
+    # 3. Payroll (expanded)
     payroll_rows = df[
-        df["Category"].str.contains(
-            "salary|wage|payroll", 
-            case=False, 
-            na=False
-        )
+        df["Category"].str.contains("salary|wage|payroll", case=False, na=False)
     ]
-    payroll_sum = payroll_rows.groupby("Year")["Amount"].sum().reset_index()
-    payroll_sum["Category"] = "Payroll"
-    payroll_sum["Source"] = "Excel"
-    
-    # -----------------------------------------------------
-    # UTILITIES (expanded matching)
-    # -----------------------------------------------------
+    payroll_sum = make_df(payroll_rows, "Payroll")
+
+    # 4. Utilities (expanded)
     util_rows = df[
-        df["Category"].str.contains(
-            "utilit|garbage|gas|electric|water", 
-            case=False, 
-            na=False
-        )
+        df["Category"].str.contains("utilit|garbage|gas|electric|water", case=False, na=False)
     ]
-    util_sum = util_rows.groupby("Year")["Amount"].sum().reset_index()
-    util_sum["Category"] = "Utilities"
-    util_sum["Source"] = "Excel"
-    
+    util_sum = make_df(util_rows, "Utilities")
+
+    # 5. Standardize all columns
+    frames = [
+        subtotals[["Category", "Year", "Amount", "Source"]],
+        total_income[["Category", "Year", "Amount", "Source"]],
+        total_expenses[["Category", "Year", "Amount", "Source"]],
+        revenue_df[["Category", "Year", "Amount", "Source"]],
+        net_income[["Category", "Year", "Amount", "Source"]],
+        payroll_sum[["Category", "Year", "Amount", "Source"]],
+        util_sum[["Category", "Year", "Amount", "Source"]],
+    ]
+
+    return pd.concat(frames, ignore_index=True)
+
     # -----------------------------------------------------
     # RETURN FULL SUBTOTAL SET
     # -----------------------------------------------------
