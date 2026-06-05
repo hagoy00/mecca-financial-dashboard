@@ -6,6 +6,20 @@ import altair as alt
 from io import BytesIO
 import os
 
+# -----------------------------------------------------
+# COLOR FUNCTION FOR SURPLUS / DEFICIT
+# -----------------------------------------------------
+def color_surplus(val):
+    try:
+        if float(val) > 0:
+            return "color: green; font-weight: 600;"
+        elif float(val) < 0:
+            return "color: red; font-weight: 600;"
+        else:
+            return ""
+    except:
+        return ""
+
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet
