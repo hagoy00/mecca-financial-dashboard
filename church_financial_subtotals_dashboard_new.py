@@ -289,7 +289,8 @@ def extract_subtotals(df):
         return pd.DataFrame()
 
     df = df.copy()
-    df["Category"] = df["Category"].astype(str).strip()
+    #df["Category"] = df["Category"].astype(str).strip()
+    df["Category"] = df["Category"].astype(str).str.strip()
 
     # 1. Extract existing subtotal rows
     mask = (
