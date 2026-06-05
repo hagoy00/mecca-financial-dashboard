@@ -398,39 +398,28 @@ def compute_surplus_deficit(subtotals):
 # ---------------------------------------------------------
 # FORECASTING — CATEGORY LEVEL (NO SOURCE COLUMN)
 # ---------------------------------------------------------
-def forecast_category(df_raw, category):
-    df_cat = df_raw[df_raw["Category"] == category].copy()
 
-    # Aggregate by year
-    df_cat = (
-        df_cat.groupby("Year")["Amount"]
-        .sum()
-        .reset_index()
-        .sort_values("Year")
-    )
-
-    df_cat["Type"] = "Actual"
-
-    if df_cat.empty:
+def forecast_category(df_raw, category, end_year=2030):
+    data = df_raw[df_raw["Category"] == category].groupby("Year")["Amount"].sum().reset_index()
+    if len(data) < 2:
         return pd.DataFrame()
 
-    last_year = df_cat["Year"].max()
-    last_amount = df_cat["Amount"].iloc[-1]
+    x = data["Year"].values
+    y = data["Amount"].values
 
-    forecast_years = [last_year + 1, last_year + 2, last_year + 3]
-    forecast_amounts = [
-        last_amount * 1.03,
-        last_amount * 1.06,
-        last_amount * 1.09
-    ]
+    m, b = np.polyfit(x, y, 1)
 
-    df_forecast = pd.DataFrame({
-        "Year": forecast_years,
-        "Amount": forecast_amounts,
-        "Type": "Forecast"
-    })
+    last_year = x.max()
+    future_years = np.arange(last_year + 1, end_year + 1)
+    future_amounts = m * future_years + b
 
-    return pd.concat([df_cat, df_forecast], ignore_index=True)
+    hist = data.copy()
+    hist["Type"] = "Actual"
+
+    fut = pd.DataFrame({"Year": future_years, "Amount": future_amounts})
+    fut["Type"] = "Forecast"
+
+    return pd.concat([hist, fut], ignore_index=True)
 
 # ---------------------------------------------------------
 # TOP INCOME / EXPENSE
