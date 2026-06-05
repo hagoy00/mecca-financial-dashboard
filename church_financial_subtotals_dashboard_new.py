@@ -289,7 +289,6 @@ def extract_subtotals(df):
         return pd.DataFrame()
 
     df = df.copy()
-    #df["Category"] = df["Category"].astype(str).strip()
     df["Category"] = df["Category"].astype(str).str.strip()
 
     # 1. Extract existing subtotal rows
@@ -349,24 +348,19 @@ def extract_subtotals(df):
     ]
     util_sum = make_df(util_rows, "Utilities")
 
-    # 5. Combine
-    frames = [
-        subtotals[["Category", "Year", "Amount", "Source"]],
-        total_income,
-        total_expenses,
-        revenue_df,
-        net_income,
-        payroll_sum,
-        util_sum,
-    ]
-
-    return pd.concat(frames, ignore_index=True)
-
     # -----------------------------------------------------
-    # RETURN FULL SUBTOTAL SET
+    # RETURN FULL SUBTOTAL SET (YOUR VERSION)
     # -----------------------------------------------------
     return pd.concat(
-        [subtotals, total_income, total_expenses, revenue_df, net_income, payroll_sum, util_sum],
+        [
+            subtotals[["Category", "Year", "Amount", "Source"]],
+            total_income,
+            total_expenses,
+            revenue_df,
+            net_income,
+            payroll_sum,
+            util_sum,
+        ],
         ignore_index=True
     )
 
