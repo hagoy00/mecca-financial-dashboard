@@ -89,25 +89,25 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .dataframe thead th {
-    font-size: 100px !important;
+    font-size: 10px !important;
     font-weight: bold !important;
 }
 
 /* Streamlit table widget */
 .stTable {
-    font-size: 100px !important;
+    font-size: 10px !important;
 }
 
 /* Streamlit dataframe widget */
 .stDataFrame {
-    font-size: 90px !important;
+    font-size: 10px !important;
 }
 
 /* -----------------------------------------
    SLIDERS, METRICS, INPUTS — NORMAL SIZE
 ----------------------------------------- */
 .stSlider, .stNumberInput, .stMetric {
-    font-size: 34px !important;
+    font-size: 32px !important;
 }
 
 </style>
