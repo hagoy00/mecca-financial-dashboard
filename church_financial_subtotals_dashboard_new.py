@@ -50,7 +50,7 @@ body {
 </style>
 
 <div id="outside-sticky-title">
-    📊 Mekan Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard
+    📊 Mekane Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard
 </div>
 """, unsafe_allow_html=True)
 
@@ -58,7 +58,7 @@ body {
 # PAGE CONFIG
 # ---------------------------------------------------------
 st.set_page_config(
-    page_title="📊 Mekan Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard",
+    page_title="📊 Mekane Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard",
     layout="wide"
 )
 # ---------------------------------------------------------
@@ -1136,7 +1136,7 @@ def main():
             st.download_button(
                 label="Download PDF",
                 data=pdf_buffer,
-                file_name=f"Mekan Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard.pdf",
+                file_name=f"Mekane Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard.pdf",
                 mime="application/pdf"
             )
 # ---------------------------------------------------------
