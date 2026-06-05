@@ -282,7 +282,7 @@ def assign_income_expense(df):
     return df
 
 # ---------------------------------------------------------
-# EXTRACT SUBTOTALS + AUTO TOTALS (FINAL BULLETPROOF VERSION)
+# EXTRACT SUBTOTALS + AUTO TOTALS (FINAL WORKING VERSION)
 # ---------------------------------------------------------
 def extract_subtotals(df):
     # Guard clauses
@@ -305,13 +305,14 @@ def extract_subtotals(df):
     subtotals = df[mask].copy()
     subtotals["Source"] = "Excel"
 
-    # 2. Auto totals
+    # Helper to standardize totals
     def make_df(rows, name):
         out = rows.groupby("Year")["Amount"].sum().reset_index()
         out["Category"] = name
         out["Source"] = "Excel"
         return out
 
+    # 2. Auto totals
     total_income = make_df(
         subtotals[subtotals["Category"].str.contains("Total for Income", case=False)],
         "Total Income"
@@ -353,7 +354,7 @@ def extract_subtotals(df):
     ]
     util_sum = make_df(util_rows, "Utilities")
 
-    # 5. Standardize all columns
+    # 5. Combine all totals
     frames = [
         subtotals[["Category", "Year", "Amount", "Source"]],
         total_income[["Category", "Year", "Amount", "Source"]],
