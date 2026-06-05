@@ -580,7 +580,7 @@ def main():
     st.subheader("DEBUG — RAW CATEGORIES")
     st.write(df_raw["Category"].unique().tolist())
     # Extract subtotals (includes Source column)
-        df_subtotals = extract_subtotals(df_raw)
+    df_subtotals = extract_subtotals(df_raw)
     
     if df_subtotals.empty:
         st.error("❌ extract_subtotals() returned an empty DataFrame — cannot continue.")
