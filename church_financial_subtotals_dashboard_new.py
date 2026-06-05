@@ -580,12 +580,11 @@ def main():
     # Subtotals for YOY, Forecast, Surplus/Deficit
     subtotals = df_subtotals
     yoy_df = compute_yoy(df_subtotals)
-    
+
     # ---------------------------------------------------------
     # FIXED: Surplus/Deficit + Forecasts MUST use df_subtotals
     # ---------------------------------------------------------
     surplus_df = compute_surplus_deficit(df_subtotals)
-    
     payroll_forecast = forecast_category(df_subtotals, "Payroll")
     utilities_forecast = forecast_category(df_subtotals, "Utilities")
 
