@@ -1023,7 +1023,7 @@ def main():
             </div>
             """, unsafe_allow_html=True)
                     
-                st.dataframe(trend_styled, use_container_width=True)
+            st.dataframe(trend_styled, use_container_width=True)
 
             # -----------------------------------------------------
             # SURPLUS / DEFICIT TABLE
