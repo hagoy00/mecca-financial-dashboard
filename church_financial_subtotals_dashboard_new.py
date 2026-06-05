@@ -85,7 +85,7 @@ h1, h2, h3, h4, h5, h6 {
    PIVOT TABLES — MAKE THESE BIGGER
 ----------------------------------------- */
 .dataframe tbody td {
-    font-size: 90px !important;
+    font-size: 190px !important;
 }
 
 .dataframe thead th {
