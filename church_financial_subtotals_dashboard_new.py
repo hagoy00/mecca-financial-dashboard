@@ -7,18 +7,16 @@ from io import BytesIO
 import os
 
 # -----------------------------------------------------
-# COLOR FUNCTION FOR SURPLUS / DEFICIT
+# COLOR FUNCTION FOR SURPLUS / DEFICIT (FINAL VERSION)
 # -----------------------------------------------------
-def color_surplus(val):
-    try:
-        if float(val) > 0:
-            return "color: green; font-weight: 600;"
-        elif float(val) < 0:
-            return "color: red; font-weight: 600;"
-        else:
-            return ""
-    except:
-        return ""
+def color_surplus(col):
+    return [
+        "color: green; font-weight: 600;" if v > 0
+        else "color: red; font-weight: 600;" if v < 0
+        else ""
+        for v in col
+    ]
+
 
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
