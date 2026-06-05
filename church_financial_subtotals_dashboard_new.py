@@ -1015,7 +1015,7 @@ def main():
                 </p>
             </div>
             """, unsafe_allow_html=True)
-    
+                    
             # -----------------------------------------------------
             # 3-YEAR TREND SUMMARY
             # -----------------------------------------------------
@@ -1023,9 +1023,12 @@ def main():
             trend["Income YoY %"] = trend["Total Income"].pct_change() * 100
             trend["Expense YoY %"] = trend["Total Expenses"].pct_change() * 100
             trend["Net YoY %"] = trend["Net Income"].pct_change() * 100
-    
+            
             st.markdown("### 📊 3‑Year Trend Summary")
-    
+            
+            # Dynamically detect columns that should be color-coded
+            subset_cols = [c for c in trend.columns if "Net" in c]
+            
             trend_styled = (
                 trend.style.format({
                     "Total Income": "{:,.0f}",
@@ -1035,11 +1038,11 @@ def main():
                     "Expense YoY %": "{:,.1f}%",
                     "Net YoY %": "{:,.1f}%"
                 })
-                .apply(color_surplus, subset=["Net Income", "Net YoY %"])
+                .apply(color_surplus, subset=subset_cols)
             )
-    
+            
             st.dataframe(trend_styled, use_container_width=True)
-    
+
             # -----------------------------------------------------
             # SURPLUS / DEFICIT TABLE
             # -----------------------------------------------------
