@@ -493,15 +493,14 @@ def style_top5(df):
     styler = styler.format("{:,.0f}", subset=numeric_cols)
 
     return styler
-
-    
 #-----------------------------------------------
 # Main 
 #-----------------------------------------------
 def main():
 
     df = load_data()
-    subtotals = extract_subtotals(df)
+    df = extract_subtotals(df)     # ← This ensures df has Source column
+    subtotals = df                 # subtotals now inside df
     yoy_df = compute_yoy(subtotals)
 
     years = sorted(df["Year"].unique())
