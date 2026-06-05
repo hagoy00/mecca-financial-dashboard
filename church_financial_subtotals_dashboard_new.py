@@ -799,17 +799,21 @@ def main():
         ).fillna(0)
     
         st.dataframe(yoy_pivot.style.format("{:,.0f}"), use_container_width=True)
+        
     # -----------------------------------------------------
     # TAB 3 — TOP INCOME & EXPENSES (FORECASTING)
     # -----------------------------------------------------
     with tab_top:
         st.subheader("Top Income & Top Expenses")
     
+        # RAW numeric data (all years) — use df_raw
         raw_top_income = get_top_income(df_raw)
         raw_top_expense = get_top_expense(df_raw)
     
+        # Year selector
         year_sel = st.selectbox("Select Year", years)
     
+        # Filter for selected year (Top 5 only)
         inc_year = (
             raw_top_income[raw_top_income["Year"] == year_sel]
             .sort_values("Amount", ascending=False)
@@ -822,9 +826,11 @@ def main():
             .head(5)
         )
     
+        # Format AFTER filtering
         inc_year_display = format_numbers(inc_year, exclude_cols=["Category", "Year"])
         exp_year_display = format_numbers(exp_year, exclude_cols=["Category", "Year"])
     
+        # Display Top 5
         st.markdown(f"### 💰 Top 5 Income Categories — {year_sel}")
         st.dataframe(inc_year_display, use_container_width=True)
     
@@ -834,16 +840,18 @@ def main():
         st.divider()
     
         # -----------------------------------------------------
-        # FORECAST CHARTS — FIXED TO USE df_subtotals
+        # FORECAST CHARTS — FIXED TO USE df_raw
         # -----------------------------------------------------
     
-        st.markdown("### Income Forecast")
+        st.markdown(f"### Income Forecast — {year_sel}")
     
         if not inc_year.empty:
             selected_inc = st.selectbox("Forecast Income Category", inc_year["Category"])
-            inc_forecast = forecast_category(df_subtotals, selected_inc)   # FIXED
+            inc_forecast = forecast_category(df_raw, selected_inc)  # FIXED
     
-            if not inc_forecast.empty:
+            if inc_forecast.empty:
+                st.info(f"No forecast available — '{selected_inc}' has fewer than 2 years of data.")
+            else:
                 chart = (
                     alt.Chart(inc_forecast)
                     .mark_line(point=True)
@@ -853,17 +861,23 @@ def main():
                         color="Type:N",
                         tooltip=["Year", "Amount", "Type"]
                     )
-                    .properties(title=f"Forecast — {selected_inc}", width=600, height=350)
+                    .properties(
+                        title=f"Income Forecast — {selected_inc} ({year_sel})",
+                        width=600,
+                        height=350
+                    )
                 )
                 st.altair_chart(chart, use_container_width=True)
     
-        st.markdown("### Expense Forecast")
+        st.markdown(f"### Expense Forecast — {year_sel}")
     
         if not exp_year.empty:
             selected_exp = st.selectbox("Forecast Expense Category", exp_year["Category"])
-            exp_forecast = forecast_category(df_subtotals, selected_exp)   # FIXED
+            exp_forecast = forecast_category(df_raw, selected_exp)  # FIXED
     
-            if not exp_forecast.empty:
+            if exp_forecast.empty:
+                st.info(f"No forecast available — '{selected_exp}' has fewer than 2 years of data.")
+            else:
                 chart = (
                     alt.Chart(exp_forecast)
                     .mark_line(point=True)
@@ -873,7 +887,11 @@ def main():
                         color="Type:N",
                         tooltip=["Year", "Amount", "Type"]
                     )
-                    .properties(title=f"Forecast — {selected_exp}", width=600, height=350)
+                    .properties(
+                        title=f"Expense Forecast — {selected_exp} ({year_sel})",
+                        width=600,
+                        height=350
+                )
                 )
                 st.altair_chart(chart, use_container_width=True)
             
@@ -925,7 +943,7 @@ def main():
                 .properties(width=800, height=400)
             )
             st.altair_chart(chart, use_container_width=True)
-    
+
     # -----------------------------------------------------
     # TAB 5 — FORECASTING (FINAL FIXED VERSION)
     # -----------------------------------------------------
