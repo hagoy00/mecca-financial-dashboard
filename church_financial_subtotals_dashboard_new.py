@@ -327,11 +327,11 @@ def extract_subtotals(df):
 
     total_expenses = make_df(
         subtotals[subtotals["Category"].str.contains("Total for Expenses", case=False)],
-        "Total Expenses"
+        "Total_Expenses"
     )
 
     revenue_df = total_income.copy()
-    revenue_df["Category"] = "Total Revenue"
+    revenue_df["Category"] = "Total_Revenue"
 
     net_income = pd.merge(
         total_income,
@@ -401,10 +401,10 @@ def compute_surplus_deficit(subtotals):
     total_income = df[df["Category"] == "Total_Income"][["Year", "Amount"]]
     total_income = total_income.rename(columns={"Amount": "Total_Income"})
 
-    total_expenses = df[df["Category"] == "Total Expenses"][["Year", "Amount"]]
+    total_expenses = df[df["Category"] == "Total_Expenses"][["Year", "Amount"]]
     total_expenses = total_expenses.rename(columns={"Amount": "Total_Expenses"})
 
-    revenue = df[df["Category"] == "Total Revenue"][["Year", "Amount"]]
+    revenue = df[df["Category"] == "Total_Revenue"][["Year", "Amount"]]
     revenue = revenue.rename(columns={"Amount": "Total_Revenue"})
 
     net_income = df[df["Category"] == "Net_Income"][["Year", "Amount"]]
@@ -654,8 +654,8 @@ def main():
                 (df_raw["Category"].str.contains("Utilit", case=False, na=False))
             ]["Amount"].sum()
     
-            summary_rows.append(["Total Revenue", year, revenue])
-            summary_rows.append(["Total Expenses", year, total_expenses])
+            summary_rows.append(["Total_Revenue", year, revenue])
+            summary_rows.append(["Total_Expenses", year, total_expenses])
             summary_rows.append(["Net_Income", year, net_income])
             summary_rows.append(["Payroll", year, payroll])
             summary_rows.append(["Utilities", year, utilities])
@@ -776,8 +776,8 @@ def main():
         st.subheader("📘 Year‑Over‑Year (YOY) Summary")
     
         TARGET_ORDER = [
-            "Total Revenue",
-            "Total Expenses",
+            "Total_Revenue",
+            "Total_Expenses",
             "Net_Income",
             "Payroll",
             "Utilities"
@@ -972,7 +972,7 @@ def main():
                 </h3>
                 <p style="margin:6px 0 0 0; font-size:16px;">
                     <b>Total_Income:</b> ${latest['Total_Income']:,.0f}<br>
-                    <b>Total Expenses:</b> ${latest['Total Expenses']:,.0f}<br>
+                    <b>Total_Expenses:</b> ${latest['Total_Expenses']:,.0f}<br>
                     <b>Net_Income (Surplus/Deficit):</b> 
                     <span style="color:{surplus_color}; font-weight:700;">
                         ${latest['Net_Income']:,.0f}
@@ -993,7 +993,7 @@ def main():
             yoy = last3["Net_Income"].pct_change().iloc[-1]
             yoy_score = max(0, min(1, yoy)) * 30
     
-            efficiency = last3["Total Expenses"].iloc[-1] / last3["Total_Income"].iloc[-1]
+            efficiency = last3["Total_Expenses"].iloc[-1] / last3["Total_Income"].iloc[-1]
             eff_score = (1 - max(0, min(1, efficiency))) * 20
     
             stability = 1 - (last3["Net_Income"].std() / abs(last3["Net_Income"].mean()))
@@ -1035,7 +1035,7 @@ def main():
             # -----------------------------------------------------
             trend = last3.copy()
             trend["Income YoY %"] = trend["Total_Income"].pct_change() * 100
-            trend["Expense YoY %"] = trend["Total Expenses"].pct_change() * 100
+            trend["Expense YoY %"] = trend["Total_Expenses"].pct_change() * 100
             trend["Net YoY %"] = trend["Net_Income"].pct_change() * 100
             
             st.markdown("### 📊 3‑Year Trend Summary")
@@ -1046,7 +1046,7 @@ def main():
             trend_styled = (
                 trend.style.format({
                     "Total_Income": "{:,.0f}",
-                    "Total Expenses": "{:,.0f}",
+                    "Total_Expenses": "{:,.0f}",
                     "Net_Income": "{:,.0f}",
                     "Income YoY %": "{:,.1f}%",
                     "Expense YoY %": "{:,.1f}%",
@@ -1064,9 +1064,9 @@ def main():
     
             filtered_styled = (
                 filtered.style.format({
-                    "Total Revenue": "{:,.0f}",
+                    "Total_Revenue": "{:,.0f}",
                     "Total_Income": "{:,.0f}",
-                    "Total Expenses": "{:,.0f}",
+                    "Total_Expenses": "{:,.0f}",
                     "Net_Income": "{:,.0f}",
                     "YoY %": "{:,.1f}%"
                 })
@@ -1103,8 +1103,8 @@ def main():
         st.subheader("📈 Forecasting Through 2030")
     
         FORECAST_TARGETS = [
-            "Total Revenue",
-            "Total Expenses",
+            "Total_Revenue",
+            "Total_Expenses",
             "Net_Income",
             "Payroll",
             "Utilities"
@@ -1114,7 +1114,7 @@ def main():
             st.markdown(f"### 🔮 {category} Forecast (to 2030)")
     
             # TOTALS use df_subtotals
-            if category in ["Total Revenue", "Total Expenses", "Net_Income"]:
+            if category in ["Total_Revenue", "Total_Expenses", "Net_Income"]:
                 fc = forecast_category(df_subtotals, category)
     
             # CATEGORY-LEVEL ALSO uses df_subtotals (FIXED)
