@@ -285,16 +285,11 @@ def assign_income_expense(df):
 # EXTRACT SUBTOTALS + AUTO TOTALS (FINAL WORKING VERSION)
 # ---------------------------------------------------------
 def extract_subtotals(df):
-    # Guard clauses
-    if df is None or not isinstance(df, pd.DataFrame) or df.empty:
-        return pd.DataFrame()
-
-    required_cols = {"Category", "Amount", "Year"}
-    if not required_cols.issubset(df.columns):
+    if df is None or df.empty:
         return pd.DataFrame()
 
     df = df.copy()
-    df["Category"] = df["Category"].astype(str).str.strip()
+    df["Category"] = df["Category"].astype(str).strip()
 
     # 1. Extract existing subtotal rows
     mask = (
@@ -305,7 +300,7 @@ def extract_subtotals(df):
     subtotals = df[mask].copy()
     subtotals["Source"] = "Excel"
 
-    # Helper to standardize totals
+    # Helper
     def make_df(rows, name):
         out = rows.groupby("Year")["Amount"].sum().reset_index()
         out["Category"] = name
@@ -326,7 +321,6 @@ def extract_subtotals(df):
     revenue_df = total_income.copy()
     revenue_df["Category"] = "Total Revenue"
 
-    # Net Income
     net_income = pd.merge(
         total_income,
         total_expenses,
@@ -342,27 +336,27 @@ def extract_subtotals(df):
     net_income["Category"] = "Net Income"
     net_income["Source"] = "Excel"
 
-    # 3. Payroll (expanded)
+    # 3. Payroll
     payroll_rows = df[
         df["Category"].str.contains("salary|wage|payroll", case=False, na=False)
     ]
     payroll_sum = make_df(payroll_rows, "Payroll")
 
-    # 4. Utilities (expanded)
+    # 4. Utilities
     util_rows = df[
         df["Category"].str.contains("utilit|garbage|gas|electric|water", case=False, na=False)
     ]
     util_sum = make_df(util_rows, "Utilities")
 
-    # 5. Combine all totals
+    # 5. Combine
     frames = [
         subtotals[["Category", "Year", "Amount", "Source"]],
-        total_income[["Category", "Year", "Amount", "Source"]],
-        total_expenses[["Category", "Year", "Amount", "Source"]],
-        revenue_df[["Category", "Year", "Amount", "Source"]],
-        net_income[["Category", "Year", "Amount", "Source"]],
-        payroll_sum[["Category", "Year", "Amount", "Source"]],
-        util_sum[["Category", "Year", "Amount", "Source"]],
+        total_income,
+        total_expenses,
+        revenue_df,
+        net_income,
+        payroll_sum,
+        util_sum,
     ]
 
     return pd.concat(frames, ignore_index=True)
@@ -405,9 +399,9 @@ def compute_surplus_deficit(subtotals):
 
     merged = (
         revenue.merge(total_income, on="Year", how="outer")
-        .merge(total_expenses, on="Year", how="outer")
-        .merge(net_income, on="Year", how="outer")
-        .sort_values("Year")
+               .merge(total_expenses, on="Year", how="outer")
+               .merge(net_income, on="Year", how="outer")
+               .sort_values("Year")
     )
 
     return merged
@@ -416,8 +410,10 @@ def compute_surplus_deficit(subtotals):
 # FORECASTING — CATEGORY LEVEL (NO SOURCE COLUMN)
 # ---------------------------------------------------------
 
-def forecast_category(df_raw, category, end_year=2030):
-    data = df_raw[df_raw["Category"] == category].groupby("Year")["Amount"].sum().reset_index()
+def forecast_category(df_subtotals, category, end_year=2030):
+    data = df_subtotals[df_subtotals["Category"] == category] \
+            .groupby("Year")["Amount"].sum().reset_index()
+
     if len(data) < 2:
         return pd.DataFrame()
 
@@ -584,6 +580,14 @@ def main():
     # Subtotals for YOY, Forecast, Surplus/Deficit
     subtotals = df_subtotals
     yoy_df = compute_yoy(df_subtotals)
+    
+    # ---------------------------------------------------------
+    # FIXED: Surplus/Deficit + Forecasts MUST use df_subtotals
+    # ---------------------------------------------------------
+    surplus_df = compute_surplus_deficit(df_subtotals)
+    
+    payroll_forecast = forecast_category(df_subtotals, "Payroll")
+    utilities_forecast = forecast_category(df_subtotals, "Utilities")
 
     # Years for filters (use raw data)
     years = sorted(df_raw["Year"].unique())
