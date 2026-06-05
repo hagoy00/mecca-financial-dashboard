@@ -1017,10 +1017,10 @@ def main():
             trend["Income YoY %"] = trend["Total Income"].pct_change() * 100
             trend["Expense YoY %"] = trend["Total Expenses"].pct_change() * 100
             trend["Net YoY %"] = trend["Net Income"].pct_change() * 100
-    
+            
             st.markdown("### 📊 3‑Year Trend Summary")
-    
-            st.dataframe(
+            
+            trend_styled = (
                 trend.style.format({
                     "Total Income": "{:,.0f}",
                     "Total Expenses": "{:,.0f}",
@@ -1028,10 +1028,11 @@ def main():
                     "Income YoY %": "{:,.1f}%",
                     "Expense YoY %": "{:,.1f}%",
                     "Net YoY %": "{:,.1f}%"
-                }).apply(color_surplus, subset=["Net Income", "Net YoY %"])
-
-                use_container_width=True
+                })
+                .apply(color_surplus, subset=["Net Income", "Net YoY %"])
             )
+            
+            st.dataframe(trend_styled, use_container_width=True)
     
             # -----------------------------------------------------
             # SURPLUS / DEFICIT TABLE
