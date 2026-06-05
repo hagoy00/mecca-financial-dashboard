@@ -255,7 +255,6 @@ def assign_income_expense(df):
 def extract_subtotals(df):
     df = df.copy()
 
-    # 1. Extract existing subtotal rows
     mask = (
         df["Category"].str.startswith("Total for ")
         | (df["Category"] == "Net Income")
@@ -264,7 +263,6 @@ def extract_subtotals(df):
     subtotals = df[mask].reset_index(drop=True)
     subtotals["Source"] = "Excel"
 
-    # 2. AUTO TOTALS
     income_rows = subtotals[subtotals["Category"] == "Total for Income"]
     total_income = income_rows.groupby("Year")["Amount"].sum().reset_index()
     total_income["Category"] = "Total Income"
@@ -285,17 +283,14 @@ def extract_subtotals(df):
     net_income["Category"] = "Net Income"
     net_income["Source"] = "Excel"
 
-    # 3. PAYROLL SUBTOTAL
     payroll_sum = df[df["Category"].isin(["Salaries & Wages", "Payroll Tax Expense"])].groupby("Year")["Amount"].sum().reset_index()
     payroll_sum["Category"] = "Payroll"
     payroll_sum["Source"] = "Excel"
 
-    # 4. UTILITIES SUBTOTAL
     util_sum = df[df["Category"].str.contains("Utilit", case=False, na=False)].groupby("Year")["Amount"].sum().reset_index()
     util_sum["Category"] = "Utilities"
     util_sum["Source"] = "Excel"
 
-    # 5. RETURN FULL SUBTOTAL SET
     return pd.concat(
         [subtotals, total_income, total_expenses, revenue_df, net_income, payroll_sum, util_sum],
         ignore_index=True
