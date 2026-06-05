@@ -368,27 +368,35 @@ def extract_subtotals(df):
 
     net_income["Category"] = "Net Income"
     net_income["Source"] = "Excel"
-
+    
     # -----------------------------------------------------
-    # PAYROLL (FLEXIBLE MATCHING)
+    # PAYROLL (expanded matching)
     # -----------------------------------------------------
     payroll_rows = df[
-        df["Category"].str.contains("salary|wage|payroll", case=False, na=False)
+        df["Category"].str.contains(
+            "salary|wage|payroll", 
+            case=False, 
+            na=False
+        )
     ]
     payroll_sum = payroll_rows.groupby("Year")["Amount"].sum().reset_index()
     payroll_sum["Category"] = "Payroll"
     payroll_sum["Source"] = "Excel"
-
+    
     # -----------------------------------------------------
-    # UTILITIES (FLEXIBLE MATCHING)
+    # UTILITIES (expanded matching)
     # -----------------------------------------------------
     util_rows = df[
-        df["Category"].str.contains("utilit", case=False, na=False)
+        df["Category"].str.contains(
+            "utilit|garbage|gas|electric|water", 
+            case=False, 
+            na=False
+        )
     ]
     util_sum = util_rows.groupby("Year")["Amount"].sum().reset_index()
     util_sum["Category"] = "Utilities"
     util_sum["Source"] = "Excel"
-
+    
     # -----------------------------------------------------
     # RETURN FULL SUBTOTAL SET
     # -----------------------------------------------------
@@ -396,7 +404,6 @@ def extract_subtotals(df):
         [subtotals, total_income, total_expenses, revenue_df, net_income, payroll_sum, util_sum],
         ignore_index=True
     )
-
 
 # ---------------------------------------------------------
 # YOY CALC (generic)
