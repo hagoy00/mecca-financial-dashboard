@@ -295,25 +295,21 @@ def load_data():
 def extract_subtotals(df):
     df = df.copy()
 
-    # 1. Extract existing subtotal rows
+    # Existing subtotals
     mask = (
         df["Category"].str.startswith("Total for ")
         | (df["Category"] == "Net Income")
         | (df["Category"] == "Net Operating Income")
     )
     subtotals = df[mask].reset_index(drop=True)
-
-    # Ensure Source column exists
     subtotals["Source"] = "Excel"
 
-    # 2. AUTO TOTALS
-    income_rows = subtotals[subtotals["Category"] == "Total for Income"]
-    total_income = income_rows.groupby("Year")["Amount"].sum().reset_index()
+    # Auto totals
+    total_income = df[df["Category"] == "Total for Income"].groupby("Year")["Amount"].sum().reset_index()
     total_income["Category"] = "Total Income"
     total_income["Source"] = "Excel"
 
-    expense_rows = subtotals[subtotals["Category"] == "Total for Expenses"]
-    total_expenses = expense_rows.groupby("Year")["Amount"].sum().reset_index()
+    total_expenses = df[df["Category"] == "Total for Expenses"].groupby("Year")["Amount"].sum().reset_index()
     total_expenses["Category"] = "Total Expenses"
     total_expenses["Source"] = "Excel"
 
@@ -321,42 +317,23 @@ def extract_subtotals(df):
     revenue_df["Category"] = "Total Revenue"
     revenue_df["Source"] = "Excel"
 
-    net_income = pd.merge(
-        total_income,
-        total_expenses,
-        on="Year",
-        suffixes=("_Income", "_Expenses")
-    )
+    net_income = pd.merge(total_income, total_expenses, on="Year", suffixes=("_Income", "_Expenses"))
     net_income["Amount"] = net_income["Amount_Income"] - net_income["Amount_Expenses"]
     net_income = net_income[["Year", "Amount"]]
     net_income["Category"] = "Net Income"
     net_income["Source"] = "Excel"
 
-    # 3. PAYROLL SUBTOTAL
-    payroll_rows = df[df["Category"].isin(["Salaries & Wages", "Payroll Tax Expense"])]
-    payroll_sum = payroll_rows.groupby("Year")["Amount"].sum().reset_index()
+    # Payroll
+    payroll_sum = df[df["Category"].isin(["Salaries & Wages", "Payroll Tax Expense"])].groupby("Year")["Amount"].sum().reset_index()
     payroll_sum["Category"] = "Payroll"
     payroll_sum["Source"] = "Excel"
 
-    # 4. UTILITIES SUBTOTAL
-    util_rows = df[df["Category"].str.contains("Utilit", case=False, na=False)]
-    util_sum = util_rows.groupby("Year")["Amount"].sum().reset_index()
+    # Utilities
+    util_sum = df[df["Category"].str.contains("Utilit", case=False, na=False)].groupby("Year")["Amount"].sum().reset_index()
     util_sum["Category"] = "Utilities"
     util_sum["Source"] = "Excel"
 
-    # 5. RETURN FULL SUBTOTAL SET
-    return pd.concat(
-        [
-            subtotals,
-            total_income,
-            total_expenses,
-            revenue_df,
-            net_income,
-            payroll_sum,
-            util_sum
-        ],
-        ignore_index=True
-    )
+    return pd.concat([subtotals, total_income, total_expenses, revenue_df, net_income, payroll_sum, util_sum], ignore_index=True)
 
 # ---------------------------------------------------------
 # YOY CALC (generic)
@@ -524,31 +501,24 @@ def style_top5(df):
 # ---------------------------------------------------------
 # FORECASTING — TOTALS (USES SOURCE COLUMN)
 # ---------------------------------------------------------
-def forecast_totals(df_subtotals, category):
+def forecast_totals(df_subtotals, category, end_year=2030):
     df_cat = df_subtotals[df_subtotals["Category"] == category].copy()
-    df_cat = df_cat[df_cat["Source"] == "Excel"]
     df_cat = df_cat.sort_values("Year")
     df_cat["Type"] = "Actual"
 
-    if df_cat.empty:
+    if df_cat.empty or len(df_cat) < 2:
         return pd.DataFrame()
 
-    last_year = df_cat["Year"].max()
-    last_amount = df_cat["Amount"].iloc[-1]
+    x = df_cat["Year"].values
+    y = df_cat["Amount"].values
 
-    forecast_years = [last_year + 1, last_year + 2, last_year + 3]
-    forecast_amounts = [
-        last_amount * 1.03,
-        last_amount * 1.06,
-        last_amount * 1.09
-    ]
+    m, b = np.polyfit(x, y, 1)
 
-    df_forecast = pd.DataFrame({
-        "Year": forecast_years,
-        "Amount": forecast_amounts,
-        "Type": "Forecast"
-    })
+    last_year = x.max()
+    future_years = np.arange(last_year + 1, end_year + 1)
+    future_amounts = m * future_years + b
 
+    df_forecast = pd.DataFrame({"Year": future_years, "Amount": future_amounts, "Type": "Forecast"})
     return pd.concat([df_cat, df_forecast], ignore_index=True)
 
 #-----------------------------------------------
