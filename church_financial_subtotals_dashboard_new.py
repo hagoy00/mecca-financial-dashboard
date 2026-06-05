@@ -945,7 +945,8 @@ def main():
     
             # Add YoY %
             filtered["YoY %"] = filtered["Net Income"].pct_change() * 100
-    
+            st.write("COLUMNS:", filtered.columns.tolist())
+
             # -----------------------------------------------------
             # BOARD SUMMARY CARD
             # -----------------------------------------------------
