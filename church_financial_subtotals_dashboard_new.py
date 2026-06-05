@@ -896,17 +896,20 @@ def main():
                 st.altair_chart(chart, use_container_width=True)
             
     # -----------------------------------------------------
-    # TAB 4 — SURPLUS / DEFICIT (FINAL FIXED VERSION)
+    # TAB 4 — SURPLUS / DEFICIT (FINAL COMPLETE VERSION)
     # -----------------------------------------------------
     with tab3:
         st.subheader("📉 Surplus / Deficit Summary")
     
-        if surplus_df.empty:
+        # Use the correct dataset — NO duplicates
+        df_sd = surplus_df.copy()
+    
+        if df_sd.empty:
             st.warning("No Surplus/Deficit data available.")
         else:
             # Year slider
-            min_year = int(surplus_df["Year"].min())
-            max_year = int(surplus_df["Year"].max())
+            min_year = int(df_sd["Year"].min())
+            max_year = int(df_sd["Year"].max())
     
             yr_range = st.slider(
                 "Select Year Range",
@@ -915,22 +918,139 @@ def main():
                 (min_year, max_year)
             )
     
-            filtered = surplus_df[
-                (surplus_df["Year"] >= yr_range[0]) &
-                (surplus_df["Year"] <= yr_range[1])
-            ]
+            filtered = df_sd[
+                (df_sd["Year"] >= yr_range[0]) &
+                (df_sd["Year"] <= yr_range[1])
+            ].copy()
     
-            # Display table
+            # Add YoY %
+            filtered["YoY %"] = filtered["Net Income"].pct_change() * 100
+    
+            # -----------------------------------------------------
+            # BOARD SUMMARY CARD
+            # -----------------------------------------------------
+            latest = filtered.iloc[-1]
+            surplus_color = "green" if latest["Net Income"] > 0 else "red"
+    
+            st.markdown(f"""
+            <div style="
+                background-color:#f8f9fa;
+                padding:18px;
+                border-radius:10px;
+                border-left: 8px solid {surplus_color};
+                margin-bottom:20px;
+            ">
+                <h3 style="margin:0; color:{surplus_color};">
+                    📌 Board Summary — {int(latest['Year'])}
+                </h3>
+                <p style="margin:6px 0 0 0; font-size:16px;">
+                    <b>Total Income:</b> ${latest['Total Income']:,.0f}<br>
+                    <b>Total Expenses:</b> ${latest['Total Expenses']:,.0f}<br>
+                    <b>Net Income (Surplus/Deficit):</b> 
+                    <span style="color:{surplus_color}; font-weight:700;">
+                        ${latest['Net Income']:,.0f}
+                    </span><br>
+                    <b>YoY Change:</b> {latest['YoY %']:.1f}%
+                </p>
+            </div>
+            """, unsafe_allow_html=True)
+    
+            # -----------------------------------------------------
+            # FINANCIAL HEALTH SCORE
+            # -----------------------------------------------------
+            last3 = filtered.tail(3).copy()
+    
+            # 1. Net Income Margin
+            margin = last3["Net Income"].iloc[-1] / last3["Total Income"].iloc[-1]
+            margin_score = max(0, min(1, margin)) * 40
+    
+            # 2. YoY Growth
+            yoy = last3["Net Income"].pct_change().iloc[-1]
+            yoy_score = max(0, min(1, yoy)) * 30
+    
+            # 3. Expense Efficiency
+            efficiency = last3["Total Expenses"].iloc[-1] / last3["Total Income"].iloc[-1]
+            eff_score = (1 - max(0, min(1, efficiency))) * 20
+    
+            # 4. Stability
+            stability = 1 - (last3["Net Income"].std() / abs(last3["Net Income"].mean()))
+            stab_score = max(0, min(1, stability)) * 10
+    
+            # Final Score
+            health_score = margin_score + yoy_score + eff_score + stab_score
+            health_score = round(health_score, 1)
+    
+            # Color
+            if health_score >= 80:
+                score_color = "green"
+            elif health_score >= 60:
+                score_color = "blue"
+            elif health_score >= 40:
+                score_color = "orange"
+            else:
+                score_color = "red"
+    
+            st.markdown(f"""
+            <div style="
+                background-color:#ffffff;
+                padding:18px;
+                border-radius:10px;
+                border-left: 8px solid {score_color};
+                margin-bottom:20px;
+            ">
+                <h3 style="margin:0; color:{score_color};">
+                    🏛️ Financial Health Score: {health_score}/100
+                </h3>
+                <p style="margin:6px 0 0 0; font-size:16px;">
+                    <b>Net Income Margin:</b> {margin:.1%}<br>
+                    <b>YoY Growth:</b> {yoy:.1%}<br>
+                    <b>Expense Efficiency:</b> {efficiency:.1%}<br>
+                    <b>Stability (3‑yr):</b> {stability:.1%}
+                </p>
+            </div>
+            """, unsafe_allow_html=True)
+    
+            # -----------------------------------------------------
+            # 3-YEAR TREND SUMMARY
+            # -----------------------------------------------------
+            trend = last3.copy()
+            trend["Income YoY %"] = trend["Total Income"].pct_change() * 100
+            trend["Expense YoY %"] = trend["Total Expenses"].pct_change() * 100
+            trend["Net YoY %"] = trend["Net Income"].pct_change() * 100
+    
+            st.markdown("### 📊 3‑Year Trend Summary")
+    
+            st.dataframe(
+                trend.style.format({
+                    "Total Income": "{:,.0f}",
+                    "Total Expenses": "{:,.0f}",
+                    "Net Income": "{:,.0f}",
+                    "Income YoY %": "{:,.1f}%",
+                    "Expense YoY %": "{:,.1f}%",
+                    "Net YoY %": "{:,.1f}%"
+                }).applymap(color_surplus, subset=["Net Income", "Net YoY %"]),
+                use_container_width=True
+            )
+    
+            # -----------------------------------------------------
+            # SURPLUS / DEFICIT TABLE
+            # -----------------------------------------------------
+            st.markdown("### 📄 Detailed Surplus / Deficit Table")
+    
             st.dataframe(
                 filtered.style.format({
                     "Total Revenue": "{:,.0f}",
                     "Total Income": "{:,.0f}",
                     "Total Expenses": "{:,.0f}",
-                    "Net Income": "{:,.0f}"
-                }),
+                    "Net Income": "{:,.0f}",
+                    "YoY %": "{:,.1f}%"
+                }).applymap(color_surplus, subset=["Net Income", "YoY %"]),
                 use_container_width=True
             )
     
+            # -----------------------------------------------------
+            # SURPLUS / DEFICIT CHART
+            # -----------------------------------------------------
             st.markdown("### 📈 Surplus / Deficit Trend (Net Income)")
             chart = (
                 alt.Chart(filtered)
@@ -938,7 +1058,12 @@ def main():
                 .encode(
                     x="Year:O",
                     y="Net Income:Q",
-                    tooltip=["Year", "Net Income"]
+                    color=alt.condition(
+                        alt.datum.Net_Income > 0,
+                        alt.value("green"),
+                        alt.value("red")
+                    ),
+                    tooltip=["Year", "Net Income", "YoY %"]
                 )
                 .properties(width=800, height=400)
             )
