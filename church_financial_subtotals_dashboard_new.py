@@ -200,9 +200,49 @@ def assign_income_expense(df):
         # 3. SUBTOTALS override everything
         subtotal_idx = group.index[group["Category"].str.lower().str.startswith("total for ")]
         df.loc[subtotal_idx, "Type"] = "Subtotal"
+        
+        # -----------------------------------------------------
+        # FIX SUBTOTAL CATEGORY NAMES
+        # -----------------------------------------------------
+        subtotals["Category"] = subtotals["Category"].replace({
+            "Total for Income": "Total Revenue",
+            "Total for Expenses": "Total Expenses"
+        })
 
+        # -----------------------------------------------------
+        # ADD PAYROLL SUBTOTAL
+        # -----------------------------------------------------
+        payroll_total = (
+            df_raw[df_raw["Category"].isin([
+                "Salaries & Wages",
+                "Payroll Tax Expense"
+            ])]
+            .groupby("Year")["Amount"]
+            .sum()
+            .reset_index()
+        )
+        
+        payroll_total["Category"] = "Payroll"
+        payroll_total["Source"] = "Excel"
+        
+        subtotals = pd.concat([subtotals, payroll_total], ignore_index=True)
+        
+        # -----------------------------------------------------
+        # ADD UTILITIES SUBTOTAL
+        # -----------------------------------------------------
+        utilities_total = (
+            df_raw[df_raw["Category"].str.contains("Utilities", case=False, na=False)]
+            .groupby("Year")["Amount"]
+            .sum()
+            .reset_index()
+        )
+        
+        utilities_total["Category"] = "Utilities"
+        utilities_total["Source"] = "Excel"
+        
+        subtotals = pd.concat([subtotals, utilities_total], ignore_index=True)
+            
     return df
-
 
 # ---------------------------------------------------------
 # LOAD DATA
@@ -249,7 +289,6 @@ def load_data():
     full_df = pd.concat(all_years, ignore_index=True)
     full_df = assign_income_expense(full_df)
     return full_df
-
 
 def extract_subtotals(df):
     df = df.copy()
@@ -353,7 +392,15 @@ def compute_surplus_deficit(subtotals):
 # ---------------------------------------------------------
 def forecast_category(df_raw, category):
     df_cat = df_raw[df_raw["Category"] == category].copy()
-    df_cat = df_cat.sort_values("Year")
+
+    # Aggregate by year
+    df_cat = (
+        df_cat.groupby("Year")["Amount"]
+        .sum()
+        .reset_index()
+        .sort_values("Year")
+    )
+
     df_cat["Type"] = "Actual"
 
     if df_cat.empty:
@@ -892,9 +939,6 @@ def main():
             )
     
             st.divider()
-    
-    
-    
 
     # -----------------------------------------------------
     # TAB 6 — BOARD PDF
