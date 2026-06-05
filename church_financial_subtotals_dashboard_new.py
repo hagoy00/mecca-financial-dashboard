@@ -1028,7 +1028,8 @@ def main():
                     "Income YoY %": "{:,.1f}%",
                     "Expense YoY %": "{:,.1f}%",
                     "Net YoY %": "{:,.1f}%"
-                }).applymap(color_surplus, subset=["Net Income", "Net YoY %"]),
+                }).apply(color_surplus, subset=["Net Income", "Net YoY %"])
+
                 use_container_width=True
             )
     
@@ -1044,7 +1045,8 @@ def main():
                     "Total Expenses": "{:,.0f}",
                     "Net Income": "{:,.0f}",
                     "YoY %": "{:,.1f}%"
-                }).applymap(color_surplus, subset=["Net Income", "YoY %"]),
+                }).apply(color_surplus, subset=["Net Income", "YoY %"])
+
                 use_container_width=True
             )
     
