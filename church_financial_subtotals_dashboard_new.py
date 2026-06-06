@@ -35,17 +35,20 @@ st.markdown("""
     width: 100%;
     z-index: 999999;
     background-color: white;
-    padding: 20px 0 26px 0;
-    font-size: 34px !important;   /* MAKE IT BIG */
+
+    /* REDUCE HEIGHT HERE */
+    padding: 5px 0 8px 0;
+
+    font-size: 28px !important;
     font-weight: 900 !important;
     color: #1E90FF !important;
     text-align: center;
-    border-bottom: 2px solid #1E90FF;
+    border-bottom: 1px solid #1E90FF;
 }
 
-/* Push Streamlit app down so title doesn't overlap */
+/* Reduce push-down */
 body {
-    padding-top: 0px !important;
+    padding-top: 20px !important;
 }
 </style>
 
@@ -53,8 +56,7 @@ body {
     📊 Mekan Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard
 </div>
 """, unsafe_allow_html=True)
-st.markdown("""
-<style>
+
 
 /* REMOVE ALL TOP PADDING FROM STREAMLIT */
 [data-testid="stAppViewContainer"] > .main {
