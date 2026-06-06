@@ -54,6 +54,23 @@ body {
 </div>
 """, unsafe_allow_html=True)
 
+st.markdown("""
+<style>
+
+/* REMOVE Streamlit's default top padding */
+.main .block-container {
+    padding-top: 0px !important;
+    margin-top: 0px !important;
+}
+
+/* OPTIONAL: tighten even more */
+section[data-testid="stSidebar"] + div .block-container {
+    padding-top: 0px !important;
+}
+
+</style>
+""", unsafe_allow_html=True)
+
 # ---------------------------------------------------------
 # PAGE CONFIG
 # ---------------------------------------------------------
