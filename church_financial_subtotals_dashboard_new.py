@@ -39,7 +39,7 @@ st.markdown("""
     /* REDUCE HEIGHT HERE */
     padding: 5px 0 8px 0;
 
-    font-size: 28px !important;
+    font-size: 40px !important;
     font-weight: 900 !important;
     color: #1E90FF !important;
     text-align: center;
