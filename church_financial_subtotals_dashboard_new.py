@@ -83,64 +83,12 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# ---------------------------------------------------------
-# GLOBAL FONT OVERRIDE
-# ---------------------------------------------------------
-st.markdown("""
-<style>
-html, body, div, span, p, label {
-    font-size: 32px !important;
-}
-</style>
-""", unsafe_allow_html=True)
+Script execution error
+File "/mount/src/mecca-financial-dashboard/church_financial_subtotals_dashboard_new.py", line 102
+      font-size: 32px !important;
+                  ^
+SyntaxError: invalid decimal literal
 
-
-/* -----------------------------------------
-   BASE FONT SIZE FOR NORMAL TEXT
------------------------------------------ */
-html, body, div, span, p, label {
-    font-size: 32px !important;
-}
-
-/* -----------------------------------------
-   HEADERS (bigger but not huge)
------------------------------------------ */
-h1, h2, h3, h4, h5, h6 {
-    font-size: 32px !important;
-    font-weight: 700 !important;
-}
-
-/* -----------------------------------------
-   PIVOT TABLES — MAKE THESE BIGGER
------------------------------------------ */
-.dataframe tbody td {
-    font-size: 190px !important;
-}
-
-.dataframe thead th {
-    font-size: 100px !important;
-    font-weight: bold !important;
-}
-
-/* Streamlit table widget */
-.stTable {
-    font-size: 100px !important;
-}
-
-/* Streamlit dataframe widget */
-.stDataFrame {
-    font-size: 100px !important;
-}
-
-/* -----------------------------------------
-   SLIDERS, METRICS, INPUTS — NORMAL SIZE
------------------------------------------ */
-.stSlider, .stNumberInput, .stMetric {
-    font-size: 32px !important;
-}
-
-</style>
-""", unsafe_allow_html=True)
 # ---------------------------------------------------------
 # FILE PATHS (LOCAL + CLOUD)
 # ---------------------------------------------------------
