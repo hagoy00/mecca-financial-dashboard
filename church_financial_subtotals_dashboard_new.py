@@ -613,8 +613,6 @@ def forecast_totals(df_subtotals, category, end_year=2030):
 # Main 
 #-----------------------------------------------
 def main():
-    st.title("Church Financial Dashboard")
-
     # Load full detailed data (multi-sheet Excel)
     df_raw = load_data()
 
