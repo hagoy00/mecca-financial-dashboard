@@ -57,6 +57,8 @@ body {
 </div>
 """, unsafe_allow_html=True)
 
+st.markdown("""
+<style>
 
 /* REMOVE ALL TOP PADDING FROM STREAMLIT */
 [data-testid="stAppViewContainer"] > .main {
