@@ -134,26 +134,6 @@ h1, h2, h3, h4, h5, h6 {
 </style>
 """, unsafe_allow_html=True)
 # ---------------------------------------------------------
-# SAFE STICKY TITLE (DOES NOT FREEZE STREAMLIT)
-# ---------------------------------------------------------
-st.markdown("""
-<style>
-.big-dashboard-title {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    background-color: white;
-    padding: 14px 0 18px 0;
-    font-size: 60px !important;
-    font-weight: 900 !important;
-    color: #1E90FF !important;
-    text-align: center;
-    border-bottom: 2px solid #1E90FF;
-}
-</style>
-""", unsafe_allow_html=True)
-
-# ---------------------------------------------------------
 # FILE PATHS (LOCAL + CLOUD)
 # ---------------------------------------------------------
 LOCAL_PATH = "/Users/yemanehagos/my_first_project/data/MECCA_Financial_Data.xlsx"
