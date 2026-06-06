@@ -33,15 +33,16 @@ st.markdown("""
     top: 0;
     left: 0;
     width: 100%;
-    z-index: 999999;
+    z-index: 9999;
     background-color: white;
 
-    padding: 5px 0 8px 0;
+    padding: 4px 0 4px 0;
 
     font-size: 40px !important;
     font-weight: 900 !important;
     color: #1E90FF !important;
     text-align: center;
+    background: white;
     border-bottom: 1px solid #1E90FF;
 }
 
@@ -64,7 +65,7 @@ st.markdown("""
 
 /* REMOVE ALL TOP PADDING FROM STREAMLIT */
 [data-testid="stAppViewContainer"] > .main {
-    padding-top: 0 !important;
+    padding-top: 34 !important;
     margin-top: 0 !important;
 }
 
