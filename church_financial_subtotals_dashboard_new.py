@@ -24,7 +24,7 @@ from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib import colors
 
 # ---------------------------------------------------------
-# REAL STICKY TITLE (OUTSIDE STREAMLIT APP)
+# REAL STICKY TITLE (CORRECTED VERSION)
 # ---------------------------------------------------------
 st.markdown("""
 <style>
@@ -36,16 +36,16 @@ st.markdown("""
     z-index: 999999;
     background-color: white;
     padding: 20px 0 26px 0;
-    font-size: 34px !important;   /* MAKE IT BIG */
+    font-size: 34px !important;
     font-weight: 900 !important;
     color: #1E90FF !important;
     text-align: center;
     border-bottom: 2px solid #1E90FF;
 }
 
-/* Push Streamlit app down so title doesn't overlap */
+/* FIX: Correct spacing under the title */
 body {
-    padding-top: 34px !important;
+    padding-top: 120px !important;
 }
 </style>
 
