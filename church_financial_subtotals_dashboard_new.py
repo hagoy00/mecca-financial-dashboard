@@ -29,7 +29,7 @@ import streamlit as st
 # PAGE CONFIG - MUST BE FIRST
 # ---------------------------------------------------------
 st.set_page_config(
-    page_title="📊 Mekane Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard",
+    page_title="📊 Mekan Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard",
     layout="wide"
 )
 
@@ -119,13 +119,15 @@ h1, h2, h3, h4, h5, h6 {
 }
 </style>
 """, unsafe_allow_html=True)
-/* -----------------------------------------
-   SLIDERS, METRICS, INPUTS — NORMAL SIZE
------------------------------------------ */
+
+# ---------------------------------------------------------
+# SLIDERS, METRICS, INPUTS - NORMAL SIZE
+# ---------------------------------------------------------
+st.markdown("""
+<style>
 .stSlider, .stNumberInput, .stMetric {
     font-size: 28px !important;
 }
-
 </style>
 """, unsafe_allow_html=True)
 
