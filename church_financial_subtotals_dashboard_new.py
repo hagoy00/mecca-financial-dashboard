@@ -42,8 +42,6 @@ st.markdown("""
     text-align: center;
     border-bottom: 2px solid #1E90FF;
 }
-
-/* FIX: push Streamlit content down correctly */
 body {
     padding-top: 200px !important;
 }
@@ -54,23 +52,14 @@ body {
 </div>
 """, unsafe_allow_html=True)
 
-# --- FIX THE WHITE SPACE ---
-st.markdown("""
-<style>
-.main .block-container {
-    padding-top: 0px !important;
-    margin-top: 0px !important;
-}
-</style>
-""", unsafe_allow_html=True)
-
 # ---------------------------------------------------------
-# PAGE CONFIG
+# PAGE CONFIG  ✔️ MUST COME BEFORE WHITE-SPACE FIX
 # ---------------------------------------------------------
 st.set_page_config(
     page_title="📊 Mekane Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard",
     layout="wide"
 )
+
 # ---------------------------------------------------------
 # REMOVE STREAMLIT DEFAULT TITLE BAR
 # ---------------------------------------------------------
@@ -83,10 +72,28 @@ header[data-testid="stHeader"] {
 """, unsafe_allow_html=True)
 
 # ---------------------------------------------------------
-# GLOBAL FONT OVERRIDE — CLEAN + CONTROLLED
+# FIX THE WHITE SPACE  ✔️ MUST COME AFTER PAGE CONFIG
 # ---------------------------------------------------------
 st.markdown("""
 <style>
+.main .block-container {
+    padding-top: 0px !important;
+    margin-top: 0px !important;
+}
+</style>
+""", unsafe_allow_html=True)
+
+# ---------------------------------------------------------
+# GLOBAL FONT OVERRIDE
+# ---------------------------------------------------------
+st.markdown("""
+<style>
+html, body, div, span, p, label {
+    font-size: 32px !important;
+}
+</style>
+""", unsafe_allow_html=True)
+
 
 /* -----------------------------------------
    BASE FONT SIZE FOR NORMAL TEXT
