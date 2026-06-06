@@ -54,6 +54,24 @@ body {
 </div>
 """, unsafe_allow_html=True)
 
+st.markdown("""
+<style>
+
+/* Remove Streamlit's built‑in top padding */
+[data-testid="stAppViewContainer"] {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+}
+
+/* Remove padding from the main block container */
+.main .block-container {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+}
+
+</style>
+""", unsafe_allow_html=True)
+
 # ---------------------------------------------------------
 # PAGE CONFIG
 # ---------------------------------------------------------
