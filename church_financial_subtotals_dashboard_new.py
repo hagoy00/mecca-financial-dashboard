@@ -623,8 +623,7 @@ def main():
     # TAB 1 — UNIFIED SUBTOTAL SUMMARY
     # -----------------------------------------------------
     with tab1:
-        st.subheader("📘 Unified Subtotal Summary (Pivot View)")
-
+        
         summary_rows = []
     
         # Loop through ALL years in df_subtotals
