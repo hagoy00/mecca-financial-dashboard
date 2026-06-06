@@ -63,7 +63,7 @@ header[data-testid="stHeader"] {
 }
 
 [data-testid="stAppViewContainer"] > .main {
-    padding-top: 15px !important;
+    padding-top: 5px !important;
     margin-top: 0 !important;
 }
 
