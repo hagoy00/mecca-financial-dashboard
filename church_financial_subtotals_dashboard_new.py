@@ -24,7 +24,7 @@ from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib import colors
 
 # ---------------------------------------------------------
-# REAL STICKY TITLE (CLEAN + CORRECTED)
+# REAL STICKY TITLE (OUTSIDE STREAMLIT APP)
 # ---------------------------------------------------------
 st.markdown("""
 <style>
@@ -36,32 +36,31 @@ st.markdown("""
     z-index: 999999;
     background-color: white;
     padding: 20px 0 26px 0;
-    font-size: 34px !important;
+    font-size: 34px !important;   /* MAKE IT BIG */
     font-weight: 900 !important;
     color: #1E90FF !important;
     text-align: center;
     border-bottom: 2px solid #1E90FF;
 }
 
-/* Push Streamlit content down */
+/* Push Streamlit app down so title doesn't overlap */
 body {
-    padding-top: 200px !important;
+    padding-top: 30px !important;
 }
 </style>
 
 <div id="outside-sticky-title">
-    📊 Mekane Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard
+    📊 Mekan Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard
 </div>
 """, unsafe_allow_html=True)
 
 # ---------------------------------------------------------
-# PAGE CONFIG  ✔️ MUST COME BEFORE WHITE-SPACE FIX
+# PAGE CONFIG
 # ---------------------------------------------------------
 st.set_page_config(
-    page_title="📊 Mekane Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard",
+    page_title="📊 Mekan Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard",
     layout="wide"
 )
-
 # ---------------------------------------------------------
 # REMOVE STREAMLIT DEFAULT TITLE BAR
 # ---------------------------------------------------------
@@ -74,57 +73,76 @@ header[data-testid="stHeader"] {
 """, unsafe_allow_html=True)
 
 # ---------------------------------------------------------
-# FIX THE WHITE SPACE  ✔️ MUST COME AFTER PAGE CONFIG
-# ---------------------------------------------------------
-st.markdown("""
-<style>
-.main .block-container {
-    padding-top: 0px !important;
-    margin-top: 0px !important;
-}
-</style>
-""", unsafe_allow_html=True)
-
-# ---------------------------------------------------------
 # GLOBAL FONT OVERRIDE — CLEAN + CONTROLLED
 # ---------------------------------------------------------
 st.markdown("""
 <style>
 
-/* Base text size */
+/* -----------------------------------------
+   BASE FONT SIZE FOR NORMAL TEXT
+----------------------------------------- */
 html, body, div, span, p, label {
     font-size: 32px !important;
 }
 
-/* Headers */
+/* -----------------------------------------
+   HEADERS (bigger but not huge)
+----------------------------------------- */
 h1, h2, h3, h4, h5, h6 {
     font-size: 32px !important;
     font-weight: 700 !important;
 }
 
-/* Dataframes */
+/* -----------------------------------------
+   PIVOT TABLES — MAKE THESE BIGGER
+----------------------------------------- */
 .dataframe tbody td {
-    font-size: 32px !important;
+    font-size: 190px !important;
 }
 
 .dataframe thead th {
-    font-size: 32px !important;
+    font-size: 10px !important;
     font-weight: bold !important;
 }
 
-/* Streamlit widgets */
-.stTable, .stDataFrame, .stSlider, .stNumberInput, .stMetric {
+/* Streamlit table widget */
+.stTable {
+    font-size: 10px !important;
+}
+
+/* Streamlit dataframe widget */
+.stDataFrame {
+    font-size: 10px !important;
+}
+
+/* -----------------------------------------
+   SLIDERS, METRICS, INPUTS — NORMAL SIZE
+----------------------------------------- */
+.stSlider, .stNumberInput, .stMetric {
     font-size: 32px !important;
 }
 
 </style>
 """, unsafe_allow_html=True)
-
-Script execution error
-File "/mount/src/mecca-financial-dashboard/church_financial_subtotals_dashboard_new.py", line 102
-      font-size: 32px !important;
-                  ^
-SyntaxError: invalid decimal literal
+# ---------------------------------------------------------
+# SAFE STICKY TITLE (DOES NOT FREEZE STREAMLIT)
+# ---------------------------------------------------------
+st.markdown("""
+<style>
+.big-dashboard-title {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: white;
+    padding: 14px 0 18px 0;
+    font-size: 60px !important;
+    font-weight: 900 !important;
+    color: #1E90FF !important;
+    text-align: center;
+    border-bottom: 2px solid #1E90FF;
+}
+</style>
+""", unsafe_allow_html=True)
 
 # ---------------------------------------------------------
 # FILE PATHS (LOCAL + CLOUD)
@@ -150,7 +168,7 @@ def classify_row_kind(cat):
     c = str(cat).strip().lower()
     if c.startswith("total for "):
         return "Subtotal"
-    if "net" in c and "income" in c:
+    if c in ["expenses", "Net_Income", "net operating income"]:
         return "Header"
     return "Detail"
 
@@ -559,7 +577,8 @@ def forecast_totals(df_subtotals, category, end_year=2030):
 # Main 
 #-----------------------------------------------
 def main():
-    
+    st.title("Church Financial Dashboard")
+
     # Load full detailed data (multi-sheet Excel)
     df_raw = load_data()
 
@@ -605,7 +624,8 @@ def main():
     # TAB 1 — UNIFIED SUBTOTAL SUMMARY
     # -----------------------------------------------------
     with tab1:
-        
+        st.subheader("📘 Unified Subtotal Summary (Pivot View)")
+
         summary_rows = []
     
         # Loop through ALL years in df_subtotals
@@ -1116,7 +1136,7 @@ def main():
             st.download_button(
                 label="Download PDF",
                 data=pdf_buffer,
-                file_name=f"Mekane Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard.pdf",
+                file_name=f"Mekan Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard.pdf",
                 mime="application/pdf"
             )
 # ---------------------------------------------------------
