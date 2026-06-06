@@ -26,7 +26,6 @@ from reportlab.lib import colors
 # ---------------------------------------------------------
 # REAL STICKY TITLE (CORRECTED VERSION)
 # ---------------------------------------------------------
-# --- Sticky Title ---
 st.markdown("""
 <style>
 #outside-sticky-title {
@@ -43,9 +42,11 @@ st.markdown("""
     text-align: center;
     border-bottom: 2px solid #1E90FF;
 }
+
+/* FIX: push Streamlit content down correctly */
 body {
     padding-top: 200px !important;
-]}
+}
 </style>
 
 <div id="outside-sticky-title">
