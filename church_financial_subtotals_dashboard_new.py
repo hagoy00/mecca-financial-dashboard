@@ -23,8 +23,18 @@ from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, 
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib import colors
 
+import streamlit as st
+
 # ---------------------------------------------------------
-# REAL STICKY TITLE (OUTSIDE STREAMLIT APP)
+# PAGE CONFIG - MUST BE FIRST
+# ---------------------------------------------------------
+st.set_page_config(
+    page_title="📊 Mekane Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard",
+    layout="wide"
+)
+
+# ---------------------------------------------------------
+# FIXED TOP TITLE + LAYOUT CONTROL
 # ---------------------------------------------------------
 st.markdown("""
 <style>
@@ -43,31 +53,28 @@ st.markdown("""
     border-bottom: 1px solid #1E90FF;
 }
 
-/* hide default streamlit header */
 header[data-testid="stHeader"] {
     display: none !important;
 }
 
-/* remove extra top spacing */
 [data-testid="stAppViewContainer"] {
-    margin-top: 0 !important;
     padding-top: 0 !important;
+    margin-top: 0 !important;
 }
 
 [data-testid="stAppViewContainer"] > .main {
+    padding-top: 58px !important;
     margin-top: 0 !important;
-    padding-top: 58px !important;  /* adjust to exact title height */
 }
 
 .main .block-container {
-    margin-top: 0 !important;
     padding-top: 0 !important;
+    margin-top: 0 !important;
 }
 
-/* optional: remove first element top spacing */
 .main .block-container > div:first-child {
-    margin-top: 0 !important;
     padding-top: 0 !important;
+    margin-top: 0 !important;
 }
 </style>
 
@@ -77,47 +84,19 @@ header[data-testid="stHeader"] {
 """, unsafe_allow_html=True)
 
 # ---------------------------------------------------------
-# PAGE CONFIG
-# ---------------------------------------------------------
-st.set_page_config(
-    page_title="📊 Mekane Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard",
-    layout="wide"
-)
-# ---------------------------------------------------------
-# REMOVE STREAMLIT DEFAULT TITLE BAR
+# GLOBAL FONT OVERRIDE
 # ---------------------------------------------------------
 st.markdown("""
 <style>
-header[data-testid="stHeader"] {
-    display: none !important;
-}
-</style>
-""", unsafe_allow_html=True)
-
-# ---------------------------------------------------------
-# GLOBAL FONT OVERRIDE — CLEAN + CONTROLLED
-# ---------------------------------------------------------
-st.markdown("""
-<style>
-
-/* -----------------------------------------
-   BASE FONT SIZE FOR NORMAL TEXT
------------------------------------------ */
 html, body, div, span, p, label {
     font-size: 32px !important;
 }
 
-/* -----------------------------------------
-   HEADERS (bigger but not huge)
------------------------------------------ */
 h1, h2, h3, h4, h5, h6 {
     font-size: 15px !important;
     font-weight: 700 !important;
 }
 
-/* -----------------------------------------
-   PIVOT TABLES — MAKE THESE BIGGER
------------------------------------------ */
 .dataframe tbody td {
     font-size: 200px !important;
 }
@@ -127,16 +106,19 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: bold !important;
 }
 
-/* Streamlit table widget */
 .stTable {
     font-size: 100px !important;
 }
 
-/* Streamlit dataframe widget */
 .stDataFrame {
     font-size: 100px !important;
 }
 
+.stSlider, .stNumberInput, .stMetric {
+    font-size: 28px !important;
+}
+</style>
+""", unsafe_allow_html=True)
 /* -----------------------------------------
    SLIDERS, METRICS, INPUTS — NORMAL SIZE
 ----------------------------------------- */
