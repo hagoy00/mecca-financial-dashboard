@@ -36,24 +36,26 @@ st.markdown("""
     z-index: 999999;
     background-color: white;
 
-    /* REDUCE HEIGHT HERE */
     padding: 5px 0 8px 0;
 
-    font-size: 50px !important;
+    font-size: 28px !important;
     font-weight: 900 !important;
     color: #1E90FF !important;
     text-align: center;
     border-bottom: 1px solid #1E90FF;
 }
 
-/* Reduce push-down */
+/* REMOVE THIS — DO NOT PUSH THE APP DOWN */
+/*
 body {
     padding-top: 20px !important;
 }
+*/
+
 </style>
 
 <div id="outside-sticky-title">
-    📊 Mekan Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard
+    📊 Mekane Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard
 </div>
 """, unsafe_allow_html=True)
 
@@ -86,7 +88,7 @@ st.markdown("""
 # PAGE CONFIG
 # ---------------------------------------------------------
 st.set_page_config(
-    page_title="📊 Mekan Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard",
+    page_title="📊 Mekane Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard",
     layout="wide"
 )
 # ---------------------------------------------------------
