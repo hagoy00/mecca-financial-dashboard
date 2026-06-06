@@ -43,7 +43,7 @@ st.markdown("""
     top: 0;
     left: 0;
     width: 100%;
-    z-index: 9999;
+    z-index: 999;
     background: white;
     padding: 4px 0 4px 0;
     font-size: 40px !important;
@@ -63,7 +63,7 @@ header[data-testid="stHeader"] {
 }
 
 [data-testid="stAppViewContainer"] > .main {
-    padding-top: 58px !important;
+    padding-top: 50px !important;
     margin-top: 0 !important;
 }
 
@@ -89,16 +89,16 @@ header[data-testid="stHeader"] {
 st.markdown("""
 <style>
 html, body, div, span, p, label {
-    font-size: 32px !important;
+    font-size: 50px !important;
 }
 
 h1, h2, h3, h4, h5, h6 {
-    font-size: 15px !important;
+    font-size: 10px !important;
     font-weight: 700 !important;
 }
 
 .dataframe tbody td {
-    font-size: 200px !important;
+    font-size:150px !important;
 }
 
 .dataframe thead th {
