@@ -45,7 +45,7 @@ st.markdown("""
 
 /* Push Streamlit app down so title doesn't overlap */
 body {
-    padding-top: 30px !important;
+    padding-top: 34px !important;
 }
 </style>
 
