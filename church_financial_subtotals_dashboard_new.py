@@ -26,6 +26,7 @@ from reportlab.lib import colors
 # ---------------------------------------------------------
 # REAL STICKY TITLE (CORRECTED VERSION)
 # ---------------------------------------------------------
+# --- Sticky Title ---
 st.markdown("""
 <style>
 #outside-sticky-title {
@@ -42,8 +43,6 @@ st.markdown("""
     text-align: center;
     border-bottom: 2px solid #1E90FF;
 }
-
-/* FIX: Correct spacing under the title */
 body {
     padding-top: 120px !important;
 }
@@ -54,20 +53,13 @@ body {
 </div>
 """, unsafe_allow_html=True)
 
+# --- FIX THE WHITE SPACE ---
 st.markdown("""
 <style>
-
-/* REMOVE Streamlit's default top padding */
 .main .block-container {
     padding-top: 0px !important;
     margin-top: 0px !important;
 }
-
-/* OPTIONAL: tighten even more */
-section[data-testid="stSidebar"] + div .block-container {
-    padding-top: 0px !important;
-}
-
 </style>
 """, unsafe_allow_html=True)
 
