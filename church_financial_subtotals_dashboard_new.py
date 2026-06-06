@@ -85,6 +85,41 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+# ---------------------------------------------------------
+# GLOBAL FONT OVERRIDE — CLEAN + CONTROLLED
+# ---------------------------------------------------------
+st.markdown("""
+<style>
+
+/* Base text size */
+html, body, div, span, p, label {
+    font-size: 32px !important;
+}
+
+/* Headers */
+h1, h2, h3, h4, h5, h6 {
+    font-size: 32px !important;
+    font-weight: 700 !important;
+}
+
+/* Dataframes */
+.dataframe tbody td {
+    font-size: 32px !important;
+}
+
+.dataframe thead th {
+    font-size: 32px !important;
+    font-weight: bold !important;
+}
+
+/* Streamlit widgets */
+.stTable, .stDataFrame, .stSlider, .stNumberInput, .stMetric {
+    font-size: 32px !important;
+}
+
+</style>
+""", unsafe_allow_html=True)
+
 Script execution error
 File "/mount/src/mecca-financial-dashboard/church_financial_subtotals_dashboard_new.py", line 102
       font-size: 32px !important;
