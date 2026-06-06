@@ -34,56 +34,47 @@ st.markdown("""
     left: 0;
     width: 100%;
     z-index: 9999;
-    background-color: white;
-
+    background: white;
     padding: 4px 0 4px 0;
-
     font-size: 40px !important;
     font-weight: 900 !important;
     color: #1E90FF !important;
     text-align: center;
-    background: white;
     border-bottom: 1px solid #1E90FF;
 }
 
-/* REMOVE THIS — DO NOT PUSH THE APP DOWN */
-/*
-body {
-    padding-top: 5px !important;
+/* hide default streamlit header */
+header[data-testid="stHeader"] {
+    display: none !important;
 }
-*/
 
+/* remove extra top spacing */
+[data-testid="stAppViewContainer"] {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}
+
+[data-testid="stAppViewContainer"] > .main {
+    margin-top: 0 !important;
+    padding-top: 58px !important;  /* adjust to exact title height */
+}
+
+.main .block-container {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}
+
+/* optional: remove first element top spacing */
+.main .block-container > div:first-child {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}
 </style>
 
 <div id="outside-sticky-title">
     📊 Mekane Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard
 </div>
 """, unsafe_allow_html=True)
-
-st.markdown("""
-<style>
-
-/* REMOVE ALL TOP PADDING FROM STREAMLIT */
-[data-testid="stAppViewContainer"] > .main {
-    padding-top: 34 !important;
-    margin-top: 0 !important;
-}
-
-/* REMOVE PADDING FROM THE BLOCK CONTAINER */
-.main .block-container {
-    padding-top: 0 !important;
-    margin-top: 0 !important;
-}
-
-/* REMOVE PADDING FROM THE APP ROOT */
-[data-testid="stAppViewContainer"] {
-    padding-top: 0 !important;
-    margin-top: 0 !important;
-}
-
-</style>
-""", unsafe_allow_html=True)
-
 
 # ---------------------------------------------------------
 # PAGE CONFIG
@@ -153,29 +144,6 @@ h1, h2, h3, h4, h5, h6 {
     font-size: 28px !important;
 }
 
-</style>
-""", unsafe_allow_html=True)
-# ---------------------------------------------------------
-# SAFE STICKY TITLE (DOES NOT FREEZE STREAMLIT)
-# ---------------------------------------------------------
-st.markdown("""
-<style>
-.big-dashboard-title {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    background-color: white;
-    padding: 14px 0 18px 0;
-    font-size: 60px !important;
-    font-weight: 900 !important;
-    color: #1E90FF !important;
-    text-align: center;
-    border-bottom: 2px solid #1E90FF;
-}
-</style>
-""", unsafe_allow_html=True)
-
-st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
