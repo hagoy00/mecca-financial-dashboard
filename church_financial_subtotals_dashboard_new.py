@@ -150,7 +150,7 @@ def classify_row_kind(cat):
     c = str(cat).strip().lower()
     if c.startswith("total for "):
         return "Subtotal"
-    if c in ["expenses", "Net_Income", "net operating income"]:
+    if "net" in c and "income" in c:
         return "Header"
     return "Detail"
 
