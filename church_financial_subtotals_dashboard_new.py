@@ -591,7 +591,8 @@ def main():
 
     # Years for filters (use raw data)
     years = sorted(df_raw["Year"].unique())
-    selected_years = st.multiselect("Select Years", years, default=years)
+    #selected_years = st.multiselect("Select Years", years, default=years)
+    selected_years = st.multiselect("", years, default=years)
 
     #-----------------------------------------------
     # Tabs
