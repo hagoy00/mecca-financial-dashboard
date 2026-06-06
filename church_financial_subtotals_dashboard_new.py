@@ -24,7 +24,7 @@ from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib import colors
 
 # ---------------------------------------------------------
-# REAL STICKY TITLE (CORRECTED VERSION)
+# REAL STICKY TITLE (CLEAN + CORRECTED)
 # ---------------------------------------------------------
 st.markdown("""
 <style>
@@ -42,6 +42,8 @@ st.markdown("""
     text-align: center;
     border-bottom: 2px solid #1E90FF;
 }
+
+/* Push Streamlit content down */
 body {
     padding-top: 200px !important;
 }
