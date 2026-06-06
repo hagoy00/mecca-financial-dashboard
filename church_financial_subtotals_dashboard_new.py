@@ -48,7 +48,7 @@ st.markdown("""
 /* REMOVE THIS — DO NOT PUSH THE APP DOWN */
 /*
 body {
-    padding-top: 20px !important;
+    padding-top: 5px !important;
 }
 */
 
@@ -119,7 +119,7 @@ html, body, div, span, p, label {
    HEADERS (bigger but not huge)
 ----------------------------------------- */
 h1, h2, h3, h4, h5, h6 {
-    font-size: 32px !important;
+    font-size: 15px !important;
     font-weight: 700 !important;
 }
 
@@ -127,29 +127,29 @@ h1, h2, h3, h4, h5, h6 {
    PIVOT TABLES — MAKE THESE BIGGER
 ----------------------------------------- */
 .dataframe tbody td {
-    font-size: 190px !important;
+    font-size: 200px !important;
 }
 
 .dataframe thead th {
-    font-size: 10px !important;
+    font-size: 100px !important;
     font-weight: bold !important;
 }
 
 /* Streamlit table widget */
 .stTable {
-    font-size: 10px !important;
+    font-size: 100px !important;
 }
 
 /* Streamlit dataframe widget */
 .stDataFrame {
-    font-size: 10px !important;
+    font-size: 100px !important;
 }
 
 /* -----------------------------------------
    SLIDERS, METRICS, INPUTS — NORMAL SIZE
 ----------------------------------------- */
 .stSlider, .stNumberInput, .stMetric {
-    font-size: 32px !important;
+    font-size: 28px !important;
 }
 
 </style>
