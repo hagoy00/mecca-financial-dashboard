@@ -175,14 +175,6 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.markdown("""
-<style>
-
-/* Reduce white space under sticky title */
-html, body, [data-testid="stAppViewContainer"] {
-    padding-top: 10px !important;
-    margin-top: 0 !important;
-}
-
 </style>
 """, unsafe_allow_html=True)
 
