@@ -694,114 +694,47 @@ def main():
     
         st.divider()
     
-        # ============================================================
-        # TOP 5 INCOME (CORRECTED — ORIGINAL LOGIC)
-        # ============================================================
-    
-        st.markdown("### 💰 Top 5 Income Categories (Per Year)")
-    
-        # Find the row index of the income subtotal
-        income_end_idx = df_raw.index[
-            df_raw["Category"].str.contains("total for income", case=False, na=False)
+        # ---------- TOP 5 INCOME ----------
+        st.markdown("### 💰 Top 5 Income Categories")
+
+        income_df = df[
+            (df["Type"] == "Income") &
+            (~df["Category"].str.lower().str.startswith("total for"))
         ]
-    
-        if len(income_end_idx) > 0:
-            income_end_idx = income_end_idx[0]
-        else:
-            income_end_idx = len(df_raw)  # fallback: treat entire sheet as income
-    
-        # Income rows = everything ABOVE the subtotal
-        income_section = df_raw.iloc[:income_end_idx]
-    
-        # Group by Category + Year
-        income_grouped = (
-            income_section.groupby(["Category", "Year"])["Amount"]
-            .sum()
-            .reset_index()
+
+        top_income = income_df.groupby("Category")["Amount"].sum().nlargest(5).index
+
+        income_yearly = income_df[income_df["Category"].isin(top_income)].pivot_table(
+            index="Category", columns="Year", values="Amount", aggfunc="sum", fill_value=0
         )
-    
-        # Top 5 per year
-        top_income = (
-            income_grouped.groupby("Year")
-            .apply(lambda x: x.nlargest(5, "Amount"))
-            .reset_index(drop=True)
-        )
-    
-        # Pivot
-        top_income_pivot = top_income.pivot_table(
-            index="Category",
-            columns="Year",
-            values="Amount",
-            aggfunc="sum"
-        ).fillna(0)
-    
-        top_income_pivot.index.name = "Category"
-    
-        st.dataframe(top_income_pivot, use_container_width=True)
-    
-        st.divider()
-    
-        # ============================================================
-        # TOP 5 EXPENSES (CORRECTED — ORIGINAL LOGIC)
-        # ============================================================
-    
-        st.markdown("### 📉 Top 5 Expense Categories (Per Year)")
-    
-        # Find the row index of income subtotal and expense subtotal
-        income_end_idx = df_raw.index[
-            df_raw["Category"].str.contains("total for income", case=False, na=False)
-        ]
-        expense_end_idx = df_raw.index[
-            df_raw["Category"].str.contains("total for expenses", case=False, na=False)
-        ]
-    
-        if len(income_end_idx) > 0:
-            income_end_idx = income_end_idx[0]
-        else:
-            income_end_idx = 0
-    
-        if len(expense_end_idx) > 0:
-            expense_end_idx = expense_end_idx[0]
-        else:
-            expense_end_idx = len(df_raw)
-    
-        # Expense rows = between the two subtotals
-        expense_section = df_raw.iloc[income_end_idx + 1 : expense_end_idx]
-    
-        # Remove depreciation
-        expense_section = expense_section[
-            ~expense_section["Category"].str.contains("depreciation", case=False, na=False)
-        ]
-    
-        # Group by Category + Year
-        expense_grouped = (
-            expense_section.groupby(["Category", "Year"])["Amount"]
-            .sum()
-            .reset_index()
-        )
-    
-        # Top 5 per year
-        top_expense = (
-            expense_grouped.groupby("Year")
-            .apply(lambda x: x.nlargest(5, "Amount"))
-            .reset_index(drop=True)
-        )
-    
-        # Pivot
-        top_expense_pivot = top_expense.pivot_table(
-            index="Category",
-            columns="Year",
-            values="Amount",
-            aggfunc="sum"
-        ).fillna(0)
-    
-        top_expense_pivot.index.name = "Category"
-    
-        st.dataframe(top_expense_pivot, use_container_width=True)
-    
+
+        income_yearly = income_yearly.applymap(lambda x: f"{int(x):,}")
+        income_html = income_yearly.to_html(classes="wide-table", border=0, justify="left")
+
+        st.markdown(f"<div class='scroll-box'>{income_html}</div>", unsafe_allow_html=True)
+
         st.divider()
 
-    
+        # ---------- TOP 5 EXPENSE ----------
+        st.markdown("### 📉 Top 5 Expense Categories")
+
+        expense_df = df[
+            (df["Type"] == "Expense") &
+            (~df["Category"].str.lower().str.startswith("total for")) &
+            (~df["Category"].str.contains("depreciat", case=False, na=False))
+        ]
+
+        top_expense = expense_df.groupby("Category")["Amount"].sum().nlargest(5).index
+
+        expense_yearly = expense_df[expense_df["Category"].isin(top_expense)].pivot_table(
+            index="Category", columns="Year", values="Amount", aggfunc="sum", fill_value=0
+        )
+
+        expense_yearly = expense_yearly.applymap(lambda x: f"{int(x):,}")
+        expense_html = expense_yearly.to_html(classes="wide-table", border=0, justify="left")
+
+        st.markdown(f"<div class='scroll-box'>{expense_html}</div>", unsafe_allow_html=True)
+
     # -----------------------------------------------------
     # TAB 2 — CLEAN YOY SUMMARY
     # -----------------------------------------------------
