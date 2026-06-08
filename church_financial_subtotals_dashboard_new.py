@@ -618,7 +618,6 @@ def main():
     # TAB 1 — UNIFIED SUBTOTAL SUMMARY
     # -----------------------------------------------------
     with tab1:
-        #st.subheader("📘 Unified Subtotal Summary (Pivot View)")
 
         summary_rows = []
     
@@ -637,7 +636,6 @@ def main():
     
             net_income = revenue - total_expenses
     
-            # Use df_raw for detailed category rows
             payroll = df_raw[
                 (df_raw["Year"] == year) &
                 (df_raw["Category"].isin(["Salaries & Wages", "Payroll Tax Expense"]))
@@ -653,51 +651,55 @@ def main():
             summary_rows.append(["Net_Income", year, net_income])
             summary_rows.append(["Payroll", year, payroll])
             summary_rows.append(["Utilities", year, utilities])
-            
-            summary_df = pd.DataFrame(summary_rows, columns=["Category", "Year", "Amount"])
-            
-            # --- FIX: ensure no missing category names ---
-            summary_df["Category"] = (
-                summary_df["Category"]
-                .astype(str)
-                .str.strip()
-                .replace("", "Missing_Category")
-                .fillna("Missing_Category")
-            )
-            
-            # SAFE formatting
-            summary_df["Amount"] = (
-                summary_df["Amount"]
-                .fillna(0)
-                .astype(float)
-                .round(0)
-                .astype(int)
-                .apply(lambda x: f"{x:,}")
-            )
-            
-            summary_pivot = summary_df.pivot_table(
-                index="Category",
-                columns="Year",
-                values="Amount",
-                aggfunc="first"
-            ).fillna("0")
-            
-            summary_pivot.index.name = None
-            
-            # --- FIX: Clean pivot index BEFORE slider ---
-            summary_pivot.index = (
-                pd.Series(summary_pivot.index)
-                .astype(str)
-                .str.strip()
-                .replace("", "Missing_Category")
-                .fillna("Missing_Category")
-            )
-            
-            st.markdown("### 📘 Main Financial Summary")
-            st.dataframe(summary_pivot, use_container_width=True)
-            
-            st.divider()
+    
+        # -----------------------------
+        # BUILD PIVOT *AFTER* THE LOOP
+        # -----------------------------
+        summary_df = pd.DataFrame(summary_rows, columns=["Category", "Year", "Amount"])
+    
+        # Clean categories
+        summary_df["Category"] = (
+            summary_df["Category"]
+            .astype(str)
+            .str.strip()
+            .replace("", "Missing_Category")
+            .fillna("Missing_Category")
+        )
+    
+        # Format amounts
+        summary_df["Amount"] = (
+            summary_df["Amount"]
+            .fillna(0)
+            .astype(float)
+            .round(0)
+            .astype(int)
+            .apply(lambda x: f"{x:,}")
+        )
+    
+        summary_pivot = summary_df.pivot_table(
+            index="Category",
+            columns="Year",
+            values="Amount",
+            aggfunc="first"
+        ).fillna("0")
+    
+        summary_pivot.index.name = None
+    
+        # Clean pivot index
+        summary_pivot.index = (
+            pd.Series(summary_pivot.index)
+            .astype(str)
+            .str.strip()
+            .replace("", "Missing_Category")
+            .fillna("Missing_Category")
+        )
+    
+        st.markdown("### 📘 Main Financial Summary")
+        st.dataframe(summary_pivot, use_container_width=True)
+    
+        st.divider()
 
+    
     
         # -----------------------------------------------------
         # TOP 5 INCOME PIVOT
