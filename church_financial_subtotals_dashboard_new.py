@@ -613,7 +613,8 @@ def main():
         "Forecasting",
         "Board PDF"
     ])
-
+    
+        
     # -----------------------------------------------------
     # TAB 1 — UNIFIED SUBTOTAL SUMMARY
     # -----------------------------------------------------
@@ -656,7 +657,7 @@ def main():
             summary_rows.append(["Utilities", year, utilities])
     
         # -----------------------------------------
-        # BUILD SUMMARY DF (ONCE)
+        # BUILD SUMMARY DF
         # -----------------------------------------
         summary_df = pd.DataFrame(summary_rows, columns=["Category", "Year", "Amount"])
     
@@ -687,8 +688,6 @@ def main():
             aggfunc="first"
         ).fillna("0")
     
-        summary_pivot.index.name = "Category"
-    
         st.markdown("### 📘 Main Financial Summary")
         st.dataframe(summary_pivot, use_container_width=True)
     
@@ -706,6 +705,7 @@ def main():
         ]
     
         if not income_df.empty:
+    
             top_income = income_df.groupby("Category")["Amount"].sum().nlargest(5).index
     
             income_yearly = income_df[income_df["Category"].isin(top_income)].pivot_table(
@@ -716,10 +716,15 @@ def main():
                 fill_value=0
             )
     
-            income_yearly = income_yearly.applymap(lambda x: f"{int(x):,}")
-            income_html = income_yearly.to_html(classes="wide-table", border=0, justify="left")
+            # Force DataFrame
+            income_yearly = pd.DataFrame(income_yearly)
     
-            st.markdown(f"<div class='scroll-box'>{income_html}</div>", unsafe_allow_html=True)
+            # Format numbers safely (NO APPLYMAP)
+            for col in income_yearly.columns:
+                income_yearly[col] = income_yearly[col].astype(int).apply(lambda x: f"{x:,}")
+    
+            st.dataframe(income_yearly, use_container_width=True)
+    
         else:
             st.info("No income data found.")
     
@@ -738,6 +743,7 @@ def main():
         ]
     
         if not expense_df.empty:
+    
             top_expense = expense_df.groupby("Category")["Amount"].sum().nlargest(5).index
     
             expense_yearly = expense_df[expense_df["Category"].isin(top_expense)].pivot_table(
@@ -748,14 +754,20 @@ def main():
                 fill_value=0
             )
     
-            expense_yearly = expense_yearly.applymap(lambda x: f"{int(x):,}")
-            expense_html = expense_yearly.to_html(classes="wide-table", border=0, justify="left")
+            # Force DataFrame
+            expense_yearly = pd.DataFrame(expense_yearly)
     
-            st.markdown(f"<div class='scroll-box'>{expense_html}</div>", unsafe_allow_html=True)
+            # Format numbers safely (NO APPLYMAP)
+            for col in expense_yearly.columns:
+                expense_yearly[col] = expense_yearly[col].astype(int).apply(lambda x: f"{x:,}")
+    
+            st.dataframe(expense_yearly, use_container_width=True)
+    
         else:
             st.info("No expense data found.")
     
         st.divider()
+
     
     # -----------------------------------------------------
     # TAB 2 — CLEAN YOY SUMMARY
