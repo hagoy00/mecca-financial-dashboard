@@ -617,6 +617,7 @@ def main():
     # -----------------------------------------------------
     # TAB 1 — UNIFIED SUBTOTAL SUMMARY
     # -----------------------------------------------------
+    
     with tab1:
     
         # -----------------------------------------
@@ -693,55 +694,70 @@ def main():
     
         st.divider()
     
-        # ---------- TOP 5 INCOME ----------
+        # ============================================================
+        # TOP 5 INCOME
+        # ============================================================
+    
         st.markdown("### 💰 Top 5 Income Categories")
     
         income_df = df_raw[
-            (df_raw["Type"] == "Income") &
+            (df_raw["Type"].str.lower() == "income") &
             (~df_raw["Category"].str.lower().str.startswith("total for"))
         ]
     
-        top_income = income_df.groupby("Category")["Amount"].sum().nlargest(5).index
+        if not income_df.empty:
+            top_income = income_df.groupby("Category")["Amount"].sum().nlargest(5).index
     
-        income_yearly = income_df[income_df["Category"].isin(top_income)].pivot_table(
-            index="Category",
-            columns="Year",
-            values="Amount",
-            aggfunc="sum",
-            fill_value=0
-        )
+            income_yearly = income_df[income_df["Category"].isin(top_income)].pivot_table(
+                index="Category",
+                columns="Year",
+                values="Amount",
+                aggfunc="sum",
+                fill_value=0
+            )
     
-        income_yearly = income_yearly.applymap(lambda x: f"{int(x):,}")
-        income_html = income_yearly.to_html(classes="wide-table", border=0, justify="left")
+            income_yearly = income_yearly.applymap(lambda x: f"{int(x):,}")
+            income_html = income_yearly.to_html(classes="wide-table", border=0, justify="left")
     
-        st.markdown(f"<div class='scroll-box'>{income_html}</div>", unsafe_allow_html=True)
+            st.markdown(f"<div class='scroll-box'>{income_html}</div>", unsafe_allow_html=True)
+        else:
+            st.info("No income data found.")
     
         st.divider()
     
-        # ---------- TOP 5 EXPENSE ----------
+        # ============================================================
+        # TOP 5 EXPENSES
+        # ============================================================
+    
         st.markdown("### 📉 Top 5 Expense Categories")
     
         expense_df = df_raw[
-            (df_raw["Type"] == "Expense") &
+            (df_raw["Type"].str.lower() == "expense") &
             (~df_raw["Category"].str.lower().str.startswith("total for")) &
             (~df_raw["Category"].str.contains("depreciat", case=False, na=False))
         ]
     
-        top_expense = expense_df.groupby("Category")["Amount"].sum().nlargest(5).index
+        if not expense_df.empty:
+            top_expense = expense_df.groupby("Category")["Amount"].sum().nlargest(5).index
     
-        expense_yearly = expense_df[expense_df["Category"].isin(top_expense)].pivot_table(
-            index="Category",
-            columns="Year",
-            values="Amount",
-            aggfunc="sum",
-            fill_value=0
-        )
+            expense_yearly = expense_df[expense_df["Category"].isin(top_expense)].pivot_table(
+                index="Category",
+                columns="Year",
+                values="Amount",
+                aggfunc="sum",
+                fill_value=0
+            )
     
-        expense_yearly = expense_yearly.applymap(lambda x: f"{int(x):,}")
-        expense_html = expense_yearly.to_html(classes="wide-table", border=0, justify="left")
+            expense_yearly = expense_yearly.applymap(lambda x: f"{int(x):,}")
+            expense_html = expense_yearly.to_html(classes="wide-table", border=0, justify="left")
     
-        st.markdown(f"<div class='scroll-box'>{expense_html}</div>", unsafe_allow_html=True)
-        
+            st.markdown(f"<div class='scroll-box'>{expense_html}</div>", unsafe_allow_html=True)
+        else:
+            st.info("No expense data found.")
+    
+        st.divider()
+
+    
     # -----------------------------------------------------
     # TAB 2 — CLEAN YOY SUMMARY
     # -----------------------------------------------------
