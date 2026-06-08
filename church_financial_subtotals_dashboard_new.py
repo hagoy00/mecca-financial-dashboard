@@ -735,7 +735,7 @@ def main():
         
         top_income_pivot.index.name = "Category"
         
-         st.markdown("### 💰 Top 5 Income Categories (Per Year)")
+        st.markdown("### 💰 Top 5 Income Categories (Per Year)")
                 st.dataframe(top_income_pivot, use_container_width=True)
                 
                 st.divider()
