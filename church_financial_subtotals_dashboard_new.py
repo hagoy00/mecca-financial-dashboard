@@ -142,6 +142,14 @@ def get_file_path():
         return LOCAL_PATH
     return CLOUD_PATH
 
+    df["Category"] = (
+        df["Category"]
+        .astype(str)
+        .str.strip()
+        .replace("", "Missing_Category")
+        .fillna("Missing_Category")
+    )
+
 # ---------------------------------------------------------
 # HELPERS
 # ---------------------------------------------------------
