@@ -683,7 +683,15 @@ def main():
         ).fillna("0")
         
         summary_pivot.index.name = None
-        
+        # --- FIX: Clean pivot index BEFORE slider ---
+        summary_pivot.index = (
+            summary_pivot.index
+            .astype(str)
+            .str.strip()
+            .replace("", "Missing_Category")
+            .fillna("Missing_Category")
+        )
+
         st.markdown("### 📘 Main Financial Summary")
         st.dataframe(summary_pivot, use_container_width=True)
         
