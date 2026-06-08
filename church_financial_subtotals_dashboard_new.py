@@ -647,7 +647,41 @@ def main():
             summary_rows.append(["Utilities", year, utilities])
     
         summary_df = pd.DataFrame(summary_rows, columns=["Category", "Year", "Amount"])
-    
+
+        # --- FIX: ensure no missing category names ---
+        summary_df["Category"] = (
+            summary_df["Category"]
+            .astype(str)
+            .str.strip()
+            .replace("", "Missing_Category")
+            .fillna("Missing_Category")
+        )
+        
+        # SAFE formatting
+        summary_df["Amount"] = (
+            summary_df["Amount"]
+            .fillna(0)
+            .astype(float)
+            .round(0)
+            .astype(int)
+            .apply(lambda x: f"{x:,}")
+        )
+        
+        summary_pivot = summary_df.pivot_table(
+            index="Category",
+            columns="Year",
+            values="Amount",
+            aggfunc="first"
+        ).fillna("0")
+        
+        summary_pivot.index.name = None
+        
+        st.markdown("### 📘 Main Financial Summary")
+        st.dataframe(summary_pivot, use_container_width=True)
+        
+        st.divider()
+        summary_df = pd.DataFrame(summary_rows, columns=["Category", "Year", "Amount"])
+            
         # SAFE formatting
         summary_df["Amount"] = (
             summary_df["Amount"]
