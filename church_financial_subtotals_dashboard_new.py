@@ -756,7 +756,6 @@ def main():
             st.info("No expense data found.")
     
         st.divider()
-
     
     # -----------------------------------------------------
     # TAB 2 — CLEAN YOY SUMMARY
