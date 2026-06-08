@@ -617,9 +617,9 @@ def main():
     # -----------------------------------------------------
     # TAB 1 — UNIFIED SUBTOTAL SUMMARY
     # -----------------------------------------------------
-    
-    with tab1:
 
+    with tab1:
+    
         # -----------------------------------------
         # BUILD SUMMARY ROWS
         # -----------------------------------------
@@ -628,12 +628,12 @@ def main():
         for year, group in df_subtotals.groupby("Year"):
     
             revenue = group.loc[
-                group["Category"].str.lower() == "total for income",
+                group["Category"].str.contains("total for income", case=False, na=False),
                 "Amount"
             ].sum()
     
             total_expenses = group.loc[
-                group["Category"].str.lower() == "total for expenses",
+                group["Category"].str.contains("total for expenses", case=False, na=False),
                 "Amount"
             ].sum()
     
@@ -695,20 +695,22 @@ def main():
         st.divider()
     
         # ============================================================
-        # TOP 5 INCOME (YOUR ORIGINAL LOGIC — FIXED & RESTORED)
+        # TOP 5 INCOME (SAFE, BULLETPROOF, ORIGINAL LOGIC)
         # ============================================================
     
         st.markdown("### 💰 Top 5 Income Categories (Per Year)")
     
-        # Find the row index of "Total for Income"
-        income_end_idx = df_raw.index[df_raw["Category"].str.lower() == "total for income"]
+        # Find the row index of the income subtotal
+        income_end_idx = df_raw.index[
+            df_raw["Category"].str.contains("total for income", case=False, na=False)
+        ]
     
         if len(income_end_idx) > 0:
             income_end_idx = income_end_idx[0]
         else:
-            income_end_idx = 0  # fallback
+            income_end_idx = len(df_raw)  # fallback: treat entire sheet as income
     
-        # Income rows = everything ABOVE "Total for Income"
+        # Income rows = everything ABOVE the subtotal
         income_section = df_raw.iloc[:income_end_idx]
     
         # Group by Category + Year
@@ -740,14 +742,18 @@ def main():
         st.divider()
     
         # ============================================================
-        # TOP 5 EXPENSES (YOUR ORIGINAL LOGIC — FIXED & RESTORED)
+        # TOP 5 EXPENSES (SAFE, BULLETPROOF, ORIGINAL LOGIC)
         # ============================================================
     
         st.markdown("### 📉 Top 5 Expense Categories (Per Year)")
     
-        # Find the row index of "Total for Income" and "Total for Expenses"
-        income_end_idx = df_raw.index[df_raw["Category"].str.lower() == "total for income"]
-        expense_end_idx = df_raw.index[df_raw["Category"].str.lower() == "total for expenses"]
+        # Find the row index of income subtotal and expense subtotal
+        income_end_idx = df_raw.index[
+            df_raw["Category"].str.contains("total for income", case=False, na=False)
+        ]
+        expense_end_idx = df_raw.index[
+            df_raw["Category"].str.contains("total for expenses", case=False, na=False)
+        ]
     
         if len(income_end_idx) > 0:
             income_end_idx = income_end_idx[0]
@@ -759,12 +765,12 @@ def main():
         else:
             expense_end_idx = len(df_raw)
     
-        # Expense rows = between Total for Income and Total for Expenses
+        # Expense rows = between the two subtotals
         expense_section = df_raw.iloc[income_end_idx + 1 : expense_end_idx]
     
         # Remove depreciation
         expense_section = expense_section[
-            expense_section["Category"] != "Depreciation Expense"
+            expense_section["Category"].str.contains("depreciation", case=False, na=False) == False
         ]
     
         # Group by Category + Year
@@ -794,7 +800,7 @@ def main():
         st.dataframe(top_expense_pivot, use_container_width=True)
     
         st.divider()
-        
+           
     # -----------------------------------------------------
     # TAB 2 — CLEAN YOY SUMMARY
     # -----------------------------------------------------
