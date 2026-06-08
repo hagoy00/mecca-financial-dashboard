@@ -652,9 +652,9 @@ def main():
             summary_rows.append(["Payroll", year, payroll])
             summary_rows.append(["Utilities", year, utilities])
     
-        # -----------------------------
-        # BUILD PIVOT *AFTER* THE LOOP
-        # -----------------------------
+        # -----------------------------------------
+        # BUILD THE TABLE *AFTER* THE LOOP
+        # -----------------------------------------
         summary_df = pd.DataFrame(summary_rows, columns=["Category", "Year", "Amount"])
     
         # Clean categories
@@ -676,6 +676,15 @@ def main():
             .apply(lambda x: f"{x:,}")
         )
     
+        # Show the FIRST TABLE (now correct)
+        st.markdown("### 📘 Main Financial Summary (Raw Table)")
+        st.dataframe(summary_df, use_container_width=True)
+    
+        st.divider()
+    
+        # -----------------------------------------
+        # BUILD THE PIVOT
+        # -----------------------------------------
         summary_pivot = summary_df.pivot_table(
             index="Category",
             columns="Year",
@@ -685,7 +694,6 @@ def main():
     
         summary_pivot.index.name = None
     
-        # Clean pivot index
         summary_pivot.index = (
             pd.Series(summary_pivot.index)
             .astype(str)
@@ -694,12 +702,10 @@ def main():
             .fillna("Missing_Category")
         )
     
-        st.markdown("### 📘 Main Financial Summary")
+        st.markdown("### 📘 Main Financial Summary (Pivot View)")
         st.dataframe(summary_pivot, use_container_width=True)
     
         st.divider()
-
-    
     
         # -----------------------------------------------------
         # TOP 5 INCOME PIVOT
