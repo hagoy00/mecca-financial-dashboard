@@ -692,7 +692,7 @@ def main():
             aggfunc="first"
         ).fillna("0")
     
-        summary_pivot.index.name = None
+        summary_pivot.index.name = "Category"
     
         summary_pivot.index = (
             pd.Series(summary_pivot.index)
