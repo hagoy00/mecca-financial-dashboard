@@ -503,20 +503,20 @@ def generate_pdf(subtotals, year):
         ("GRID", (0, 0), (-1, -1), 0.25, colors.grey),
     ])
 
-    table.setStyle(TableStyle([
-    ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),   # Header bold
-    ("FONTSIZE", (0, 0), (-1, 0), 30),                 # Header size
-
-    ("FONTNAME", (0, 1), (-1, -1), "Helvetica"),       # Body font
-    ("FONTSIZE", (0, 1), (-1, -1), 30),                # Body size
-
-    ("TEXTCOLOR", (0, 0), (-1, -1), colors.black),
-    ("ALIGN", (0, 0), (-1, -1), "LEFT"),
-    ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-
-    ("BOTTOMPADDING", (0, 0), (-1, -1), 10),
-    ("TOPPADDING", (0, 0), (-1, -1), 10),
-]))
+        table.setStyle(TableStyle([
+        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),   # Header bold
+        ("FONTSIZE", (0, 0), (-1, 0), 30),                 # Header size
+    
+        ("FONTNAME", (0, 1), (-1, -1), "Helvetica"),       # Body font
+        ("FONTSIZE", (0, 1), (-1, -1), 30),                # Body size
+    
+        ("TEXTCOLOR", (0, 0), (-1, -1), colors.black),
+        ("ALIGN", (0, 0), (-1, -1), "LEFT"),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+    
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 10),
+        ("TOPPADDING", (0, 0), (-1, -1), 10),
+    ]))
 ###table.setStyle(TableStyle([
     ("FONTNAME", (0, 0), (-1, -1), "Helvetica-Bold"),
     ("FONTSIZE", (0, 0), (-1, -1), 42),   # ← bigger font
