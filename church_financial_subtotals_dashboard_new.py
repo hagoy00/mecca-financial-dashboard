@@ -779,8 +779,10 @@ def main():
     # TAB 2 — CLEAN YOY SUMMARY
     # -----------------------------------------------------
     with tab2:
-        st.markdown("**Prepared by: Yemane Tadesse Hagos**")
-        st.subheader("📘 Year‑Over‑Year (YOY) Summary")
+        st.markdown(
+            "<p style='color:#3F51B5; font-weight:700;'>Prepared by: Yemane T. Hagos</p>",
+            unsafe_allow_html=True
+        )        st.subheader("📘 Year‑Over‑Year (YOY) Summary")
     
         TARGET_ORDER = [
             "Total_Revenue",
@@ -832,8 +834,10 @@ def main():
     # TAB 3 — TOP INCOME & EXPENSES (FORECASTING)
     # -----------------------------------------------------
     with tab_top:
-        st.markdown("**Prepared by: Yemane Tadesse Hagos**")
-        st.subheader("Top Income & Top Expenses")
+        st.markdown(
+            "<p style='color:#3F51B5; font-weight:700;'>Prepared by: Yemane T. Hagos</p>",
+            unsafe_allow_html=True
+        )        st.subheader("Top Income & Top Expenses")
     
         # RAW numeric data (all years) — use df_raw
         raw_top_income = get_top_income(df_raw)
@@ -928,8 +932,10 @@ def main():
     # TAB 4 — SURPLUS / DEFICIT (FINAL WITH COMMAS)
     # -----------------------------------------------------
     with tab3:
-        st.markdown("**Prepared by: Yemane Tadesse Hagos**")
-      
+        st.markdown(
+            "<p style='color:#3F51B5; font-weight:700;'>Prepared by: Yemane T. Hagos</p>",
+            unsafe_allow_html=True
+        )      
         st.subheader("📉 Surplus / Deficit Summary")
     
         df_sd = surplus_df.copy()
@@ -1084,8 +1090,10 @@ def main():
     # TAB 5 — FORECASTING (FINAL FIXED VERSION)
     # -----------------------------------------------------
     with tab4:
-        st.markdown("**Prepared by: Yemane Tadesse Hagos**")
-        st.subheader("📈 Forecasting Through 2030")
+        st.markdown(
+            "<p style='color:#3F51B5; font-weight:700;'>Prepared by: Yemane T. Hagos</p>",
+            unsafe_allow_html=True
+        )        st.subheader("📈 Forecasting Through 2030")
     
         FORECAST_TARGETS = [
             "Total_Revenue",
@@ -1137,8 +1145,10 @@ def main():
     # TAB 6 — BOARD PDF
     # -----------------------------------------------------
     with tab_pdf:
-        st.markdown("**Prepared by: Yemane Tadesse Hagos**")
-        st.subheader("Board PDF Report")
+        st.markdown(
+            "<p style='color:#3F51B5; font-weight:700;'>Prepared by: Yemane T. Hagos</p>",
+            unsafe_allow_html=True
+        )        st.subheader("Board PDF Report")
 
         year_for_pdf = st.selectbox("Select Year for PDF", years)
 
