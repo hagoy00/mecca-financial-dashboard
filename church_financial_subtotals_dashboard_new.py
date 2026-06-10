@@ -622,9 +622,10 @@ def main():
     with tab1:
     
         st.markdown(
-            "<p style='color:#2196F3; font-weight:700;'>Prepared by: Yemane T. Hagos</p>",
+            "<p style='color:#3F51B5; font-weight:700;'>Prepared by: Yemane T. Hagos</p>",
             unsafe_allow_html=True
         )
+
 
         # -----------------------------------------
         # BUILD SUMMARY ROWS
