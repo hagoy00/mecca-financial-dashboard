@@ -489,7 +489,7 @@ def generate_pdf(subtotals, year):
     title_style = ParagraphStyle(
         name="Title",
         fontName="Helvetica-Bold",
-        fontSize=26,
+        fontSize=20,
         alignment=1,  # center
         textColor=colors.HexColor("#1E90FF")
     )
