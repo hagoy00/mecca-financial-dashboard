@@ -31,7 +31,7 @@ import streamlit as st
 # ---------------------------------------------------------
 st.set_page_config(
     page_title="📊 Mekane Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard
-    --->>>Prepared by Yemane Tadesse Hagos",layout="wide"
+    ,layout="wide"
 )
 
 # ---------------------------------------------------------
@@ -80,8 +80,7 @@ header[data-testid="stHeader"] {
 </style>
 
 <div id="outside-sticky-title">
-    📊 Mekane Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard---->>>> Prepared by Yemane Tadesse Hagos
-</div>
+    📊 Mekane Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard </div>
 """, unsafe_allow_html=True)
 
 # ---------------------------------------------------------
