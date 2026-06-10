@@ -505,10 +505,10 @@ def generate_pdf(subtotals, year):
 
     table.setStyle(TableStyle([
         ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),   # Header bold
-        ("FONTSIZE", (0, 0), (-1, 0), 30),                 # Header size
+        ("FONTSIZE", (0, 0), (-1, 0), 40),                 # Header size
     
         ("FONTNAME", (0, 1), (-1, -1), "Helvetica"),       # Body font
-        ("FONTSIZE", (0, 1), (-1, -1), 32),                # Body size
+        ("FONTSIZE", (0, 1), (-1, -1), 42),                # Body size
     
         ("TEXTCOLOR", (0, 0), (-1, -1), colors.black),
         ("ALIGN", (0, 0), (-1, -1), "LEFT"),
