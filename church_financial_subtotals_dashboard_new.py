@@ -85,7 +85,12 @@ st.markdown("""
 # Sticky Title
 st.markdown("""
 <div id="outside-sticky-title">
-    📊 Mekane Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard</div>
+    📊 Mekane Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard
+    <br>
+    <span style="font-size:20px; color:#5A4FCF;">
+        Prepared by <b>Yemane Tadesse Hagos</b>
+    </span>
+</div>
 """, unsafe_allow_html=True)
 
 # Sticky Prepared By
