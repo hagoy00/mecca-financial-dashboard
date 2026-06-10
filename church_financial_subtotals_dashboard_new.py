@@ -509,7 +509,7 @@ def generate_pdf(subtotals, year):
         ("FONTSIZE", (0, 0), (-1, 0), 40),                 # Header size
     
         ("FONTNAME", (0, 1), (-1, -1), "Helvetica"),       # Body font
-        ("FONTSIZE", (0, 1), (-1, -1), 42),                # Body size
+        ("FONTSIZE", (0, 1), (-1, -1), 30),                # Body size
     
         ("TEXTCOLOR", (0, 0), (-1, -1), colors.black),
         ("ALIGN", (0, 0), (-1, -1), "LEFT"),
