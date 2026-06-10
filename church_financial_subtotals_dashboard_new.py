@@ -502,8 +502,9 @@ def generate_pdf(subtotals, year):
         ("FONTSIZE", (0, 0), (-1, -1), 9),
         ("GRID", (0, 0), (-1, -1), 0.25, colors.grey),
     ])
-
-    table.setStyle(TableStyle([
+    
+        # Create the base style
+    style = TableStyle([
         ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),   # Header bold
         ("FONTSIZE", (0, 0), (-1, 0), 40),                 # Header size
     
@@ -516,16 +517,19 @@ def generate_pdf(subtotals, year):
     
         ("BOTTOMPADDING", (0, 0), (-1, -1), 10),
         ("TOPPADDING", (0, 0), (-1, -1), 10),
-    ]))
-
+    ])
+    
+    # Apply subtotal formatting
     for i, row in enumerate(df_year.itertuples(), start=1):
         if str(row.Category).lower().startswith("total for "):
             style.add("BACKGROUND", (0, i), (-1, i), colors.HexColor("#f0f0f0"))
             style.add("FONTNAME", (0, i), (-1, i), "Helvetica-Bold")
-
+            style.add("FONTSIZE", (0, i), (-1, i), 44)   # Bigger subtotal font
+    
+    # Apply the FINAL merged style ONCE
     table.setStyle(style)
+    
     story.append(table)
-
     doc.build(story)
     buffer.seek(0)
     return buffer
