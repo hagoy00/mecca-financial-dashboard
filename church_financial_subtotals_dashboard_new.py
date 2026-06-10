@@ -30,9 +30,10 @@ import streamlit as st
 # PAGE CONFIG - MUST BE FIRST
 # ---------------------------------------------------------
 st.set_page_config(
-    page_title="📊 Mekane Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard,
+    page_title="📊 Mekane Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard",
     layout="wide"
 )
+
 
 # ---------------------------------------------------------
 # FIX STREAMLIT CONTAINER SO STICKY WORKS
