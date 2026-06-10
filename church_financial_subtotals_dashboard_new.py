@@ -33,23 +33,6 @@ st.set_page_config(
     page_title="📊 Mekane Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard",
     layout="wide"
 )
-# ---------------------------------------------------------
-# FIX STREAMLIT CONTAINER SO STICKY WORKS
-# ---------------------------------------------------------
-st.markdown("""
-<style>
-.main .block-container {
-    overflow: visible !important;
-}
-</style>
-""", unsafe_allow_html=True)
-# ---------------------------------------------------------
-# PAGE CONFIG - MUST BE FIRST
-# ---------------------------------------------------------
-st.set_page_config(
-    page_title="📊 Mekane Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard",
-    layout="wide"
-)
 
 # ---------------------------------------------------------
 # FIX STREAMLIT CONTAINER SO STICKY WORKS
@@ -101,7 +84,7 @@ st.markdown("""
 # Sticky Title
 st.markdown("""
 <div id="outside-sticky-title">
-    📊 Mekane Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard
+    📊 Mekane Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard- Prepared by Yemane Tadesse Hagos
 </div>
 """, unsafe_allow_html=True)
 
