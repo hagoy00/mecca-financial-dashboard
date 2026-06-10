@@ -93,12 +93,6 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# Sticky Prepared By
-st.markdown("""
-<div id="prepared-by">
-    Prepared by <b>Yemane Tadesse Hagos</b>
-</div>
-""", unsafe_allow_html=True)
 
 # ---------------------------------------------------------
 # FIXED TOP TITLE + LAYOUT CONTROL
