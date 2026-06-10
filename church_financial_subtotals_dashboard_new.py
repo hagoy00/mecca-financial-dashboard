@@ -33,6 +33,56 @@ st.set_page_config(
     page_title="📊 Mekane Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard",
     layout="wide"
 )
+# ---------------------------------------------------------
+# PAGE CONFIG - MUST BE FIRST
+# ---------------------------------------------------------
+st.set_page_config(
+    page_title="📊 Mekane Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard",
+    layout="wide"
+)
+
+# ---------------------------------------------------------
+# STICKY TITLE + PREPARED BY (PASTE HERE)
+# ---------------------------------------------------------
+st.markdown("""
+<style>
+/* Sticky Title */
+#outside-sticky-title {
+    position: sticky;
+    top: 0;
+    background-color: white;
+    padding: 12px 0;
+    font-size: 32px;
+    font-weight: bold;
+    z-index: 999;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+/* Sticky Prepared By */
+#prepared-by {
+    position: sticky;
+    top: 55px;   /* sits right under the title */
+    background-color: white;
+    padding: 6px 0;
+    font-size: 20px;
+    color: #444;
+    z-index: 998;
+    border-bottom: 1px solid #ddd;
+}
+</style>
+""", unsafe_allow_html=True)
+
+st.markdown("""
+<div id="outside-sticky-title">
+    📊 Mekane Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard
+</div>
+""", unsafe_allow_html=True)
+
+st.markdown("""
+<div id="prepared-by">
+    Prepared by <b>Yemane Tadesse Hagos</b>
+</div>
+""", unsafe_allow_html=True)
 
 
 # ---------------------------------------------------------
