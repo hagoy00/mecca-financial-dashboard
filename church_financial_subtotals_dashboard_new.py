@@ -79,6 +79,8 @@ header[data-testid="stHeader"] {
     margin-top: 0 !important;
 }
 </style>
+""", unsafe_allow_html=True)
+
 st.markdown("""
 <div id="outside-sticky-title">
     📊 Mekane Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard
