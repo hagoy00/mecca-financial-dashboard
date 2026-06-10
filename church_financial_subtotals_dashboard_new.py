@@ -480,60 +480,95 @@ def get_top_expense(df, n=5):
 def generate_pdf(subtotals, year):
     buffer = BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=letter)
-    styles = getSampleStyleSheet()
     story = []
 
-    title = Paragraph(f"<b>MSMAEOC Financial Subtotals Report – {year}</b>", styles["Title"])
+    # -----------------------------
+    # Title
+    # -----------------------------
+    title_style = ParagraphStyle(
+        name="Title",
+        fontName="Helvetica-Bold",
+        fontSize=26,
+        alignment=1,  # center
+        textColor=colors.HexColor("#1E90FF")
+    )
+    title = Paragraph(f"MSMAEOC Financial Subtotals Report – {year}", title_style)
     story.append(title)
-    story.append(Spacer(1, 12))
+    story.append(Spacer(1, 18))
 
+    # -----------------------------
+    # Filter data
+    # -----------------------------
     df_year = subtotals[subtotals["Year"] == year].copy()
     df_year = df_year[["Category", "Amount"]]
 
-    table_data = [["Category", "Amount"]]
+    # -----------------------------
+    # REAL font control (ParagraphStyle)
+    # -----------------------------
+    normal_style = ParagraphStyle(
+        name="Normal",
+        fontName="Helvetica",
+        fontSize=18,   # REAL font size
+        leading=22     # Prevents overlapping
+    )
+
+    # -----------------------------
+    # Build table data with Paragraphs
+    # -----------------------------
+    table_data = [
+        [
+            Paragraph("<b>Category</b>", normal_style),
+            Paragraph("<b>Amount</b>", normal_style)
+        ]
+    ]
+
     for _, row in df_year.iterrows():
-        table_data.append([row["Category"], f"${row['Amount']:,.0f}"])
+        table_data.append([
+            Paragraph(str(row["Category"]), normal_style),
+            Paragraph(f"${row['Amount']:,.0f}", normal_style)
+        ])
+
     table = Table(table_data, colWidths=[300, 150])
+
+    # -----------------------------
+    # Base Table Style
+    # -----------------------------
     style = TableStyle([
         ("BACKGROUND", (0, 0), (-1, 0), colors.lightgrey),
-        ("TEXTCOLOR", (0, 0), (-1, 0), colors.black),
-        ("ALIGN", (1, 1), (-1, -1), "RIGHT"),
         ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-        ("FONTSIZE", (0, 0), (-1, -1), 9),
+        ("FONTSIZE", (0, 0), (-1, 0), 22),   # Header size
+
+        ("FONTNAME", (0, 1), (-1, -1), "Helvetica"),
+        ("FONTSIZE", (0, 1), (-1, -1), 22),  # Body size
+
+        ("TEXTCOLOR", (0, 0), (-1, -1), colors.black),
+        ("ALIGN", (1, 1), (-1, -1), "RIGHT"),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 12),
+        ("TOPPADDING", (0, 0), (-1, -1), 12),
+
         ("GRID", (0, 0), (-1, -1), 0.25, colors.grey),
     ])
-    
-        # Create the base style
-    style = TableStyle([
-        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),   # Header bold
-        ("FONTSIZE", (0, 0), (-1, 0), 30),                 # Header size
-    
-        ("FONTNAME", (0, 1), (-1, -1), "Helvetica"),       # Body font
-        ("FONTSIZE", (0, 1), (-1, -1), 26),                # Body size
-    
-        ("TEXTCOLOR", (0, 0), (-1, -1), colors.black),
-        ("ALIGN", (0, 0), (-1, -1), "LEFT"),
-        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-    
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 10),
-        ("TOPPADDING", (0, 0), (-1, -1), 10),
-    ])
-    
-    # Apply subtotal formatting
+
+    # -----------------------------
+    # Subtotal Formatting
+    # -----------------------------
     for i, row in enumerate(df_year.itertuples(), start=1):
         if str(row.Category).lower().startswith("total for "):
             style.add("BACKGROUND", (0, i), (-1, i), colors.HexColor("#f0f0f0"))
             style.add("FONTNAME", (0, i), (-1, i), "Helvetica-Bold")
-            style.add("FONTSIZE", (0, i), (-1, i), 44)   # Bigger subtotal font
-    
-    # Apply the FINAL merged style ONCE
+            style.add("FONTSIZE", (0, i), (-1, i), 20)
+
+    # -----------------------------
+    # Apply final style ONCE
+    # -----------------------------
     table.setStyle(style)
-    
+
     story.append(table)
     doc.build(story)
     buffer.seek(0)
     return buffer
-
 
 # ---------------------------------------------------------
 # STYLING HELPERS
