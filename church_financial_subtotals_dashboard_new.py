@@ -33,7 +33,10 @@ st.set_page_config(
     page_title="📊 Mekane Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard",
     layout="wide"
 )
-
+st.markdown(
+            "<p style='color:#3F51B5; font-weight:700;'>Prepared by: Yemane T. Hagos</p>",
+            unsafe_allow_html=True
+        )
 # ---------------------------------------------------------
 # FIXED TOP TITLE + LAYOUT CONTROL
 # ---------------------------------------------------------
