@@ -78,11 +78,10 @@ header[data-testid="stHeader"] {
     margin-top: 0 !important;
 }
 </style>
-
+st.markdown("""
 <div id="outside-sticky-title">
-    📊 Mekane Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard </div>
-""", unsafe_allow_html=True)
-
+    📊 Mekane Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard
+</div> """, unsafe_allow_html=True)
 # ---------------------------------------------------------
 # GLOBAL FONT OVERRIDE
 # ---------------------------------------------------------
