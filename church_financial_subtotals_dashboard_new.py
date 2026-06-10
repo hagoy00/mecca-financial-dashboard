@@ -653,6 +653,18 @@ def main():
             "<p style='color:#3F51B5; font-weight:700;'>Prepared by: Yemane T. Hagos</p>",
             unsafe_allow_html=True
         )
+        st.markdown("""
+        <style>
+        .prepared-by {
+            font-size: 18px;
+            color: #555;
+            margin-top: 20px;
+            padding-top: 10px;
+            border-top: 1px solid #ddd;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+
     #-----------------------------------------------
     # Tabs
     #-----------------------------------------------
