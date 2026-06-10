@@ -34,6 +34,17 @@ st.set_page_config(
     layout="wide"
 )
 # ---------------------------------------------------------
+# FIX STREAMLIT CONTAINER SO STICKY WORKS
+# ---------------------------------------------------------
+st.markdown("""
+<style>
+.main .block-container {
+    overflow: visible !important;
+}
+</style>
+""", unsafe_allow_html=True)
+
+# ---------------------------------------------------------
 # PAGE CONFIG - MUST BE FIRST
 # ---------------------------------------------------------
 st.set_page_config(
@@ -55,7 +66,7 @@ st.markdown("""
     padding: 12px 0;
     font-size: 32px;
     font-weight: bold;
-    color: #5A4FCF;  /* Purple-blue */
+    color: #5A4FCF;
     z-index: 999;
     border-bottom: 3px solid #5A4FCF;
     text-align: center;
@@ -64,13 +75,13 @@ st.markdown("""
 /* Sticky Prepared By */
 #prepared-by {
     position: sticky;
-    top: 60px;   /* sits right under the title */
+    top: 60px;
     background-color: white;
     padding: 6px 0;
     font-size: 20px;
-    color: #5A4FCF;  /* Purple-blue */
+    color: #5A4FCF;
     z-index: 998;
-    border-bottom: 2px solid #D6D2FF;  /* Light purple accent */
+    border-bottom: 2px solid #D6D2FF;
     text-align: center;
 }
 
