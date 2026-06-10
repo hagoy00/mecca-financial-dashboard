@@ -504,28 +504,28 @@ def generate_pdf(subtotals, year):
     ])
 
         table.setStyle(TableStyle([
-        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),   # Header bold
-        ("FONTSIZE", (0, 0), (-1, 0), 30),                 # Header size
-    
-        ("FONTNAME", (0, 1), (-1, -1), "Helvetica"),       # Body font
-        ("FONTSIZE", (0, 1), (-1, -1), 30),                # Body size
-    
+            ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),   # Header bold
+            ("FONTSIZE", (0, 0), (-1, 0), 30),                 # Header size
+        
+            ("FONTNAME", (0, 1), (-1, -1), "Helvetica"),       # Body font
+            ("FONTSIZE", (0, 1), (-1, -1), 30),                # Body size
+        
+            ("TEXTCOLOR", (0, 0), (-1, -1), colors.black),
+            ("ALIGN", (0, 0), (-1, -1), "LEFT"),
+            ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+        
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 10),
+            ("TOPPADDING", (0, 0), (-1, -1), 10),
+        ]))
+    ###table.setStyle(TableStyle([
+        ("FONTNAME", (0, 0), (-1, -1), "Helvetica-Bold"),
+        ("FONTSIZE", (0, 0), (-1, -1), 42),   # ← bigger font
         ("TEXTCOLOR", (0, 0), (-1, -1), colors.black),
         ("ALIGN", (0, 0), (-1, -1), "LEFT"),
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-    
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 10),
-        ("TOPPADDING", (0, 0), (-1, -1), 10),
-    ]))
-###table.setStyle(TableStyle([
-    ("FONTNAME", (0, 0), (-1, -1), "Helvetica-Bold"),
-    ("FONTSIZE", (0, 0), (-1, -1), 42),   # ← bigger font
-    ("TEXTCOLOR", (0, 0), (-1, -1), colors.black),
-    ("ALIGN", (0, 0), (-1, -1), "LEFT"),
-    ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-    ("BOTTOMPADDING", (0, 0), (-1, -1), 8),
-    ("TOPPADDING", (0, 0), (-1, -1), 8),
-]))####
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 8),
+        ("TOPPADDING", (0, 0), (-1, -1), 8),
+    ]))####
 
     for i, row in enumerate(df_year.itertuples(), start=1):
         if str(row.Category).lower().startswith("total for "):
