@@ -782,7 +782,8 @@ def main():
         st.markdown(
             "<p style='color:#3F51B5; font-weight:700;'>Prepared by: Yemane T. Hagos</p>",
             unsafe_allow_html=True
-        )        st.subheader("📘 Year‑Over‑Year (YOY) Summary")
+        )        
+        st.subheader("📘 Year‑Over‑Year (YOY) Summary")
     
         TARGET_ORDER = [
             "Total_Revenue",
@@ -837,7 +838,8 @@ def main():
         st.markdown(
             "<p style='color:#3F51B5; font-weight:700;'>Prepared by: Yemane T. Hagos</p>",
             unsafe_allow_html=True
-        )        st.subheader("Top Income & Top Expenses")
+        )        
+        st.subheader("Top Income & Top Expenses")
     
         # RAW numeric data (all years) — use df_raw
         raw_top_income = get_top_income(df_raw)
@@ -1093,7 +1095,8 @@ def main():
         st.markdown(
             "<p style='color:#3F51B5; font-weight:700;'>Prepared by: Yemane T. Hagos</p>",
             unsafe_allow_html=True
-        )        st.subheader("📈 Forecasting Through 2030")
+        )        
+        st.subheader("📈 Forecasting Through 2030")
     
         FORECAST_TARGETS = [
             "Total_Revenue",
@@ -1148,7 +1151,8 @@ def main():
         st.markdown(
             "<p style='color:#3F51B5; font-weight:700;'>Prepared by: Yemane T. Hagos</p>",
             unsafe_allow_html=True
-        )        st.subheader("Board PDF Report")
+        )        
+        st.subheader("Board PDF Report")
 
         year_for_pdf = st.selectbox("Select Year for PDF", years)
 
