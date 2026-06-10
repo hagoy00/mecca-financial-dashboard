@@ -30,9 +30,10 @@ import streamlit as st
 # PAGE CONFIG - MUST BE FIRST
 # ---------------------------------------------------------
 st.set_page_config(
-    page_title="📊 Mekane Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard
-    ,layout="wide"
+    page_title="📊 Mekane Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard",
+    layout="wide"
 )
+
 
 # ---------------------------------------------------------
 # FIXED TOP TITLE + LAYOUT CONTROL
