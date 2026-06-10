@@ -5,6 +5,7 @@ import altair as alt
 
 from io import BytesIO
 import os
+from reportlab.lib.styles import ParagraphStyle
 
 # -----------------------------------------------------
 # COLOR FUNCTION FOR SURPLUS / DEFICIT (FINAL VERSION)
