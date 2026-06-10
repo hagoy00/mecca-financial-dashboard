@@ -43,7 +43,6 @@ st.markdown("""
 }
 </style>
 """, unsafe_allow_html=True)
-
 # ---------------------------------------------------------
 # PAGE CONFIG - MUST BE FIRST
 # ---------------------------------------------------------
@@ -51,6 +50,17 @@ st.set_page_config(
     page_title="📊 Mekane Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard",
     layout="wide"
 )
+
+# ---------------------------------------------------------
+# FIX STREAMLIT CONTAINER SO STICKY WORKS
+# ---------------------------------------------------------
+st.markdown("""
+<style>
+.main .block-container {
+    overflow: visible !important;
+}
+</style>
+""", unsafe_allow_html=True)
 
 # ---------------------------------------------------------
 # STICKY TITLE + PREPARED BY (PURPLE-BLUE THEME)
@@ -88,12 +98,14 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+# Sticky Title
 st.markdown("""
 <div id="outside-sticky-title">
     📊 Mekane Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard
 </div>
 """, unsafe_allow_html=True)
 
+# Sticky Prepared By
 st.markdown("""
 <div id="prepared-by">
     Prepared by <b>Yemane Tadesse Hagos</b>
