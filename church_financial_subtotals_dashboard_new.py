@@ -42,10 +42,11 @@ st.set_page_config(
 )
 
 # ---------------------------------------------------------
-# STICKY TITLE + PREPARED BY (PASTE HERE)
+# STICKY TITLE + PREPARED BY (PURPLE-BLUE THEME)
 # ---------------------------------------------------------
 st.markdown("""
 <style>
+
 /* Sticky Title */
 #outside-sticky-title {
     position: sticky;
@@ -54,21 +55,25 @@ st.markdown("""
     padding: 12px 0;
     font-size: 32px;
     font-weight: bold;
+    color: #5A4FCF;  /* Purple-blue */
     z-index: 999;
-    border-bottom: 2px solid #e0e0e0;
+    border-bottom: 3px solid #5A4FCF;
+    text-align: center;
 }
 
 /* Sticky Prepared By */
 #prepared-by {
     position: sticky;
-    top: 55px;   /* sits right under the title */
+    top: 60px;   /* sits right under the title */
     background-color: white;
     padding: 6px 0;
     font-size: 20px;
-    color: #444;
+    color: #5A4FCF;  /* Purple-blue */
     z-index: 998;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 2px solid #D6D2FF;  /* Light purple accent */
+    text-align: center;
 }
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -83,7 +88,6 @@ st.markdown("""
     Prepared by <b>Yemane Tadesse Hagos</b>
 </div>
 """, unsafe_allow_html=True)
-
 
 # ---------------------------------------------------------
 # FIXED TOP TITLE + LAYOUT CONTROL
