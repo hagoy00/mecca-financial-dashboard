@@ -1152,7 +1152,7 @@ def main():
         filtered_styled = (
             filtered.style.format({
                 "Total_Revenue": "{:,.0f}",
-                "Total_Income": "{:,.0f}",
+        
                 "Total_Expenses": "{:,.0f}",
                 "Net_Income": "{:,.0f}",
                 "YoY_%": "{:.0f}%"
