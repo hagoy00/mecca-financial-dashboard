@@ -696,6 +696,10 @@ def main():
     # FIXED: Surplus/Deficit + Forecasts MUST use df_subtotals
     # ---------------------------------------------------------
     surplus_df = compute_surplus_deficit(df_subtotals)
+    
+    # Do NOT drop Total_Income here — backend needs it
+    # Only hide it when displaying tables
+    
     payroll_forecast = forecast_category(df_subtotals, "Payroll")
     utilities_forecast = forecast_category(df_subtotals, "Utilities")
 
