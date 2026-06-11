@@ -699,7 +699,7 @@ def main():
     
     # Hide Total_Income from UI
     if "Total_Income" in surplus_df.columns:
-        surplus_df = surplus_df.drop(columns=["Total_Income"])
+        #surplus_df = surplus_df.drop(columns=["Total_Income"])
     
     payroll_forecast = forecast_category(df_subtotals, "Payroll")
     utilities_forecast = forecast_category(df_subtotals, "Utilities")
