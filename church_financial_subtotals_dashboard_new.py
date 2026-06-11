@@ -451,8 +451,8 @@ def compute_surplus_deficit(subtotals):
     df = subtotals.copy()
 
     # Extract each subtotal category with unique column names
-    total_income = df[df["Category"] == "Total_Income"][["Year", "Amount"]]
-    total_income = total_income.rename(columns={"Amount": "Total_Income"})
+    #total_income = df[df["Category"] == "Total_Income"][["Year", "Amount"]]
+    #total_income = total_income.rename(columns={"Amount": "Total_Income"})
 
     total_expenses = df[df["Category"] == "Total_Expenses"][["Year", "Amount"]]
     total_expenses = total_expenses.rename(columns={"Amount": "Total_Expenses"})
@@ -1152,7 +1152,7 @@ def main():
         filtered_styled = (
             filtered.style.format({
                 "Total_Revenue": "{:,.0f}",
-        
+                "Total_Income": "{:,.0f}",
                 "Total_Expenses": "{:,.0f}",
                 "Net_Income": "{:,.0f}",
                 "YoY_%": "{:.0f}%"
