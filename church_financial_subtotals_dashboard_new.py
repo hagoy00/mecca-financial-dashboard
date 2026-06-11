@@ -18,13 +18,10 @@ def color_surplus(col):
         for v in col
     ]
 
-
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib import colors
-
-import streamlit as st
 
 # ---------------------------------------------------------
 # PAGE CONFIG - MUST BE FIRST
@@ -33,7 +30,6 @@ st.set_page_config(
     page_title="📊 Mekane Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard",
     layout="wide"
 )
-
 
 # ---------------------------------------------------------
 # FIX STREAMLIT CONTAINER SO STICKY WORKS
@@ -92,7 +88,6 @@ st.markdown("""
     </span>
 </div>
 """, unsafe_allow_html=True)
-
 
 # ---------------------------------------------------------
 # FIXED TOP TITLE + LAYOUT CONTROL
