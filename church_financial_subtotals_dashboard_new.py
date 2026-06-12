@@ -1151,7 +1151,7 @@ def main():
         # -----------------------------------------------------
         # SURPLUS / DEFICIT TABLE (CLEANED)
         # -----------------------------------------------------
-                st.markdown("### 📄 Detailed Surplus / Deficit Table")
+        st.markdown("### 📄 Detailed Surplus / Deficit Table")
         
         # Remove Total_Income from UI
         if "Total_Income" in filtered.columns:
