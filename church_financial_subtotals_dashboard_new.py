@@ -53,7 +53,7 @@ st.markdown("""
     position: sticky;
     top: 0;
     background-color: white;
-    padding: 12px 0;
+    padding: 18px 0;
     font-size: 38px;
     font-weight: bold;
     color: #5A4FCF;
