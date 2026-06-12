@@ -173,7 +173,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .stSlider, .stNumberInput, .stMetric {
-    font-size: 28px !important;
+    font-size: 30px !important;
 }
 </style>
 """, unsafe_allow_html=True)
