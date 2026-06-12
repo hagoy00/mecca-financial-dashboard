@@ -1149,10 +1149,19 @@ def main():
         """, unsafe_allow_html=True)
     
         # -----------------------------------------------------
-        # SURPLUS / DEFICIT TABLE
+        # SURPLUS / DEFICIT TABLE (CLEANED)
         # -----------------------------------------------------
-        st.markdown("### 📄 Detailed Surplus / Deficit Table")
-    
+                st.markdown("### 📄 Detailed Surplus / Deficit Table")
+        
+        # Remove Total_Income from UI
+        if "Total_Income" in filtered.columns:
+            filtered = filtered.drop(columns=["Total_Income"])
+        
+        # Fix floating‑point decimals
+        filtered["Net_Income"] = filtered["Net_Income"].round(0)
+        filtered["Total_Revenue"] = filtered["Total_Revenue"].round(0)
+        filtered["Total_Expenses"] = filtered["Total_Expenses"].round(0)
+        
         filtered_styled = (
             filtered.style.format({
                 "Total_Revenue": "{:,.0f}",
@@ -1162,8 +1171,9 @@ def main():
             })
             .apply(lambda s: ["color: green" if v > 0 else "color: red" for v in s], subset=["Net_Income"])
         )
-    
+        
         st.dataframe(filtered_styled, use_container_width=True)
+        
     
         # -----------------------------------------------------
         # 📊 SURPLUS / DEFICIT BAR CHART
