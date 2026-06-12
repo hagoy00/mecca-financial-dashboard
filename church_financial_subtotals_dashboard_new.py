@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import altair as alt
-
+import plotly.express as px
 from io import BytesIO
 import os
 from reportlab.lib.styles import ParagraphStyle
