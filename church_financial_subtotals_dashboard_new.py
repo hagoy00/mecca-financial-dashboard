@@ -689,23 +689,23 @@ def main():
         </style>
         """, unsafe_allow_html=True)
         
-        # Load full detailed data (multi-sheet Excel)
-        df_raw = load_data()
+    # Load full detailed data (multi-sheet Excel)
+    df_raw = load_data()
+
+    if df_raw.empty:
+        st.error("❌ No data loaded from Excel. Check sheet names and file path.")
+        st.stop()
     
-        if df_raw.empty:
-            st.error("❌ No data loaded from Excel. Check sheet names and file path.")
-            st.stop()
-        
-        # Extract subtotals (includes Source column)
-        df_subtotals = extract_subtotals(df_raw)
-        
-        if df_subtotals.empty:
-            st.error("❌ extract_subtotals() returned an empty DataFrame — cannot continue.")
-            st.stop()
+    # Extract subtotals (includes Source column)
+    df_subtotals = extract_subtotals(df_raw)
     
-        # Subtotals for YOY, Forecast, Surplus/Deficit
-        subtotals = df_subtotals
-        yoy_df = compute_yoy(df_subtotals)
+    if df_subtotals.empty:
+        st.error("❌ extract_subtotals() returned an empty DataFrame — cannot continue.")
+        st.stop()
+
+    # Subtotals for YOY, Forecast, Surplus/Deficit
+    subtotals = df_subtotals
+    yoy_df = compute_yoy(df_subtotals)
     
     # ---------------------------------------------------------
     # FIXED: Surplus/Deficit + Forecasts MUST use df_subtotals
