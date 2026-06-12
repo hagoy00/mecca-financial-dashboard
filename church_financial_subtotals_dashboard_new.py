@@ -1038,7 +1038,7 @@ def main():
     # TAB 4 — SURPLUS / DEFICIT (FINAL WITH COMMAS)
     # -----------------------------------------------------
     with tab3:
-            
+    
         st.subheader("📉 Surplus / Deficit Summary")
     
         df_sd = surplus_df.copy()
@@ -1087,7 +1087,7 @@ def main():
                 📌 Board Summary — {int(latest['Year'])}
             </h3>
             <p style="margin:6px 0 0 0; font-size:16px;">
-                <b>Total Income:</b> ${latest['Total_Income']:,.0f}<br>
+                <b>Total Revenue:</b> ${latest['Total_Revenue']:,.0f}<br>
                 <b>Total Expenses:</b> ${latest['Total_Expenses']:,.0f}<br>
                 <b>Net Income (Surplus/Deficit):</b>
                 <span style="color:{surplus_color}; font-weight:700;">
@@ -1101,17 +1101,17 @@ def main():
         st.markdown(board_html, unsafe_allow_html=True)
     
         # -----------------------------------------------------
-        # FINANCIAL HEALTH SCORE (CLEAN)
+        # FINANCIAL HEALTH SCORE
         # -----------------------------------------------------
         last3 = filtered.tail(3).copy()
     
-        margin = last3["Net_Income"].iloc[-1] / last3["Total_Income"].iloc[-1]
+        margin = last3["Net_Income"].iloc[-1] / last3["Total_Revenue"].iloc[-1]
         margin_score = max(0, min(1, margin)) * 40
     
         yoy = last3["Net_Income"].pct_change().iloc[-1]
         yoy_score = max(0, min(1, yoy)) * 30
     
-        efficiency = last3["Total_Expenses"].iloc[-1] / last3["Total_Income"].iloc[-1]
+        efficiency = last3["Total_Expenses"].iloc[-1] / last3["Total_Revenue"].iloc[-1]
         eff_score = (1 - max(0, min(1, efficiency))) * 20
     
         stability = 1 - (last3["Net_Income"].std() / abs(last3["Net_Income"].mean()))
@@ -1149,14 +1149,13 @@ def main():
         """, unsafe_allow_html=True)
     
         # -----------------------------------------------------
-        # SURPLUS / DEFICIT TABLE (WITH COMMAS)
+        # SURPLUS / DEFICIT TABLE
         # -----------------------------------------------------
         st.markdown("### 📄 Detailed Surplus / Deficit Table")
     
         filtered_styled = (
             filtered.style.format({
                 "Total_Revenue": "{:,.0f}",
-                "Total_Income": "{:,.0f}",
                 "Total_Expenses": "{:,.0f}",
                 "Net_Income": "{:,.0f}",
                 "YoY_%": "{:.0f}%"
@@ -1167,28 +1166,39 @@ def main():
         st.dataframe(filtered_styled, use_container_width=True)
     
         # -----------------------------------------------------
-        # SURPLUS / DEFICIT CHART
+        # 📊 SURPLUS / DEFICIT BAR CHART
         # -----------------------------------------------------
-        st.markdown("### 📈 Surplus / Deficit Trend (Net_Income)")
+        st.markdown("### 📊 Surplus / Deficit Trend (Net_Income)")
     
-        chart = (
-            alt.Chart(filtered)
-            .mark_line(point=True)
-            .encode(
-                x="Year:O",
-                y="Net_Income:Q",
-                color=alt.condition(
-                    alt.datum.Net_Income > 0,
-                    alt.value("green"),
-                    alt.value("red")
-                ),
-                tooltip=["Year", "Net_Income", "YoY_%"]
-            )
-            .properties(width=800, height=400)
+        filtered["Color"] = filtered["Net_Income"].apply(
+            lambda x: "green" if x >= 0 else "red"
         )
     
-        st.altair_chart(chart, use_container_width=True)
+        fig = px.bar(
+            filtered,
+            x="Year",
+            y="Net_Income",
+            color="Color",
+            color_discrete_map={"green": "green", "red": "red"},
+            text="Net_Income",
+            title="📊 Surplus / Deficit Trend (Net_Income)"
+        )
     
+        fig.update_traces(
+            texttemplate="%{text:,.0f}",
+            textposition="outside"
+        )
+    
+        fig.update_layout(
+            xaxis_title="Year",
+            yaxis_title="Net Income ($)",
+            showlegend=False,
+            height=450
+        )
+    
+        
+        st.plotly_chart(fig, use_container_width=True)
+
     # -----------------------------------------------------
     # TAB 5 — FORECASTING (FINAL FIXED VERSION)
     # -----------------------------------------------------
