@@ -83,7 +83,7 @@ st.markdown("""
 <div id="outside-sticky-title">
     📊 Mekane Selam Medhanialem Ethiopian Orthodox Church → Financial Dashboard
     <br>
-    <span style="font-size:20px; color:#5A4FCF;">
+    <span style="font-size:30px; color:#5A4FCF;">
         Prepared by <b>Yemane Tadesse Hagos</b>
     </span>
 </div>
