@@ -678,12 +678,12 @@ def main():
         <style>
         /* Increase font size inside all dataframes */
         .dataframe tbody td {
-            font-size: 60px !important;
+            font-size: 66px !important;
         }
         
         /* Increase header font size */
         .dataframe thead th {
-            font-size: 62px !important;
+            font-size: 50px !important;
             font-weight: bold !important;
         }
         </style>
