@@ -674,39 +674,39 @@ def forecast_totals(df_subtotals, category, end_year=2030):
 # Main 
 #-----------------------------------------------
 def main():
-st.markdown("""
-    <style>
-    /* Increase font size inside all dataframes */
-    .dataframe tbody td {
-        font-size: 20px !important;
-    }
+    st.markdown("""
+        <style>
+        /* Increase font size inside all dataframes */
+        .dataframe tbody td {
+            font-size: 20px !important;
+        }
+        
+        /* Increase header font size */
+        .dataframe thead th {
+            font-size: 22px !important;
+            font-weight: bold !important;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+        
+        # Load full detailed data (multi-sheet Excel)
+        df_raw = load_data()
     
-    /* Increase header font size */
-    .dataframe thead th {
-        font-size: 22px !important;
-        font-weight: bold !important;
-    }
-    </style>
-    """, unsafe_allow_html=True)
+        if df_raw.empty:
+            st.error("❌ No data loaded from Excel. Check sheet names and file path.")
+            st.stop()
+        
+        # Extract subtotals (includes Source column)
+        df_subtotals = extract_subtotals(df_raw)
+        
+        if df_subtotals.empty:
+            st.error("❌ extract_subtotals() returned an empty DataFrame — cannot continue.")
+            st.stop()
     
-    # Load full detailed data (multi-sheet Excel)
-    df_raw = load_data()
-
-    if df_raw.empty:
-        st.error("❌ No data loaded from Excel. Check sheet names and file path.")
-        st.stop()
+        # Subtotals for YOY, Forecast, Surplus/Deficit
+        subtotals = df_subtotals
+        yoy_df = compute_yoy(df_subtotals)
     
-    # Extract subtotals (includes Source column)
-    df_subtotals = extract_subtotals(df_raw)
-    
-    if df_subtotals.empty:
-        st.error("❌ extract_subtotals() returned an empty DataFrame — cannot continue.")
-        st.stop()
-
-    # Subtotals for YOY, Forecast, Surplus/Deficit
-    subtotals = df_subtotals
-    yoy_df = compute_yoy(df_subtotals)
-
     # ---------------------------------------------------------
     # FIXED: Surplus/Deficit + Forecasts MUST use df_subtotals
     # ---------------------------------------------------------
