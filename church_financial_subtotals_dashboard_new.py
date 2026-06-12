@@ -674,6 +674,21 @@ def forecast_totals(df_subtotals, category, end_year=2030):
 # Main 
 #-----------------------------------------------
 def main():
+st.markdown("""
+    <style>
+    /* Increase font size inside all dataframes */
+    .dataframe tbody td {
+        font-size: 20px !important;
+    }
+    
+    /* Increase header font size */
+    .dataframe thead th {
+        font-size: 22px !important;
+        font-weight: bold !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+    
     # Load full detailed data (multi-sheet Excel)
     df_raw = load_data()
 
