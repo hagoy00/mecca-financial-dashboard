@@ -678,7 +678,7 @@ def main():
         <style>
         /* Increase font size inside all dataframes */
         .dataframe tbody td {
-            font-size: 40px !important;
+            font-size: 50px !important;
         }
         
         /* Increase header font size */
