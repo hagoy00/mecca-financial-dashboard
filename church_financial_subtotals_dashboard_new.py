@@ -1174,7 +1174,6 @@ def main():
         
         st.dataframe(filtered_styled, use_container_width=True)
         
-    
         # -----------------------------------------------------
         # 📊 SURPLUS / DEFICIT BAR CHART
         # -----------------------------------------------------
@@ -1191,7 +1190,7 @@ def main():
             color="Color",
             color_discrete_map={"green": "green", "red": "red"},
             text="Net_Income",
-            title="📊 Surplus / Deficit Trend (Net_Income)"
+            #title="📊 Surplus / Deficit Trend (Net_Income)"
         )
     
         fig.update_traces(
@@ -1205,7 +1204,6 @@ def main():
             showlegend=False,
             height=450
         )
-    
         
         st.plotly_chart(fig, use_container_width=True)
 
