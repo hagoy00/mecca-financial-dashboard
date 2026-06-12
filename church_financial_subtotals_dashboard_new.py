@@ -147,7 +147,7 @@ st.markdown("""
 st.markdown("""
 <style>
 html, body, div, span, p, label {
-    font-size: 28px !important;
+    font-size: 30px !important;
 }
 
 h1, h2, h3, h4, h5, h6 {
